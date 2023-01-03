@@ -1,9 +1,13 @@
 package ToolsQA.generalStudentSystemGUI;
 
 import java.util.LinkedList;
+
+import javax.swing.*;
+
+import java.awt.Component;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
+import com.formdev.flatlaf.FlatDarkLaf;
 public class ClassCourse extends Course {
 	private int courseNum;
 	private LinkedList<Student> students;
@@ -17,13 +21,27 @@ public class ClassCourse extends Course {
 	private int period;
 	private double totalWeight=0.0;
 	
+	
+	private JButton baseDisplay;
+	private Hashtable<Student, JPanel> longUI;
+	private Hashtable<Student, JPanel> fullUI;
+	private Hashtable<Student, JPanel> shortUI;
+	
+	
+	
 	public ClassCourse(int n, Teacher t, String s, int p, Course c) {
 		super(c);
 		courseNum=n;
 		prof=t;
 		room=s;
 		period=p;
+		FlatDarkLaf.setup();
+		
+		baseDisplay = new JButton(this.getCode() + " - 0" + courseNum);
+		baseDisplay.setAlignmentX(Component.LEFT_ALIGNMENT);
+		baseDisplay.setSize(School.rect.width - 200, 250);
 	}
+	
 	
 	public void addStudent(Student s) {
 		students.add(s);
@@ -82,5 +100,9 @@ public class ClassCourse extends Course {
 	
 	public int getPeriod() {
 		return period;
+	}
+
+	public JButton getBaseDisplay() {
+		return baseDisplay;
 	}
 }

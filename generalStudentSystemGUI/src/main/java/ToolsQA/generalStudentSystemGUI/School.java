@@ -7,6 +7,9 @@ import java.awt.event.*;
 import java.util.LinkedList;
 
 public class School implements ActionListener, FocusListener {
+	
+	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
+	
 	static LinkedList<Student> students = new  LinkedList<Student>();
 	static LinkedList<Teacher> teachers = new  LinkedList<Teacher>();
 	static LinkedList<Course> courseOfferings = new  LinkedList<Course>();
@@ -27,7 +30,10 @@ public class School implements ActionListener, FocusListener {
 	static JFrame window;
 	static String adminPass = "123tester"; // hardcoded since database isn't finished
 	static JTextArea incorrect;
+	
+	static Teacher currProf;
 
+	
 	public void addStudent(Student s) {
 		students.add(s);
 	}
@@ -62,7 +68,8 @@ public class School implements ActionListener, FocusListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+		String a = e.getActionCommand();
+		
 		if (e.getSource() == tLogin) {
 
 			window.remove(loginChoice);
@@ -77,8 +84,23 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		} else if (e.getSource() == submitTeacherLogin) { // edit to check login credentials
-			if(teacherLogin()) {
+			Teacher loginner = teacherLogin();
+			if(loginner!=null) {
+				currProf = loginner;
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				window.remove(teacherLogin);
+				window.revalidate();
+				window.repaint();
+				window.setLayout(null);
+				
+				window.add(currProf.getHeader());
+				window.add(currProf.getSem1());
+				window.add(currProf.getSem2());
+				window.add(currProf.getCourses());
+				
+				window.revalidate();
+				window.repaint();
+				
 			}
 			else {
 				incorrect.setText("Login information incorrect");
@@ -99,6 +121,14 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		}
+		else if (e.getActionCommand().equals("Semester 2")) {
+			currProf.switchSem(2);
+			
+		}
+		else if (e.getActionCommand().equals("Semester 1")) {
+			currProf.switchSem(1);
+		}
+		
 
 	}
 
@@ -132,6 +162,7 @@ public class School implements ActionListener, FocusListener {
 		teacherLogin.setLayout(new BoxLayout(teacherLogin, BoxLayout.PAGE_AXIS));
 
 		JTextArea login = new JTextArea("Enter your login information in the boxes below");
+		login.setEditable(false);
 		lastName = new JTextField("Enter your last name here");
 		ID = new JTextField("Enter your 5-digit teacher ID here");
 		lastName.addFocusListener(new School());
@@ -163,6 +194,7 @@ public class School implements ActionListener, FocusListener {
 		teacherLogin.add(Box.createRigidArea(new Dimension(0, 20)));
 		
 		JTextArea pass = new JTextArea("Enter the school-assigned password to login");
+		pass.setEditable(false);
 		adminLogin = new JPanel();
 		adminLogin.setLayout(new BoxLayout(adminLogin, BoxLayout.PAGE_AXIS));
 		
@@ -219,27 +251,44 @@ public class School implements ActionListener, FocusListener {
 		} 
 	}
 	
-	public boolean teacherLogin() {
+	public Teacher teacherLogin() {
 		
 		// this is mainly for testing, you assume there's gonna be teachers via the UML
 		if(teachers.isEmpty()) {
-			return false;
+			return null;
 		}
 		
 		for (int i=0;i<teachers.size();i++) {
 			
+			
 			// checks if the inputted last name and id match the current teacher in the linked list
 			if (teachers.get(i).getLastName().equals(lastName.getText()) && String.valueOf(teachers.get(i).getID()).equals(ID.getText())) {
-				return true;
+				
+				return teachers.get(i);
 			}
 		}
 		
-		return false;
+		return null;
 		
 	}
 
 	public static void main(String[] args) {
+		
+		//test data
+		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
+		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "programming", new LinkedList<String>(), 5);
+		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
+		
+		mckay.addClass(ourClass, 1);
+		teachers.add(mckay);
+		
+		
+		
 		initialize();
+		
+		
+		
+		
 		
 	}
 

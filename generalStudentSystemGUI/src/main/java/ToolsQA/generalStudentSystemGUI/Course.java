@@ -9,6 +9,7 @@ public class Course {
 	private LinkedList<String> usableRooms;
 	private int priority;
 	
+	
 	public Course(String name, String code, String type, LinkedList<String> rooms, int priority) {
 		this.name = name;
 		this.code = code;
@@ -23,5 +24,9 @@ public class Course {
 		this.type = c.type;
 		this.usableRooms = new LinkedList<String>(c.usableRooms);
 		this.priority = c.priority;
+	}
+	
+	public String getCode() {
+		return code;
 	}
 }
