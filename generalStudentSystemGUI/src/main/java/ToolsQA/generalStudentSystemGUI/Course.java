@@ -29,4 +29,10 @@ public class Course {
 	public String getCode() {
 		return code;
 	}
+	public String getName() {
+		return name;
+	}
+	public String getType() {
+		return type;
+	}
 }

@@ -12,4 +12,16 @@ public class Attend {
 		minutesLate = m;
 		reason = s;
 	}
+	public boolean getPresent() {
+		return present;
+	}
+	public boolean getLate() {
+		return late;
+	}
+	public int getMinutesLate() {
+		return minutesLate;
+	}
+	public String getReason() {
+		return reason;
+	}
 }
