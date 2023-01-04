@@ -177,11 +177,14 @@ public class School implements ActionListener, FocusListener {
 			dashboard.remove(currClass.getTab());
 			dashboard.add(currClass.getDayChoice());
 			dashboard.add(currClass.getSubmitter());
-			dashboard.add(currClass.getTab());
+			dashboard.add(currClass.addDailys());
+			
+			window.add(dashboard);
+			
 			window.revalidate();
 			window.repaint();
 			
-			currClass.addDailys();
+			
 			
 			}
 		else if (e.getActionCommand().equals("Dashboard")) {
@@ -231,7 +234,8 @@ public class School implements ActionListener, FocusListener {
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-
+		
+		
 		loginChoice = new JPanel();
 		loginChoice.setLayout(new GridLayout(2, 1));
 
@@ -404,6 +408,21 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Lawrence", "Huang", 3));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Doris", "Zhang", 4));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Naheen", "Mahboob", 6));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Ahmed", "Sinjab", 7));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Calvin", "Cao", 9));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdul", "Ali", 11));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Trevor", "Bliss", 12));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Victor", "Reznov", 13));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Sofia", "Odegaard", 14));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Tanya", "Poulouchina", 15));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Minjae", "Kim", 16));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Mashrur", "Khandaker", 17));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Cason", "Cook", 18));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Nathan", "Killinger", 19));
+		
 		mckay.addClass(ourClass, 1);
 
 		teachers.add(mckay);
