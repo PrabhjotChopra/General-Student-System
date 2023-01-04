@@ -36,7 +36,7 @@ public class ClassCourse extends Course {
 	private JScrollPane pane;
 
 	JComboBox<String> dayChoice;
-	JButton submitter;
+	
 
 	// various menu jbuttons
 	private JButton main;
@@ -105,15 +105,12 @@ public class ClassCourse extends Course {
 			days[i] = "Day " + String.valueOf(i + 1);
 		}
 		dayChoice = new JComboBox<String>(days);
-		dayChoice.setBounds(600, 170, 100, 75);
+		dayChoice.setBounds(580, 170, 150, 75);
 		dayChoice.setFont(School.buttonFont);
+		dayChoice.setActionCommand("Day Choice");
+		dayChoice.addActionListener(new School());
 		
 		
-		
-		submitter = new JButton("Select day");
-		submitter.addActionListener(new School());
-		submitter.setBounds(710, 170, 150, 75);
-		submitter.setFont(School.buttonFont);
 
 		subAtt = new JButton("Submit Attendance");
 		subAtt.setBounds(950, 170, 300, 75);
@@ -366,7 +363,7 @@ public class ClassCourse extends Course {
 
 				}
 			} else {
-				setNull(students.get(i));
+				setPresent(students.get(i));
 			}
 
 		}
@@ -442,9 +439,7 @@ public class ClassCourse extends Course {
 		return pane;
 	}
 
-	public JButton getSubmitter() {
-		return submitter;
-	}
+
 
 	public LocalTime getStart() {
 		return start;

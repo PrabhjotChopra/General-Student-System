@@ -176,10 +176,11 @@ public class School implements ActionListener, FocusListener {
 		else if (e.getActionCommand().equals("Daily Attendance")) {
 			dashboard.remove(currClass.getTab());
 			dashboard.add(currClass.getDayChoice());
-			dashboard.add(currClass.getSubmitter());
-			dashboard.add(currClass.getSubAtt());
-			dashboard.add(currClass.addDailys());
 			
+			dashboard.add(currClass.getSubAtt());
+			
+			dashboard.add(currClass.addDailys());
+			currClass.changeAttDay();
 			window.add(dashboard);
 			
 			window.revalidate();
@@ -191,7 +192,7 @@ public class School implements ActionListener, FocusListener {
 		else if (e.getActionCommand().equals("Dashboard")) {
 			currClass.goDash();
 			dashboard.remove(currClass.getDayChoice());
-			dashboard.remove(currClass.getSubmitter());
+			
 			dashboard.remove(currClass.getSubAtt());
 			window.revalidate();
 			window.repaint();
@@ -220,7 +221,7 @@ public class School implements ActionListener, FocusListener {
 				}
 			}
 		}
-		else if(e.getActionCommand().equals("Select day")) {
+		else if(e.getActionCommand().equals("Day Choice")) {
 			currClass.changeAttDay();
 			
 		}
