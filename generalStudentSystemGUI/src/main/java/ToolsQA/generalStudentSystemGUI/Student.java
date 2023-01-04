@@ -73,12 +73,15 @@ public class Student {
 		minsLate.setFont(studentStandard);
 		minsLate.addFocusListener(new School());
 		minsLate.setFocusable(false);
-
+		
+		
+		
 		absentReason = new JTextField("Reason for absence");
 		absentReason.setFont(studentStandard);
 		absentReason.addFocusListener(new School());
 		absentReason.setFocusable(false);
-
+		
+		
 		daily.add(Box.createRigidArea(new Dimension(0, 5)));
 		daily.add(name);
 		daily.add(Box.createRigidArea(new Dimension(20, 0)));

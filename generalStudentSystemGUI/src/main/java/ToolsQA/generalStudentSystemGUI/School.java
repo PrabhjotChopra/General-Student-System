@@ -2,21 +2,21 @@ package ToolsQA.generalStudentSystemGUI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import javax.swing.*;
-import javax.swing.text.TabableView;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
 public class School implements ActionListener, FocusListener {
 
 	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-	public static LocalTime period1 = LocalTime.of(8, 15);
-	public static LocalTime period2 = LocalTime.of(9, 37);
-	public static LocalTime period3 = LocalTime.of(11, 58);
-	public static LocalTime period4 = LocalTime.of(1, 20);
+	public static LocalTime[] periodStarts = {LocalTime.of(8, 15), LocalTime.of(9, 37), LocalTime.of(11, 58), LocalTime.of(13, 20)};
 
 	public static Font buttonFont = new Font("Arial", 1, 20);
 	
@@ -177,6 +177,7 @@ public class School implements ActionListener, FocusListener {
 			dashboard.remove(currClass.getTab());
 			dashboard.add(currClass.getDayChoice());
 			dashboard.add(currClass.getSubmitter());
+			dashboard.add(currClass.getSubAtt());
 			dashboard.add(currClass.addDailys());
 			
 			window.add(dashboard);
@@ -191,6 +192,7 @@ public class School implements ActionListener, FocusListener {
 			currClass.goDash();
 			dashboard.remove(currClass.getDayChoice());
 			dashboard.remove(currClass.getSubmitter());
+			dashboard.remove(currClass.getSubAtt());
 			window.revalidate();
 			window.repaint();
 		}
@@ -222,8 +224,14 @@ public class School implements ActionListener, FocusListener {
 			currClass.changeAttDay();
 			
 		}
-
+		else if(e.getActionCommand().equals("Submit Attendance")) {
+			currClass.submitAttendance();
+		}
 	}
+
+	
+	
+	
 
 	public static void initialize() { // initializes login selection and login interface
 		FlatDarkLaf.setup();
@@ -430,5 +438,8 @@ public class School implements ActionListener, FocusListener {
 		initialize();
 
 	}
+
+	
+	
 
 }
