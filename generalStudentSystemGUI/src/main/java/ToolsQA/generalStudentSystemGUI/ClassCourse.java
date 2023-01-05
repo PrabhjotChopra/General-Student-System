@@ -36,7 +36,6 @@ public class ClassCourse extends Course {
 	private JScrollPane pane;
 
 	JComboBox<String> dayChoice;
-	
 
 	// various menu jbuttons
 	private JButton main;
@@ -109,11 +108,9 @@ public class ClassCourse extends Course {
 		dayChoice.setFont(School.buttonFont);
 		dayChoice.setActionCommand("Day Choice");
 		dayChoice.addActionListener(new School());
-		
-		
 
 		subAtt = new JButton("Submit Attendance");
-		subAtt.setBounds(950, 170, 300, 75);
+		subAtt.setBounds(1000, 170, 250, 75);
 		subAtt.setFont(School.buttonFont);
 		subAtt.addActionListener(new School());
 
@@ -295,7 +292,7 @@ public class ClassCourse extends Course {
 
 	public void setLate(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
-		thisAttendance[courseDay] = new Attend(true, true, 0, "");
+		thisAttendance[courseDay] = new Attend(true, true, 1, "");
 		attendance.replace(s, thisAttendance);
 
 		s.bLate();
@@ -344,7 +341,7 @@ public class ClassCourse extends Course {
 
 	public void changeAttDay() {
 		String choice = String.valueOf(dayChoice.getSelectedItem()).split(" ")[1];
-		int day = Integer.parseInt(choice)-1;
+		int day = Integer.parseInt(choice) - 1;
 		courseDay = day;
 		for (int i = 0; i < students.size(); i++) {
 			Attend temp = attendance.get(students.get(i))[day];
@@ -360,7 +357,6 @@ public class ClassCourse extends Course {
 				} else {
 					setAbsent(students.get(i), temp.getReason());
 
-
 				}
 			} else {
 				setPresent(students.get(i));
@@ -372,12 +368,14 @@ public class ClassCourse extends Course {
 	/**
 	 * Method Name: selectionSort
 	 * 
-	 * @Author Rajat Mishra * @Date 09/01/2022
-	 * @Modified 11/28/2022
-	 * @Description java implementation of selection sort
-	 * @Parameters String[] to be sorted
-	 * @Returns time in milliseconds to sort the array Dependencies: N/A
-	 *          Throws/Exceptions: N/A
+	 * @Author Rajat Mishra, Prabhjot Chopra 
+	 * @Date 09/01/2022
+	 * @Modified 01/05/2023
+	 * @Description java implementation of selection sort for string linked lists
+	 * @Parameters LinkedList<String> to be sorted
+	 * @Returns time in milliseconds to sort the array 
+	 * Dependencies: N/A
+	 * @Throws N/A
 	 */
 	public void sortKids() {
 
@@ -438,8 +436,6 @@ public class ClassCourse extends Course {
 	public JScrollPane getPane() {
 		return pane;
 	}
-
-
 
 	public LocalTime getStart() {
 		return start;

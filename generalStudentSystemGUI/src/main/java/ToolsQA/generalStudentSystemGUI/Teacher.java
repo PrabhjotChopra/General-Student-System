@@ -52,17 +52,17 @@ public class Teacher {
 		
 		JButton classes = new JButton("Classes");
 		classes.addActionListener(new School());
-		classes.setBounds(School.rect.width - 400, 0,200, 100);
 		
-		classes.setFont(new Font("Arial", 1, 20));
+		
+		classes.setFont(new Font("Arial", 1, 40));
 		header.add(classes);
 		classes.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		
+		header.add(Box.createRigidArea(new Dimension(20, 0)));
 		
 		JButton exit = new JButton("Close app");
 		exit.addActionListener(new School());
-		exit.setSize(200,100);
-		exit.setFont(new Font("Arial", 1, 20));
+		
+		exit.setFont(new Font("Arial", 1, 40));
 		header.add(exit);
 		exit.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		

@@ -95,6 +95,7 @@ public class School implements ActionListener, FocusListener {
 						dashboard.removeAll();
 						dashboard.add(currClass.getMain());
 						dashboard.add(currClass.getDaily());
+						currClass.goDash();
 						dashboard.add(currClass.getTab());
 						dashboard.revalidate();
 						dashboard.repaint();
@@ -409,7 +410,7 @@ public class School implements ActionListener, FocusListener {
 
 		// test data
 		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
-		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "programming", new LinkedList<String>(), 5);
+		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5);
 		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
 		
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
@@ -422,7 +423,7 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Calvin", "Cao", 9));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdul", "Ali", 11));
+		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdulmuhaimin", "Ali", 11));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Trevor", "Bliss", 12));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Victor", "Reznov", 13));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Sofia", "Odegaard", 14));

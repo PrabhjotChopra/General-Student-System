@@ -40,18 +40,18 @@ public class Student {
 		daily.setLayout(new BoxLayout(daily, BoxLayout.X_AXIS));
 		daily.setSize(School.rect.width - 200, 20);
 
-		String padName = first + " " + last + "\t";
+		String padName = last + ", " + first + "\t";
 		FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
 		double width = (studentStandard.getStringBounds(padName, frc).getWidth());
 		
-		if (width<134.5) {
+		if (width<138.91) {
 			padName += "\t";
 		}
 		
 		
 		
+		
 		JTextArea name = new JTextArea(padName);
-
 		name.setEditable(false);
 		name.setFont(studentStandard);
 		
@@ -69,14 +69,16 @@ public class Student {
 		late.setFont(studentStandard);
 		late.addActionListener(new School());
 
-		minsLate = new JTextField("Time arrived");
+		minsLate = new JTextField(7);
+		minsLate.setText("Time arrived");
 		minsLate.setFont(studentStandard);
 		minsLate.addFocusListener(new School());
 		minsLate.setFocusable(false);
 		
 		
 		
-		absentReason = new JTextField("Reason for absence");
+		absentReason = new JTextField(13);
+		absentReason.setText("Reason for absence");
 		absentReason.setFont(studentStandard);
 		absentReason.addFocusListener(new School());
 		absentReason.setFocusable(false);
@@ -109,30 +111,36 @@ public class Student {
 	}
 
 	public void gPresent() {
-		present.setBackground(Color.decode("#40826d"));
+		present.setBackground(Color.decode("#006d0c"));
 		absent.setBackground(null);
 		late.setBackground(null);
 
 		minsLate.setFocusable(false);
+		minsLate.setBackground(null);
 		absentReason.setFocusable(false);
+		absentReason.setBackground(null);
 	}
 
 	public void rAbsent() {
-		absent.setBackground(Color.RED);
+		absent.setBackground(Color.decode("#dc143c"));
 		present.setBackground(null);
 		late.setBackground(null);
 
 		minsLate.setFocusable(false);
+		minsLate.setBackground(null);
 		absentReason.setFocusable(true);
+		absentReason.setBackground(Color.decode("#dc143c"));
 	}
 
 	public void bLate() {
-		late.setBackground(Color.BLUE);
+		late.setBackground(Color.decode("#104E8B"));
 		absent.setBackground(null);
 		present.setBackground(null);
 
 		minsLate.setFocusable(true);
+		minsLate.setBackground(Color.decode("#104E8B"));
 		absentReason.setFocusable(false);
+		absentReason.setBackground(null);
 
 	}
 
