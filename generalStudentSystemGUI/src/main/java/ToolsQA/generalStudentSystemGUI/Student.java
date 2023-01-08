@@ -19,14 +19,17 @@ public class Student {
 	private int studentNumber;
 
 	private JPanel daily;
-	private Font studentStandard = new Font("Arial", 1, 20);
+	public static Font studentStandard = new Font("Arial", 1, 20);
 
 	private JTextField absentReason;
 	private JTextField minsLate;
 	private JButton present;
 	private JButton absent;
 	private JButton late;
-
+	
+	
+	
+	
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
 		courseReqs = requests;
 		year = grade;
@@ -40,20 +43,7 @@ public class Student {
 		daily.setLayout(new BoxLayout(daily, BoxLayout.X_AXIS));
 		daily.setSize(School.rect.width - 200, 20);
 
-		String padName = last + ", " + first + "\t";
-		FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
-		double width = (studentStandard.getStringBounds(padName, frc).getWidth());
 		
-		if (width<138.91) {
-			padName += "\t";
-		}
-		
-		
-		
-		
-		JTextArea name = new JTextArea(padName);
-		name.setEditable(false);
-		name.setFont(studentStandard);
 		
 		
 		
@@ -85,7 +75,7 @@ public class Student {
 		
 		
 		daily.add(Box.createRigidArea(new Dimension(0, 5)));
-		daily.add(name);
+		daily.add(tabbedName());
 		daily.add(Box.createRigidArea(new Dimension(20, 0)));
 		daily.add(present);
 		daily.add(Box.createRigidArea(new Dimension(20, 0)));
@@ -108,6 +98,20 @@ public class Student {
 
 		minsLate.setFocusable(false);
 		absentReason.setFocusable(false);
+	}
+	public JTextArea tabbedName() {
+		String padName = lastName + ", " + firstName + "\t";
+		FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
+		double width = (studentStandard.getStringBounds(padName, frc).getWidth());
+		
+		if (width<138.91) {
+			padName += "\t";
+		}
+		
+		JTextArea name = new JTextArea(padName);
+		name.setEditable(false);
+		name.setFont(studentStandard);
+		return name;
 	}
 
 	public void gPresent() {
@@ -192,5 +196,8 @@ public class Student {
 
 	public JButton getAbsent() {
 		return absent;
+	}
+	public int getStudentNumber() {
+		return studentNumber;
 	}
 }

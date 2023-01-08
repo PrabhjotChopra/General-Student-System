@@ -25,8 +25,13 @@ public class ClassCourse extends Course {
 	private double totalWeight = 0.0;
 	private int courseDay;
 	private LocalTime start;
+	private boolean sem1;
 
 	private JButton baseDisplay;
+	
+	// these three might be removed since you can just generate them after each button press
+	// makes it easier to deal with students joining/leaving the class and class sizes of max 30
+	// allows for the time complexity to be shit
 	private Hashtable<Student, JPanel> longUI = new Hashtable<Student, JPanel>();
 	private Hashtable<Student, JPanel> fullUI = new Hashtable<Student, JPanel>();
 	private Hashtable<Student, JPanel> shortUI = new Hashtable<Student, JPanel>();
@@ -57,8 +62,10 @@ public class ClassCourse extends Course {
 
 		if (period > 4) {
 			start = School.periodStarts[period - 5];
+			sem1=false;
 		} else {
 			start = School.periodStarts[period - 1];
+			sem1=true;
 		}
 
 		FlatDarkLaf.setup();
@@ -92,7 +99,12 @@ public class ClassCourse extends Course {
 		daily.setBounds(350, 170, 200, 75);
 		daily.setFont(School.buttonFont);
 		daily.addActionListener(new School());
-
+		
+		overallAtt = new JButton("Overall Attendance");
+		overallAtt.setBounds(570, 170, 250, 75);
+		overallAtt.setFont(School.buttonFont);
+		overallAtt.addActionListener(new School());
+		
 		String[] days;
 		if (period < 5) {
 			days = new String[School.sem1days];
@@ -104,7 +116,7 @@ public class ClassCourse extends Course {
 			days[i] = "Day " + String.valueOf(i + 1);
 		}
 		dayChoice = new JComboBox<String>(days);
-		dayChoice.setBounds(580, 170, 150, 75);
+		dayChoice.setBounds(830, 170, 150, 75);
 		dayChoice.setFont(School.buttonFont);
 		dayChoice.setActionCommand("Day Choice");
 		dayChoice.addActionListener(new School());
@@ -128,6 +140,9 @@ public class ClassCourse extends Course {
 
 		for (int i = 0; i < courseDay; i++) {
 			temp[i] = (new Attend(false, false, 0, ""));
+		}
+		for(int i=courseDay; i<temp.length;i++) {
+			temp[i] = (new Attend(true, false, 0, ""));
 		}
 		attendance.put(s, temp);
 
@@ -215,7 +230,7 @@ public class ClassCourse extends Course {
 
 	public JPanel addDailys() {
 		sortKids();
-
+		dayChoice.setActionCommand("Day Choice");
 		tab.removeAll();
 
 		Box container = Box.createVerticalBox();
@@ -240,10 +255,97 @@ public class ClassCourse extends Course {
 
 			// not initialized so commented out for now
 			// marks.setLocation(marks.getX(), 170);
-			// overallAtt.setLocation(overallAtt.getX(), 170);
+			overallAtt.setLocation(overallAtt.getX(), 170);
 
 		}
 
+		return tab;
+	}
+	
+	public JPanel overallAtt() {
+		sortKids();
+
+		tab.removeAll();
+
+		Box container = Box.createVerticalBox();
+		
+		for (int i = 0; i < students.size(); i++) {
+			JPanel thisStudentAtt = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			thisStudentAtt.setSize(School.rect.width - 200, 20);
+			thisStudentAtt.setBorder(BorderFactory.createLineBorder(Color.black));
+			
+			
+			Attend[] studentData = attendance.get(students.get(i));
+			
+			JButton studentB = new JButton("View Individual Attendance");
+			studentB.addActionListener(new School());
+			studentB.setActionCommand("overAtt " + students.get(i).getStudentNumber());
+			studentB.setFont(Student.studentStandard);
+			
+			int lates = 0;
+			int absents = 0;
+			
+			for(int j=0; j<=courseDay;j++) {
+				if (studentData[j].getPresent()) {
+					if(studentData[j].getLate()) {
+						lates++;
+					}
+				}
+				else {
+					absents++;
+				}
+			}
+			
+			lates = (int) Math.round(((double) lates/ (courseDay+1)) * 100); // percent of days late
+			
+			
+			absents = (int) Math.round(((double)absents/(courseDay+1)) * 100); // percent of days absent
+			
+			
+			JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far");
+			latePercent.setEditable(false);
+			latePercent.setFont(Student.studentStandard);
+			JTextArea abPercent = new JTextArea("absent " + String.valueOf(absents) + "% of days so far");
+			abPercent.setEditable(false);
+			abPercent.setFont(Student.studentStandard);
+			
+			thisStudentAtt.add(Box.createRigidArea(new Dimension(0, 5)));
+			thisStudentAtt.add(students.get(i).tabbedName());
+			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
+			thisStudentAtt.add(latePercent);
+			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
+			thisStudentAtt.add(abPercent);
+			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
+			thisStudentAtt.add(studentB);
+			
+			container.add(thisStudentAtt);
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
+		}
+		
+		dayChoice.setActionCommand("Until day x");
+		
+		
+		
+		pane = new JScrollPane(container);
+
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.getVerticalScrollBar().setUnitIncrement(16);
+
+		tab.setLayout(new BorderLayout());
+		tab.add(pane);
+		tab.revalidate();
+		tab.repaint();
+
+		if (overallAtt.getY() == 170) {
+			daily.setLocation(daily.getX(), 170);
+			main.setLocation(main.getX(), 170);
+
+			// not initialized so commented out for now
+			// marks.setLocation(marks.getX(), 170);
+			overallAtt.setLocation(overallAtt.getX(), 180);
+
+		}
+		
 		return tab;
 	}
 
@@ -276,6 +378,7 @@ public class ClassCourse extends Course {
 		tab.repaint();
 
 	}
+	
 
 	public void setAbsent(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
@@ -339,31 +442,39 @@ public class ClassCourse extends Course {
 		tab.repaint();
 	}
 
-	public void changeAttDay() {
+	public void changeAttDay(int type) {
 		String choice = String.valueOf(dayChoice.getSelectedItem()).split(" ")[1];
 		int day = Integer.parseInt(choice) - 1;
 		courseDay = day;
-		for (int i = 0; i < students.size(); i++) {
-			Attend temp = attendance.get(students.get(i))[day];
+		
+		if (type == 1) {
+			for (int i = 0; i < students.size(); i++) {
+				Attend temp = attendance.get(students.get(i))[day];
 
-			if (temp != null) {
-				if (temp.getPresent()) {
-					if (attendance.get(students.get(i))[day].getLate()) {
-						setLate(students.get(i), temp.getMinutesLate(), start.plusMinutes(temp.getMinutesLate()));
+				if (temp != null) {
+					if (temp.getPresent()) {
+						if (attendance.get(students.get(i))[day].getLate()) {
+							setLate(students.get(i), temp.getMinutesLate(), start.plusMinutes(temp.getMinutesLate()));
+						} else {
+							setPresent(students.get(i));
+						}
+
 					} else {
-						setPresent(students.get(i));
+						setAbsent(students.get(i), temp.getReason());
+
 					}
-
 				} else {
-					setAbsent(students.get(i), temp.getReason());
-
+					setPresent(students.get(i));
 				}
-			} else {
-				setPresent(students.get(i));
-			}
 
+			}
 		}
+		else if (type==2) {
+			overallAtt();
+		}
+		
 	}
+	
 
 	/**
 	 * Method Name: selectionSort
@@ -443,5 +554,8 @@ public class ClassCourse extends Course {
 
 	public JButton getSubAtt() {
 		return subAtt;
+	}
+	public JButton getOverallAtt() {
+		return overallAtt;
 	}
 }
