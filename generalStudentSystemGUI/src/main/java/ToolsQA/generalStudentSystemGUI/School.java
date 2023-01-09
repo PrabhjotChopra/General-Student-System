@@ -427,7 +427,7 @@ public class School implements ActionListener, FocusListener {
 
 		// test data
 		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
-		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5);
+		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5, 30,1,15);
 		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
 		
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
