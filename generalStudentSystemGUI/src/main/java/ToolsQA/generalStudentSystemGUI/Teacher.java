@@ -17,6 +17,7 @@ public class Teacher {
 	private JButton sem2;
 	private JPanel courses;
 
+	public Teacher() {}
 	public Teacher(String f, String l, int ID, LinkedList<String> teachables) {
 		this.ID = ID;
 		this.teachables = teachables;

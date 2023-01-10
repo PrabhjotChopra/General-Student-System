@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import com.formdev.flatlaf.FlatDarkLaf;
 import javax.swing.*;
@@ -199,5 +200,15 @@ public class Student {
 	}
 	public int getStudentNumber() {
 		return studentNumber;
+	}
+	public boolean wantsCourse(Course c) {
+		Enumeration<Course> courses = courseReqs.keys();
+		
+		while(courses.hasMoreElements()) {
+			if (c.equals(courses.nextElement())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

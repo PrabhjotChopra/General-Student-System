@@ -361,7 +361,7 @@ public class ClassCourse extends Course {
 
 			// not initialized so commented out for now
 			// marks.setLocation(marks.getX(), 170);
-			// overallAtt.setLocation(overallAtt.getX(), 170);
+			overallAtt.setLocation(overallAtt.getX(), 170);
 
 		}
 
