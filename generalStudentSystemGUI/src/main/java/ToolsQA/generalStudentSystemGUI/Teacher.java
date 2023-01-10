@@ -160,4 +160,7 @@ public class Teacher {
 	public ClassCourse[] getClasses() {
 		return classes;
 	}
+	public LinkedList<String> getTeachables(){
+		return teachables;
+	}
 }

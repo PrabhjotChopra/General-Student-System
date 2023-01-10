@@ -28,6 +28,8 @@ public class School implements ActionListener, FocusListener {
 	static LinkedList<Teacher> teachers = new LinkedList<Teacher>();
 	static LinkedList<Course> courseOfferings = new LinkedList<Course>();
 	static LinkedList<ClassCourse> currentClasses = new LinkedList<ClassCourse>();
+	static LinkedList<String> rooms = new LinkedList<String>();
+	
 	static boolean teacher;
 	static boolean admin;
 
