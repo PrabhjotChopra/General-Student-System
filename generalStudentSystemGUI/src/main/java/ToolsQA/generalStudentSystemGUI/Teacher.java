@@ -159,7 +159,6 @@ public class Teacher {
 	public JButton getSem2() {
 		return sem2;
 	}
-
 	public ClassCourse[] getClasses() {
 		return classes;
 	}
