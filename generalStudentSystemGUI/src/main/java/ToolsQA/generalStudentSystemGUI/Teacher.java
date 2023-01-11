@@ -78,7 +78,7 @@ public class Teacher {
 	
 	
 	// add courses in order in the teacher's courses array
-	public boolean addClass(ClassCourse c, int sem) {
+	public boolean addClass(ClassCourse c, int sem) throws NullPointerException {
 		sem--;
 		sem *= 3;
 
@@ -93,10 +93,13 @@ public class Teacher {
 				return true; // there was room to add the class in the teacher's schedule and it was added
 			}
 			else {
-				if(classes[i].getPeriod() == c.getPeriod()) {
-					// if the teacher is alr teaching a class in that period then return false
-					return false;
+				if(classes[i]!=null) {
+					if(classes[i].getPeriod() == c.getPeriod()) {
+						// if the teacher is alr teaching a class in that period then return false
+						return false;
+					}
 				}
+				
 			}
 		}
 		return false; // no room to add a class to teacher's schedule
