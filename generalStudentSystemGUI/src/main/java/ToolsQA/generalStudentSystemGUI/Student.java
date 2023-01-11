@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import com.formdev.flatlaf.FlatDarkLaf;
 import javax.swing.*;
 
+
 public class Student {
 	private ClassCourse[] classes = new ClassCourse[8];
 	private Hashtable<Course, Boolean> courseReqs;

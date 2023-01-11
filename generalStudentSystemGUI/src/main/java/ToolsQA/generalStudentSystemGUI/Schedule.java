@@ -12,6 +12,7 @@ public class Schedule {
 		for(int i=0;i<madeSchedule.length;i++) {
 			madeSchedule[i] = new LinkedList<ClassCourse>();
 		}
+		
 		Hashtable<String, Boolean[]> roomUsed = new Hashtable<String, Boolean[]>();
 		
 		for(int i=0;i<rooms.size();i++) {
