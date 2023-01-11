@@ -7,6 +7,7 @@ public class Schedule {
 	
 	private LinkedList<ClassCourse>[] madeSchedule = new LinkedList[8];
 	
+	// courses should be added to the courses linkedlist based on absolute priority (i.e. gr12 english, then gr12 math, then gr12 science and so on)
 	public Schedule(LinkedList<Student> students, LinkedList<Teacher> teachers, LinkedList<Course> courses, LinkedList<String> rooms) {
 		for(int i=0;i<madeSchedule.length;i++) {
 			madeSchedule[i] = new LinkedList<ClassCourse>();
@@ -68,35 +69,59 @@ public class Schedule {
 			String currRoom = courses.get(i).getUsableRooms().get(roomIndex);
 			
 			for(int j=0;j<courses.get(i).getNumClasses(); j++) {
-				
-				if(roomUsed.get(currRoom)[7]) {
+				// checks if room is available (adds the course periods 1-4 alternating semesters)
+				// add randomizing course placement as a stretch goal
+				if(roomUsed.get(currRoom)[7]) { 
 					currNum++;
 					
 					roomIndex++;
-					if(roomIndex == courses.get(i).getUsableRooms().size()) {
+					if(roomIndex == courses.get(i).getUsableRooms().size()) { // ran out of usable rooms (realistically this will never happen)
 						break;
 					}
 					currRoom = courses.get(i).getUsableRooms().get(roomIndex);
 					continue;
 				}
+				Teacher thisProf = teachersAvailable.get((int) (Math.random() * teachersAvailable.size()));
 				if(sem1==1) {
 					
-					madeSchedule[j%4].add(new ClassCourse(currNum, new Teacher(), currRoom, j%4+1, courses.get(i)));
+					
+					ClassCourse thisClass = new ClassCourse(currNum, new Teacher(), currRoom, j%4+1, courses.get(i));
+					while(!(thisProf.addClass(thisClass, 1))) { // if this teacher doesn't have room then we randomly pick another
+						thisProf = teachersAvailable.get((int) (Math.random() * teachersAvailable.size()));
+					}
+					// we're gonna assume that there's always enough teachers and that the school isn't under staffed like that
+					// this is a course scheduler, not a cost-of-living/wage/bureaucracy fixer
+					
+					thisClass.setProf(thisProf);
+					madeSchedule[j%4].add(thisClass);
 					roomUsed.get(currRoom)[j%4] = true;
 						
 				}
 				else {
-					madeSchedule[(j%4)+4].add(new ClassCourse(currNum, new Teacher(), currRoom, (j%4)+5, courses.get(i)));
+					ClassCourse thisClass = new ClassCourse(currNum, new Teacher(), currRoom, j%4+5, courses.get(i));
+					
+					
+					while(!(thisProf.addClass(thisClass, 2))) { // if this teacher doesn't have room then we randomly pick another
+						thisProf = teachersAvailable.get((int) (Math.random() * teachersAvailable.size()));
+					}
+					
+					
+					thisClass.setProf(thisProf);
+					madeSchedule[(j%4)+4].add(thisClass);
 					roomUsed.get(currRoom)[(j%4)+4] = true;
 				}
 				
-				currNum++;
-				sem1*=-1;
-			}
+				currNum++; // current number of classes for this course
+				sem1*=-1; // used to alternate semesters
+			} // end for loop to add individual classes
 			
 			
 			
-		}
+		} // end for loop for adding courses
 		
+	} // end schedule constructor
+	
+	public LinkedList<ClassCourse>[] getSchedule(){
+		return madeSchedule;
 	}
-}
+} // end class schedule

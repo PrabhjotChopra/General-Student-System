@@ -433,15 +433,6 @@ public class ClassCourse extends Course {
 		tab.repaint();
 	}
 
-	public void setNull(Student s) {
-		s.setMinsLate("Time arrived");
-		s.setAbsentReason("Reason for absence");
-		s.setNull();
-
-		tab.revalidate();
-		tab.repaint();
-	}
-
 	public void changeAttDay(int type) {
 		String choice = String.valueOf(dayChoice.getSelectedItem()).split(" ")[1];
 		int day = Integer.parseInt(choice) - 1;
@@ -557,5 +548,8 @@ public class ClassCourse extends Course {
 	}
 	public JButton getOverallAtt() {
 		return overallAtt;
+	}
+	public void setProf(Teacher t) {
+		prof = t;
 	}
 }

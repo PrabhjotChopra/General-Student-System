@@ -455,7 +455,8 @@ public class School implements ActionListener, FocusListener {
 		mckay.addClass(ourClass, 1);
 
 		teachers.add(mckay);
-
+		
+		Schedule timetable = new Schedule(students, teachers, courseOfferings, rooms);
 		initialize();
 
 	}

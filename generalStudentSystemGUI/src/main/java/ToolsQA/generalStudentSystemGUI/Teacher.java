@@ -85,12 +85,12 @@ public class Teacher {
 		int endSem = sem + 3;
 		for (int i = sem; i < endSem; i++) {
 			
-			if (classes[i] == null) {
+			if (classes[i] == null && i == c.getPeriod()) { // if the teacher is free the period the course is running
 				
 				classes[i] = c;
 
 				courses.add(c.getBaseDisplay());
-				return true; // there was room to add the class in the teacher's schedule
+				return true; // there was room to add the class in the teacher's schedule and it was added
 			}
 			else {
 				if(classes[i].getPeriod() == c.getPeriod()) {
