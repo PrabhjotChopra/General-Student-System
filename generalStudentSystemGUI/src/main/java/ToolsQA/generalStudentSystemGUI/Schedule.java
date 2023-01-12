@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 public class Schedule {
 	
+	@SuppressWarnings("unchecked")
 	private LinkedList<ClassCourse>[] madeSchedule = new LinkedList[8];
 	
 	// courses should be added to the courses linkedlist based on absolute priority (i.e. gr12 english, then gr12 math, then gr12 science and so on)

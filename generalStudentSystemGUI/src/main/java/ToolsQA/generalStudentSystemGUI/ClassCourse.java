@@ -35,7 +35,9 @@ public class ClassCourse extends Course {
 	private Hashtable<Student, JPanel> longUI = new Hashtable<Student, JPanel>();
 	private Hashtable<Student, JPanel> fullUI = new Hashtable<Student, JPanel>();
 	private Hashtable<Student, JPanel> shortUI = new Hashtable<Student, JPanel>();
-
+	
+	
+	private Hashtable<Student, JPanel> attendanceUI;
 	private JTextArea dashboard;
 	private JPanel tab;
 	private JScrollPane pane;
@@ -269,7 +271,8 @@ public class ClassCourse extends Course {
 
 		Box container = Box.createVerticalBox();
 		
-		for (int i = 0; i < students.size(); i++) {
+		for (int i = 0; i < students.size(); i++) { // thank god for java's auto garbage collection
+			// almost makes up for how bad swing is
 			JPanel thisStudentAtt = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			thisStudentAtt.setSize(School.rect.width - 200, 20);
 			thisStudentAtt.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -277,10 +280,7 @@ public class ClassCourse extends Course {
 			
 			Attend[] studentData = attendance.get(students.get(i));
 			
-			JButton studentB = new JButton("View Individual Attendance");
-			studentB.addActionListener(new School());
-			studentB.setActionCommand("overAtt " + students.get(i).getStudentNumber());
-			studentB.setFont(Student.studentStandard);
+			
 			
 			int lates = 0;
 			int absents = 0;
@@ -302,7 +302,7 @@ public class ClassCourse extends Course {
 			absents = (int) Math.round(((double)absents/(courseDay+1)) * 100); // percent of days absent
 			
 			
-			JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far");
+			JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far\t");
 			latePercent.setEditable(false);
 			latePercent.setFont(Student.studentStandard);
 			JTextArea abPercent = new JTextArea("absent " + String.valueOf(absents) + "% of days so far");
@@ -316,7 +316,7 @@ public class ClassCourse extends Course {
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
 			thisStudentAtt.add(abPercent);
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
-			thisStudentAtt.add(studentB);
+			thisStudentAtt.add(students.get(i).getStudentAttB());
 			
 			container.add(thisStudentAtt);
 			container.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -347,6 +347,90 @@ public class ClassCourse extends Course {
 		}
 		
 		return tab;
+	}
+	
+	public void indAtt(int id) {
+		
+		Student s = new Student();
+		for(int i=0;i<students.size();i++) {
+			if(students.get(i).getStudentNumber() == id) {
+				s = students.get(i);
+			}
+		}
+		
+		tab.removeAll();
+
+		Box container = Box.createVerticalBox();
+		container.setSize(200, School.rect.width -355);;
+		
+		JPanel indvAtt = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		
+		indvAtt.setSize(School.rect.width - 200, 20);
+		indvAtt.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+			
+		Attend[] studentData = attendance.get(s);
+		
+		for(int i =0; i<students.size();i++) {
+			if(!(s.equals(students.get(i)))) {
+				JButton b = students.get(i).getStudentAttB();
+				b.setPreferredSize(new Dimension(250, 50));
+				b.setText(students.get(i).tabbedName().getText());
+				container.add(b);
+				container.add(Box.createRigidArea(new Dimension(0,10)));
+			}
+
+		}
+		
+		
+			
+			
+			
+		int lates = 0;
+		int absents = 0;
+			
+		for(int j=0; j<=courseDay;j++) {
+			if (studentData[j].getPresent()) {
+				if(studentData[j].getLate()) {
+					lates++;
+				}
+			}
+			else {
+				absents++;
+			}
+		}
+		
+		lates = (int) Math.round(((double) lates/ (courseDay+1)) * 100); // percent of days late
+		
+		
+		absents = (int) Math.round(((double)absents/(courseDay+1)) * 100); // percent of days absent
+			
+			
+		JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far\t");
+		latePercent.setEditable(false);
+		latePercent.setFont(Student.studentStandard);
+		JTextArea abPercent = new JTextArea("absent " + String.valueOf(absents) + "% of days so far");
+		abPercent.setEditable(false);
+		abPercent.setFont(Student.studentStandard);
+			
+			
+		
+		
+		
+		
+		
+		
+		pane = new JScrollPane(container);
+
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.getVerticalScrollBar().setUnitIncrement(16);
+
+		tab.setLayout(new BorderLayout());
+		tab.add(pane);
+		tab.revalidate();
+		tab.repaint();
+
+		
 	}
 
 	public void goDash() {

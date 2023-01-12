@@ -30,8 +30,9 @@ public class Student {
 	private JButton late;
 	
 	
+	private JButton studentAttB;
 	
-	
+	public Student() {}
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
 		courseReqs = requests;
 		year = grade;
@@ -90,6 +91,14 @@ public class Student {
 		daily.add(minsLate);
 
 		daily.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		
+		
+		
+		studentAttB = new JButton("View Individual");
+		studentAttB.addActionListener(new School());
+		studentAttB.setActionCommand("overAtt " + studentNumber);
+		studentAttB.setFont(Student.studentStandard);
 
 	}
 
@@ -201,6 +210,9 @@ public class Student {
 	}
 	public int getStudentNumber() {
 		return studentNumber;
+	}
+	public JButton getStudentAttB() {
+		return studentAttB;
 	}
 	public boolean wantsCourse(Course c) {
 		Enumeration<Course> courses = courseReqs.keys();

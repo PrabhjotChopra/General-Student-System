@@ -235,6 +235,7 @@ public class School implements ActionListener, FocusListener {
 		else if (e.getActionCommand().equals("Overall Attendance")) {
 			
 			dashboard.remove(currClass.getSubAtt());
+			dashboard.add(currClass.getDayChoice());
 			
 			
 			dashboard.add(currClass.overallAtt());
@@ -247,6 +248,10 @@ public class School implements ActionListener, FocusListener {
 			currClass.changeAttDay(2);
 			window.revalidate();
 			window.repaint();
+		}
+		
+		else if (e.getActionCommand().substring(0,7).equals("overAtt")) {
+			currClass.indAtt(Integer.parseInt(e.getActionCommand().substring(8)));
 		}
 	}
 
