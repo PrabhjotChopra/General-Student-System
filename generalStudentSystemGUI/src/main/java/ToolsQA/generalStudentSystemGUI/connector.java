@@ -12,10 +12,10 @@
  */
 public class connector {
       public static void main(String[] args) {
-	
-        	final String USERNAME = "root";//DBMS접속 시 아이디
-    	  final String PASSWORD = "!Sjsshs1177";//DBMS접속 시 비밀번호
-    	    final String URL = "jdbc:mysql://localhost:3306/sys";//DBMS접속할 db명  
+		//please note that this version of the branch was being tested on Danny's macbook, which will require redirect of the connect j library, in order to be ran on prabhjot's pc
+	    final String USERNAME = "root";//DBMS접속 시 아이디
+	    final String PASSWORD = "329228654sql";//DBMS접속 시 비밀번호
+	    final String URL = "jdbc:mysql://localhost:3306/sys";//DBMS접속할 db명
 
             try {
                 // Load JDBC driver
