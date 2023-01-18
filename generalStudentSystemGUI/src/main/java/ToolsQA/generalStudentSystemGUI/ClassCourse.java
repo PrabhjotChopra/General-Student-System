@@ -25,7 +25,7 @@ public class ClassCourse extends Course {
 	private double totalWeight = 0.0;
 	private int courseDay;
 	private LocalTime start;
-	private boolean sem1;
+	private int days;
 
 	private JButton baseDisplay;
 	
@@ -64,10 +64,10 @@ public class ClassCourse extends Course {
 
 		if (period > 4) {
 			start = School.periodStarts[period - 5];
-			sem1=false;
+			days = School.sem1days;
 		} else {
 			start = School.periodStarts[period - 1];
-			sem1=true;
+			days = School.sem2days;
 		}
 
 		FlatDarkLaf.setup();
@@ -107,17 +107,14 @@ public class ClassCourse extends Course {
 		overallAtt.setFont(School.buttonFont);
 		overallAtt.addActionListener(new School());
 		
-		String[] days;
-		if (period < 5) {
-			days = new String[School.sem1days];
-		} else {
-			days = new String[School.sem2days];
-		}
+		String[] dayChoices = new String[days];
+		
+		
 
-		for (int i = 0; i < days.length; i++) {
-			days[i] = "Day " + String.valueOf(i + 1);
+		for (int i = 0; i < days; i++) {
+			dayChoices[i] = "Day " + String.valueOf(i + 1);
 		}
-		dayChoice = new JComboBox<String>(days);
+		dayChoice = new JComboBox<String>(dayChoices);
 		dayChoice.setBounds(830, 170, 150, 75);
 		dayChoice.setFont(School.buttonFont);
 		dayChoice.setActionCommand("Day Choice");
@@ -141,11 +138,9 @@ public class ClassCourse extends Course {
 		}
 
 		for (int i = 0; i < courseDay; i++) {
-			temp[i] = (new Attend(false, false, 0, ""));
+			temp[i] = (new Attend(false, false, 0, "Not in course"));
 		}
-		for(int i=courseDay; i<temp.length;i++) {
-			temp[i] = (new Attend(true, false, 0, ""));
-		}
+		
 		attendance.put(s, temp);
 
 		// add to grades
@@ -233,6 +228,7 @@ public class ClassCourse extends Course {
 	public JPanel addDailys() {
 		sortKids();
 		dayChoice.setActionCommand("Day Choice");
+		
 		tab.removeAll();
 
 		Box container = Box.createVerticalBox();
@@ -248,6 +244,8 @@ public class ClassCourse extends Course {
 
 		tab.setLayout(new BorderLayout());
 		tab.add(pane);
+		
+		changeAttDay(1);
 		tab.revalidate();
 		tab.repaint();
 
@@ -286,13 +284,15 @@ public class ClassCourse extends Course {
 			int absents = 0;
 			
 			for(int j=0; j<=courseDay;j++) {
-				if (studentData[j].getPresent()) {
-					if(studentData[j].getLate()) {
-						lates++;
+				if(studentData[j]!=null) {
+					if (studentData[j].getPresent()) {
+						if(studentData[j].getLate()) {
+							lates++;
+						}
 					}
-				}
-				else {
-					absents++;
+					else {
+						absents++;
+					}
 				}
 			}
 			
@@ -316,7 +316,9 @@ public class ClassCourse extends Course {
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
 			thisStudentAtt.add(abPercent);
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
-			thisStudentAtt.add(students.get(i).getStudentAttB());
+			JButton b = students.get(i).getStudentAttB();
+			b.setText("View Individual");
+			thisStudentAtt.add(b);
 			
 			container.add(thisStudentAtt);
 			container.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -360,48 +362,41 @@ public class ClassCourse extends Course {
 		
 		tab.removeAll();
 
-		Box container = Box.createVerticalBox();
-		container.setSize(200, School.rect.width -355);;
-		
-		JPanel indvAtt = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		
-		indvAtt.setSize(School.rect.width - 200, 20);
-		indvAtt.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-			
-		Attend[] studentData = attendance.get(s);
-		
+		JPanel container = new JPanel(new GridLayout(students.size()-1,1));
+
 		for(int i =0; i<students.size();i++) {
 			if(!(s.equals(students.get(i)))) {
-				JButton b = students.get(i).getStudentAttB();
-				b.setPreferredSize(new Dimension(250, 50));
+				JButton b = students.get(i).getStudentAttB();	
 				b.setText(students.get(i).tabbedName().getText());
-				container.add(b);
-				container.add(Box.createRigidArea(new Dimension(0,10)));
+				container.add(b);	
 			}
-
 		}
+		pane = new JScrollPane(container);
+
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		pane.getVerticalScrollBar().setUnitIncrement(16);
 		
 		
-			
-			
-			
+		Attend[] studentData = attendance.get(s);
 		int lates = 0;
 		int absents = 0;
 			
 		for(int j=0; j<=courseDay;j++) {
-			if (studentData[j].getPresent()) {
-				if(studentData[j].getLate()) {
-					lates++;
+			if(studentData[j] != null) {
+				if (studentData[j].getPresent()) {
+					if(studentData[j].getLate()) {
+						lates++;
+					}
 				}
-			}
-			else {
-				absents++;
+				else {
+					absents++;
+				}
 			}
 		}
 		
 		lates = (int) Math.round(((double) lates/ (courseDay+1)) * 100); // percent of days late
-		
+			
 		
 		absents = (int) Math.round(((double)absents/(courseDay+1)) * 100); // percent of days absent
 			
@@ -414,21 +409,61 @@ public class ClassCourse extends Course {
 		abPercent.setFont(Student.studentStandard);
 			
 			
+		JPanel thisKid = new JPanel(new GridLayout(2,1));
+		// individual attendance portion
+		JPanel stats = new JPanel();
 		
 		
+		JPanel attending = new JPanel();
+		attending.setLayout(new GridLayout(days,1));
 		
 		
-		
-		
-		pane = new JScrollPane(container);
+		for(int i=1;i<=courseDay; i++) {
+			Attend temp = studentData[i];
+			if(temp==null) {
+				continue;
+			}
+			
+			JTextArea thisday = new JTextArea("Day " + i + ":\t");
+			if(temp.getPresent()) {
+				if(temp.getLate()) {
+					thisday.setText(thisday.getText() + temp.getMinutesLate() + "Minutes Late");
+				}
+				else {
+					thisday.setText(thisday.getText() + "Present and On Time");
+				}
+			}
+			else {
+				thisday.setText(thisday.getText() + "Absent for reason: " + temp.getReason());
+			}
+			thisday.setFont(Student.studentStandard);
+			thisday.setEditable(false);
+			attending.add(thisday);
+			
+		}
+		JScrollPane attPanel = new JScrollPane(attending);
 
-		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		pane.getVerticalScrollBar().setUnitIncrement(16);
-
+		attPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		attPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		attPanel.getVerticalScrollBar().setUnitIncrement(10);
+		
+		
+		thisKid.add(stats);
+		thisKid.add(attPanel);		
+		
 		tab.setLayout(new BorderLayout());
 		tab.add(pane);
+		tab.add(thisKid);
+		
+		pane.setSize(250, School.rect.height -355);
+		
+		thisKid.setSize(School.rect.width - 450, School.rect.height - 355);
+		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
+		
 		tab.revalidate();
 		tab.repaint();
+		
+		
 
 		
 	}
@@ -450,7 +485,14 @@ public class ClassCourse extends Course {
 		}
 
 	}
+	public void setNull(Student s) {
+		s.setMinsLate("Time arrived");
+		s.setAbsentReason("Reason for absence");
+		s.setNull();
 
+		tab.revalidate();
+		tab.repaint();
+	}
 	public void setPresent(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
 		thisAttendance[courseDay] = new Attend(true, false, 0, "");
@@ -539,7 +581,7 @@ public class ClassCourse extends Course {
 
 					}
 				} else {
-					setPresent(students.get(i));
+					setNull(students.get(i));
 				}
 
 			}
@@ -635,5 +677,11 @@ public class ClassCourse extends Course {
 	}
 	public void setProf(Teacher t) {
 		prof = t;
+	}
+	public Attend[] getAttendance(Student s) {
+		return attendance.get(s);
+	}
+	public void setAttendance(Attend[] a, Student s) {
+		attendance.replace(s, a);
 	}
 }

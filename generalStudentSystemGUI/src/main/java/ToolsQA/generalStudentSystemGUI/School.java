@@ -250,8 +250,8 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		}
 		
-		else if (e.getActionCommand().substring(0,7).equals("overAtt")) {
-			currClass.indAtt(Integer.parseInt(e.getActionCommand().substring(8)));
+		else if (e.getActionCommand().split(" ")[0].equals("overAtt")) {
+			currClass.indAtt(Integer.parseInt(e.getActionCommand().split(" ")[1]));
 		}
 	}
 
@@ -441,7 +441,9 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Danny", "Song", 2));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Lawrence", "Huang", 3));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Doris", "Zhang", 4));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5));
+		
+		Student isa = new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5);
+		ourClass.addStudent(isa);
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Naheen", "Mahboob", 6));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Ahmed", "Sinjab", 7));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
@@ -461,6 +463,19 @@ public class School implements ActionListener, FocusListener {
 
 		teachers.add(mckay);
 		
+		Attend[] test = ourClass.getAttendance(isa);
+		test[0] = new Attend(true, true, 20, "");
+		test[1] = new Attend(true, false, 0, "");
+		test[2] = new Attend(true, false, 0, "");
+		test[3] = new Attend(false, false, 0, "Sick");
+		test[4] = new Attend(true, true, 15, "");
+		test[5] = new Attend(true, true, 20, "");
+		test[6] = new Attend(true, false, 0, "");
+		test[7] = new Attend(true, false, 0, "");
+		test[8] = new Attend(false, false, 0, "Sick");
+		test[9] = new Attend(true, true, 15, "");
+		ourClass.setAttendance(test, isa);
+	
 		//Schedule timetable = new Schedule(students, teachers, courseOfferings, rooms);
 		initialize();
 	}
