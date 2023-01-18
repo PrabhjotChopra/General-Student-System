@@ -99,6 +99,7 @@ public class Student {
 		studentAttB.addActionListener(new School());
 		studentAttB.setActionCommand("overAtt " + studentNumber);
 		studentAttB.setFont(Student.studentStandard);
+		
 
 	}
 
@@ -108,7 +109,9 @@ public class Student {
 		late.setBackground(null);
 
 		minsLate.setFocusable(false);
+		minsLate.setBackground(null);
 		absentReason.setFocusable(false);
+		absentReason.setBackground(null);
 	}
 	public JTextArea tabbedName() {
 		String padName = lastName + ", " + firstName + "\t";

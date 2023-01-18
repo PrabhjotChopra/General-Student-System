@@ -141,11 +141,9 @@ public class ClassCourse extends Course {
 		}
 
 		for (int i = 0; i < courseDay; i++) {
-			temp[i] = (new Attend(false, false, 0, ""));
+			temp[i] = (new Attend(false, false, 0, "Not in course"));
 		}
-		for(int i=courseDay; i<temp.length;i++) {
-			temp[i] = (new Attend(true, false, 0, ""));
-		}
+		
 		attendance.put(s, temp);
 
 		// add to grades
@@ -233,6 +231,7 @@ public class ClassCourse extends Course {
 	public JPanel addDailys() {
 		sortKids();
 		dayChoice.setActionCommand("Day Choice");
+		
 		tab.removeAll();
 
 		Box container = Box.createVerticalBox();
@@ -248,6 +247,8 @@ public class ClassCourse extends Course {
 
 		tab.setLayout(new BorderLayout());
 		tab.add(pane);
+		
+		changeAttDay(1);
 		tab.revalidate();
 		tab.repaint();
 
@@ -286,13 +287,15 @@ public class ClassCourse extends Course {
 			int absents = 0;
 			
 			for(int j=0; j<=courseDay;j++) {
-				if (studentData[j].getPresent()) {
-					if(studentData[j].getLate()) {
-						lates++;
+				if(studentData[j]!=null) {
+					if (studentData[j].getPresent()) {
+						if(studentData[j].getLate()) {
+							lates++;
+						}
 					}
-				}
-				else {
-					absents++;
+					else {
+						absents++;
+					}
 				}
 			}
 			
@@ -316,7 +319,9 @@ public class ClassCourse extends Course {
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
 			thisStudentAtt.add(abPercent);
 			thisStudentAtt.add(Box.createRigidArea(new Dimension(20, 0)));
-			thisStudentAtt.add(students.get(i).getStudentAttB());
+			JButton b = students.get(i).getStudentAttB();
+			b.setText("View Individual");
+			thisStudentAtt.add(b);
 			
 			container.add(thisStudentAtt);
 			container.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -360,48 +365,43 @@ public class ClassCourse extends Course {
 		
 		tab.removeAll();
 
-		Box container = Box.createVerticalBox();
-		container.setSize(200, School.rect.width -355);;
+		JPanel container = new JPanel(new GridLayout(students.size()-1,1));
+	
 		
-		JPanel indvAtt = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		
-		indvAtt.setSize(School.rect.width - 200, 20);
-		indvAtt.setBorder(BorderFactory.createLineBorder(Color.black));
+
 		
 			
 		Attend[] studentData = attendance.get(s);
 		
+		
+		
 		for(int i =0; i<students.size();i++) {
 			if(!(s.equals(students.get(i)))) {
-				JButton b = students.get(i).getStudentAttB();
-				b.setPreferredSize(new Dimension(250, 50));
+				JButton b = students.get(i).getStudentAttB();	
 				b.setText(students.get(i).tabbedName().getText());
-				container.add(b);
-				container.add(Box.createRigidArea(new Dimension(0,10)));
+				container.add(b);	
 			}
-
 		}
 		
-		
-			
-			
-			
+
 		int lates = 0;
 		int absents = 0;
 			
 		for(int j=0; j<=courseDay;j++) {
-			if (studentData[j].getPresent()) {
-				if(studentData[j].getLate()) {
-					lates++;
+			if(studentData[j] != null) {
+				if (studentData[j].getPresent()) {
+					if(studentData[j].getLate()) {
+						lates++;
+					}
 				}
-			}
-			else {
-				absents++;
+				else {
+					absents++;
+				}
 			}
 		}
 		
 		lates = (int) Math.round(((double) lates/ (courseDay+1)) * 100); // percent of days late
-		
+			
 		
 		absents = (int) Math.round(((double)absents/(courseDay+1)) * 100); // percent of days absent
 			
@@ -414,21 +414,33 @@ public class ClassCourse extends Course {
 		abPercent.setFont(Student.studentStandard);
 			
 			
+		JPanel thisKid = new JPanel(new GridLayout(2,1));
+		// individual attendance portion
+		JPanel stats = new JPanel();
+		JPanel attending = new JPanel();
+		attending.setLayout(new GridLayout(students.size()-1,1));
 		
 		
 		
-		
-		
-		
+			
 		pane = new JScrollPane(container);
 
 		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		pane.getVerticalScrollBar().setUnitIncrement(16);
-
+		
+		
 		tab.setLayout(new BorderLayout());
 		tab.add(pane);
+		tab.add(thisKid);
+		
+		pane.setSize(250, School.rect.height -355);
+		thisKid.setSize(School.rect.width - 450, School.rect.height - 355);
+		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
 		tab.revalidate();
 		tab.repaint();
+		
+		
 
 		
 	}
@@ -450,7 +462,14 @@ public class ClassCourse extends Course {
 		}
 
 	}
+	public void setNull(Student s) {
+		s.setMinsLate("Time arrived");
+		s.setAbsentReason("Reason for absence");
+		s.setNull();
 
+		tab.revalidate();
+		tab.repaint();
+	}
 	public void setPresent(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
 		thisAttendance[courseDay] = new Attend(true, false, 0, "");
@@ -539,7 +558,7 @@ public class ClassCourse extends Course {
 
 					}
 				} else {
-					setPresent(students.get(i));
+					setNull(students.get(i));
 				}
 
 			}
