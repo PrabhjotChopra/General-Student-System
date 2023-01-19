@@ -88,7 +88,7 @@ public class School implements ActionListener, FocusListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (teacher) {
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 8; i++) {
 				if (currProf.getClasses()[i] != null) {
 					if (e.getSource() == currProf.getClasses()[i].getBaseDisplay()) {
 						currClass = currProf.getClasses()[i];
@@ -138,7 +138,7 @@ public class School implements ActionListener, FocusListener {
 				
 				dashboard.add(currProf.getSem1());
 				dashboard.add(currProf.getSem2());
-				dashboard.add(currProf.getCourses());
+				dashboard.add(currProf.getCourses(1));
 				window.add(dashboard);
 
 				window.revalidate();
@@ -173,7 +173,7 @@ public class School implements ActionListener, FocusListener {
 			dashboard.removeAll();
 			dashboard.add(currProf.getSem1());
 			dashboard.add(currProf.getSem2());
-			dashboard.add(currProf.getCourses());
+			dashboard.add(currProf.getCourses(1));
 			window.revalidate();
 			window.repaint();
 		}
@@ -194,8 +194,9 @@ public class School implements ActionListener, FocusListener {
 			
 			}
 		else if (e.getActionCommand().equals("Dashboard")) {
+			dashboard.add(currClass.getDayChoice());
 			currClass.goDash();
-			dashboard.remove(currClass.getDayChoice());
+			
 			
 			dashboard.remove(currClass.getSubAtt());
 			window.revalidate();
@@ -227,10 +228,13 @@ public class School implements ActionListener, FocusListener {
 		}
 		else if(e.getActionCommand().equals("Day Choice")) {
 			currClass.changeAttDay(1);
-			
+			window.revalidate();
+			window.repaint();
 		}
 		else if(e.getActionCommand().equals("Submit Attendance")) {
 			currClass.submitAttendance();
+			window.revalidate();
+			window.repaint();
 		}
 		else if (e.getActionCommand().equals("Overall Attendance")) {
 			
@@ -252,7 +256,16 @@ public class School implements ActionListener, FocusListener {
 		
 		else if (e.getActionCommand().split(" ")[0].equals("overAtt")) {
 			currClass.indAtt(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
 		}
+		else if (e.getActionCommand().equals("indAtt")) {
+			currClass.changeAttDay(3);
+			window.revalidate();
+			window.repaint();
+			
+		}
+		
 	}
 
 	
@@ -363,9 +376,7 @@ public class School implements ActionListener, FocusListener {
 					currClass.getStudents().get(i).setMinsLate("");
 					
 				}
-				else if(e.getSource() == temp.getAbsentReason() && temp.getAbsentReason().getText().equals("Reason for absence")) {
-					currClass.getStudents().get(i).setAbsentReason("");
-				}
+				
 			}
 		}
 		
@@ -390,9 +401,7 @@ public class School implements ActionListener, FocusListener {
 				if(e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("")) {
 					currClass.getStudents().get(i).setMinsLate("Time arrived");
 				}
-				else if(e.getSource() == temp.getAbsentReason() && temp.getAbsentReason().getText().equals("")) {
-					currClass.getStudents().get(i).setAbsentReason("Reason for absence");
-				}
+				
 			}
 		}
 		
@@ -435,7 +444,7 @@ public class School implements ActionListener, FocusListener {
 		// test data
 		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
 		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5, 30,1,15);
-		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
+		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 8, ics4u);
 		
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Danny", "Song", 2));
@@ -444,11 +453,12 @@ public class School implements ActionListener, FocusListener {
 		
 		Student isa = new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5);
 		ourClass.addStudent(isa);
+		Student varun = new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10);
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Naheen", "Mahboob", 6));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Ahmed", "Sinjab", 7));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Calvin", "Cao", 9));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10));
+		ourClass.addStudent(varun);
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdulmuhaimin", "Ali", 11));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Trevor", "Bliss", 12));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Victor", "Reznov", 13));
@@ -459,7 +469,7 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Cason", "Cook", 18));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Nathan", "Killinger", 19));
 		
-		mckay.addClass(ourClass, 1);
+		mckay.addClass(ourClass, 2);
 
 		teachers.add(mckay);
 		
@@ -467,12 +477,12 @@ public class School implements ActionListener, FocusListener {
 		test[0] = new Attend(true, true, 20, "");
 		test[1] = new Attend(true, false, 0, "");
 		test[2] = new Attend(true, false, 0, "");
-		test[3] = new Attend(false, false, 0, "Sick");
+		test[3] = new Attend(false, false, 0, "Illness or injury");
 		test[4] = new Attend(true, true, 15, "");
 		test[5] = new Attend(true, true, 20, "");
 		test[6] = new Attend(true, false, 0, "");
 		test[7] = new Attend(true, false, 0, "");
-		test[8] = new Attend(false, false, 0, "Sick");
+		test[8] = new Attend(false, false, 0, "Appointment");
 		test[9] = new Attend(true, true, 15, "");
 		ourClass.setAttendance(test, isa);
 	
