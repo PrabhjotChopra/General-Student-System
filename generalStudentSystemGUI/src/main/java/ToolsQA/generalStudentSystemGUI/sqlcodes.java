@@ -1,5 +1,4 @@
 package ToolsQA.generalStudentSystemGUI;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,12 +6,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * @author songdanny
- *
- */
 public class sqlcodes {
-	
 	public static String[][] downloadTable(String tableName, Connection con) throws SQLException {
 		// Execute SQL query
 		Statement statement = con.createStatement();
@@ -36,11 +30,9 @@ public class sqlcodes {
 			}
 			row++;
 		}
-
 		// Close result set and statement
 		rs.close();
 		statement.close();
-
 		return infos;
 	}
 	
@@ -61,10 +53,6 @@ public class sqlcodes {
 
 	public static void uploadArray(String[][] infos, Connection con, String tableName) throws SQLException {
 	    // Create SQL statement
-		//UPDATE `sys`.`stu` SET `first_name` = 'Dann', `last_name` = 'Song' WHERE (`student_id` = '1');
-		//UPDATE `sys`.`stu` SET `first_name` = 'Dann', `last_name` = 'Song' WHERE (`student_id` = '1');
-		//UPDATE `stu` SET `first_name` = 'Danni', `last_name` = 'Song' WHERE (`student_id` = '1'); UPDATE `stu` SET `first_name` = 'Prab', `last_name` = 'Jot' WHERE (`student_id` = '2'); 
-
 	    for (int i = 1; i < infos.length; i++) {
 	    	StringBuilder sql = new StringBuilder();
 	        if (infos[i][0] != null) {
@@ -79,30 +67,35 @@ public class sqlcodes {
 	            sql.append(" WHERE (" + infos[0][0] + " = '" + (i) + "'); ");
 	            Statement statement = con.createStatement();
 	    	    statement.executeUpdate(sql.toString());
+	    	    statement.close();
 	        }
 	    }
 	    // Create statement and execute
-	    
 	}
 
 	public static void createTable(String tableName, String[] columnTitles, Connection con) throws SQLException {
 		// Create SQL statement
-		StringBuilder sql = new StringBuilder("CREATE TABLE " + tableName + "(");
+		StringBuilder sql = new StringBuilder("CREATE TABLE " + tableName + " (");
 		for (int i = 0; i < columnTitles.length; i++) {
-			sql.append(columnTitles[i] + " VARCHAR(3)");
+			sql.append(columnTitles[i] + " VARCHAR(30) NOT NULL");
 			if (i != columnTitles.length - 1) {
-				sql.append(",");
+				sql.append(", ");
 			}
 		}
-		sql.append(")");
+		sql.append(", PRIMARY KEY ("+ columnTitles[0] +"));");
+		
 		// Create statement and execute
+		//CREATE TABLE `SCEM DB`.`new_table` (
+		//  `Student_id` VARCHAR(30) NOT NULL,
+		 // `first name` VARCHAR(30) NOT NULL,
+		  //`last name` VARCHAR(30) NOT NULL,
+		  //PRIMARY KEY (`Student_id`);
 		Statement statement = con.createStatement();
 		statement.executeUpdate(sql.toString());
 		statement.close();
 	}
 
-	public static void addColumn(String tableName, String columnName, Connection con)
-		throws SQLException {
+	public static void addColumn(String tableName, String columnName, Connection con) throws SQLException {
 		// Create SQL statement
 		String sql = "ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + "VARCHAR(30)";
 		// Create statement and execute
@@ -114,7 +107,7 @@ public class sqlcodes {
 	public static void main(String[] args) {
         final String USERNAME = "root";// DBMS connection username
         final String PASSWORD = "!Sjsshs1177";// DBMS connection password
-        final String URL = "jdbc:mysql://localhost:3306/sys";// DBMS connection URL
+        final String URL = "jdbc:mysql://localhost:3306/SCEM DB";// DBMS connection URL
 
         try {
             // Load JDBC driver
@@ -124,12 +117,14 @@ public class sqlcodes {
             Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             
             // Download table data into 2D array
-            String[][] infos = downloadTable("Student", con);
+            String[][] infos = downloadTable("Attendance_ics4u1", con);
+            
+            String [] info = {"Student_ID", "Name", "Attendance", "late", "reason"};
             // Print array elements in table format
             printArray(infos);
-            uploadArray(infos,con, "stu");
-          //  addColumn("stu", "Student_schesdule",con);
-
+          //addColumn("stu", "Student_schesdule",con);
+           // createTable ("ICS3U1_Marks", info, con);
+            uploadArray(infos, con, "ICS3U1_Marks");
             // Close resources
             con.close();
         } catch (SQLException | ClassNotFoundException e) {
