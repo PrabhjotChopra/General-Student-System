@@ -7,7 +7,6 @@ import java.awt.*;
 import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -31,11 +30,7 @@ public class ClassCourse extends Course {
 	private int currKid;
 	private JButton baseDisplay;
 
-	// these three might be removed since you can just generate them after each
-	// button press
-	// makes it easier to deal with students joining/leaving the class and class
-	// sizes of max 30
-	// allows for the time complexity to be shit
+	
 
 	private JTextArea dashboard;
 	private JPanel tab;
@@ -48,10 +43,16 @@ public class ClassCourse extends Course {
 	private JButton daily;
 	private JButton marks;
 	private JButton overallAtt;
+	private JButton subAtt;
+	
+	private JButton marksDash;
+	private JButton assDash;
+	
 	private JButton addAss;
 	private JButton removeAss;
-	private JButton editAss;
-	private JButton subAtt;
+	
+	private JButton goBack;
+	
 
 	public ClassCourse(int n, Teacher t, String s, int p, Course c) {
 		super(c);
@@ -121,6 +122,39 @@ public class ClassCourse extends Course {
 		subAtt.setBounds(965, 170, 300, 75);
 		subAtt.setFont(School.buttonFont);
 		subAtt.addActionListener(new School());
+		
+		marks = new JButton("Marks Dashboard");
+		marks.setActionCommand("dmarks");
+		marks.setBounds(965, 170, 200, 75);
+		marks.setFont(School.buttonFont);
+		marks.addActionListener(new School());
+		
+		
+		
+		marksDash = new JButton("Student marks");
+		marksDash.setBounds(100, 180, 200, 75);
+		marksDash.setFont(School.buttonFont);
+		marksDash.addActionListener(new School());
+
+		assDash = new JButton("Assessments");
+		assDash.setBounds(320, 170, 200, 75);
+		assDash.setFont(School.buttonFont);
+		assDash.addActionListener(new School());
+
+		addAss = new JButton("Add assessment");
+		addAss.setBounds(540, 170, 200, 75);
+		addAss.setFont(School.buttonFont);
+		addAss.addActionListener(new School());
+		
+		removeAss = new JButton("Remove assessment");
+		removeAss.setBounds(760, 170, 240, 75);
+		removeAss.setFont(School.buttonFont);
+		removeAss.addActionListener(new School());
+		
+		goBack = new JButton("Back to dashboard");
+		goBack.setBounds(1020, 170, 220, 75);
+		goBack.setFont(School.buttonFont);
+		goBack.addActionListener(new School());
 
 	}
 
@@ -198,6 +232,37 @@ public class ClassCourse extends Course {
 
 		}
 		return grade;
+	}
+	
+	
+	public void goMarks() {
+		School.dashboard.add(marksDash);
+		School.dashboard.add(assDash);
+		School.dashboard.add(addAss);
+		School.dashboard.add(removeAss);
+		School.dashboard.add(goBack);
+		
+		
+	}
+	
+	public void studentMarks() {
+		
+	}
+	
+	public void assMarks() {
+		
+	}
+	
+	public void addAss() {
+		
+	}
+	
+	public void removeAss() {
+		
+	}
+	
+	public void backToAtt() {
+		
 	}
 
 	public void submitAttendance() {
@@ -288,9 +353,6 @@ public class ClassCourse extends Course {
 		if (daily.getY() == 170) {
 			daily.setLocation(daily.getX(), 180);
 			main.setLocation(main.getX(), 170);
-
-			// not initialized so commented out for now
-			// marks.setLocation(marks.getX(), 170);
 			overallAtt.setLocation(overallAtt.getX(), 170);
 
 		}
@@ -362,7 +424,12 @@ public class ClassCourse extends Course {
 
 		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		pane.getVerticalScrollBar().setUnitIncrement(16);
-
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   public void run() { 
+			       pane.getVerticalScrollBar().setValue(0);      
+			   }
+		});
+		
 		tab.setLayout(new BorderLayout());
 		tab.add(pane);
 		tab.revalidate();
@@ -371,9 +438,9 @@ public class ClassCourse extends Course {
 		if (overallAtt.getY() == 170) {
 			daily.setLocation(daily.getX(), 170);
 			main.setLocation(main.getX(), 170);
-
-			// not initialized so commented out for now
-			// marks.setLocation(marks.getX(), 170);
+			
+			
+			marks.setLocation(marks.getX(), 170);
 			overallAtt.setLocation(overallAtt.getX(), 180);
 
 		}
@@ -396,7 +463,7 @@ public class ClassCourse extends Course {
 
 		tab.removeAll();
 
-		// JPanel container = new JPanel(new GridLayout(students.size()-1,1));
+		
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
 
@@ -419,18 +486,39 @@ public class ClassCourse extends Course {
 		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		pane.getVerticalScrollBar().setUnitIncrement(16);
 
+		
+		
+
+		JPanel thisKid = new JPanel();
+		thisKid.setLayout(new BoxLayout(thisKid, BoxLayout.PAGE_AXIS));
+		
+		// individual attendance portion
+		JPanel stats = new JPanel();
+		stats.setLayout(new BoxLayout(stats, BoxLayout.PAGE_AXIS));
+		// add the stats here
+		JTextArea title = new JTextArea(s.getLastName() + ", " + s.getFirstName());
+		title.setEditable(false);
+		title.setFont(new Font("Arial", 1, 40));
+		
+		stats.add(title);
+		
+		
 		Attend[] studentData = attendance.get(s);
 		int lates = 0;
 		int absents = 0;
-
+		int minsLost = 0;
+		
+		
 		for (int j = 0; j <= courseDay; j++) {
 			if (studentData[j] != null) {
 				if (studentData[j].getPresent()) {
 					if (studentData[j].getLate()) {
 						lates++;
+						minsLost+=studentData[j].getMinutesLate();
 					}
 				} else {
 					absents++;
+					minsLost+=75;
 				}
 			}
 
@@ -440,21 +528,118 @@ public class ClassCourse extends Course {
 
 		absents = (int) Math.round(((double) absents / (courseDay + 1)) * 100); // percent of days absent
 
-		JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far\t");
+		JTextArea latePercent = new JTextArea("Late " + String.valueOf(lates) + "% of days so far");
 		latePercent.setEditable(false);
 		latePercent.setFont(Student.studentStandard);
-		JTextArea abPercent = new JTextArea("absent " + String.valueOf(absents) + "% of days so far");
+		JTextArea abPercent = new JTextArea("Absent " + String.valueOf(absents) + "% of days so far");
 		abPercent.setEditable(false);
 		abPercent.setFont(Student.studentStandard);
-
-		JPanel thisKid = new JPanel(new GridLayout(2, 1));
-		// individual attendance portion
-		JPanel stats = new JPanel();
-
+		
+		int percentLost = (int) Math.round(((double) minsLost / ((courseDay + 1)*75)) * 100);
+		JTextArea totalMins = new JTextArea("Not present for " + minsLost + " minutes of class so far "
+				+ "(" + percentLost + "% of the class)");
+		totalMins.setEditable(false);
+		totalMins.setFont(Student.studentStandard);
+		
+		stats.add(latePercent);
+		stats.add(abPercent);
+		stats.add(totalMins);
+		
+		
+		int specificlates = 0;
+		int specificabsents = 0;
+		int specificmins = 0;
+		
+		if (courseDay+1>=5) {
+			for(int i=courseDay-4; i<=courseDay; i++) {
+				if(studentData[i]!=null) {
+					if (studentData[i].getPresent()) {
+						if (studentData[i].getLate()) {
+							specificlates++;
+							specificmins+=studentData[i].getMinutesLate();
+						}
+					} else {
+						specificabsents++;
+						specificmins+=75;
+					}
+				}
+				
+			}
+			
+			int percentmins = (int) Math.round(((double) specificmins / ((5*75)) * 100));
+			
+			JTextArea lastweek = new JTextArea("\nLate " + specificlates + " time(s) and absent " + specificabsents + 
+					" time(s) in the past week, \nmissing " + percentmins + "% of classtime over that period");
+			lastweek.setEditable(false);
+			lastweek.setFont(Student.studentStandard);
+			
+			stats.add(lastweek);
+		}
+		if (courseDay+1>=10) {
+			specificlates = 0;
+			specificabsents = 0;
+			specificmins = 0;
+			
+			for(int i=courseDay-9; i<=courseDay; i++) {
+				if(studentData[i]!=null) {
+					if (studentData[i].getPresent()) {
+						if (studentData[i].getLate()) {
+							specificlates++;
+							specificmins+=studentData[i].getMinutesLate();
+						}
+					} else {
+						specificabsents++;
+						specificmins+=75;
+					}
+				}
+				
+			}
+			
+			int percentmins = (int) Math.round(((double) specificmins / ((10*75)) * 100));
+			
+			JTextArea twoweeks = new JTextArea("\nLate " + specificlates + " time(s) and absent " + specificabsents + 
+					" time(s) in the past two weeks, \nmissing " + percentmins + "% of classtime over that period");
+			twoweeks.setEditable(false);
+			twoweeks.setFont(Student.studentStandard);
+			stats.add(twoweeks);
+		}
+		
+		if (courseDay+1>=20) {
+			specificlates = 0;
+			specificabsents = 0;
+			specificmins = 0;
+			for(int i=courseDay-19; i<=courseDay; i++) {
+				if(studentData[i]!=null) {
+					if (studentData[i].getPresent()) {
+						if (studentData[i].getLate()) {
+							specificlates++;
+							specificmins+=studentData[i].getMinutesLate();
+						}
+					} else {
+						specificabsents++;
+						specificmins+=75;
+					}
+				}
+				
+			}
+			
+			int percentmins = (int) Math.round(((double) specificmins / ((20*75)) * 100));
+			
+			JTextArea lastmonth = new JTextArea("\nLate " + specificlates + " time(s) and absent " + specificabsents + 
+					" time(s) in the past month, \nmissing " + percentmins + "% of classtime over that period");
+			lastmonth.setEditable(false);
+			lastmonth.setFont(Student.studentStandard);
+			stats.add(lastmonth);
+		}
+		final JScrollPane statistics = new JScrollPane(stats);
+		statistics.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		statistics.getVerticalScrollBar().setUnitIncrement(10);
+		
 		JPanel attending = new JPanel();
 
 		attending.setLayout(new BoxLayout(attending, BoxLayout.PAGE_AXIS));
-
+		
+		
 		for (int i = 0; i <= courseDay; i++) {
 			Attend temp = studentData[i];
 			if (temp == null) {
@@ -475,29 +660,41 @@ public class ClassCourse extends Course {
 				thisday.setBackground((Color.decode("#cc473d")));
 
 			}
-			thisday.setFont(new Font("Arial", 1, 25));
+			thisday.setFont(new Font("Arial", 1, 25));	
 			thisday.setBorder(BorderFactory.createLineBorder(Color.black));
 
 			thisday.setEditable(false);
 			attending.add(thisday);
 
 		}
-		JScrollPane attPanel = new JScrollPane(attending);
+		final JScrollPane attPanel = new JScrollPane(attending);
 
 		attPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		attPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		attPanel.getVerticalScrollBar().setUnitIncrement(10);
-
-		thisKid.add(stats);
+		
+		statistics.setMaximumSize(new Dimension(School.rect.width-540, statistics.getHeight()));
+		attPanel.setMaximumSize(new Dimension(School.rect.width-540, attPanel.getHeight()));
+		
+	
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   public void run() { 
+			       statistics.getVerticalScrollBar().setValue(0);
+			       attPanel.getVerticalScrollBar().setValue(0);
+			   }
+		});
+		
+		
+		thisKid.add(statistics);
+		thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
 		thisKid.add(attPanel);
 
 		tab.setLayout(null);
 		tab.add(pane);
 		tab.add(thisKid);
 
-		pane.setSize(300, School.rect.height - 355);
+		pane.setSize(320, School.rect.height - 355);
 
-		thisKid.setBounds(300, 0, School.rect.width - 500, School.rect.height - 355);
+		thisKid.setBounds(320, 0, School.rect.width - 500, School.rect.height - 355);
 
 		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -507,17 +704,22 @@ public class ClassCourse extends Course {
 	}
 
 	public void goDash() {
+		
+		
+		
+		changeAttDay(4);
 		tab.removeAll();
 		tab.setLayout(new BoxLayout(tab, BoxLayout.Y_AXIS));
 		tab.add(dashboard);
 		tab.revalidate();
 		tab.repaint();
+		
 		if (main.getY() == 170) {
 			daily.setLocation(daily.getX(), 170);
 			main.setLocation(main.getX(), 180);
 
-			// not initialized so commented out for now
-			// marks.setLocation(marks.getX(), 170);
+			
+			marks.setLocation(marks.getX(), 170);
 			overallAtt.setLocation(overallAtt.getX(), 170);
 
 		}
@@ -639,6 +841,7 @@ public class ClassCourse extends Course {
 		} else if (type == 3) {
 			indAtt(currKid);
 		}
+		
 
 	}
 
@@ -723,6 +926,9 @@ public class ClassCourse extends Course {
 
 	public JButton getOverallAtt() {
 		return overallAtt;
+	}
+	public JButton getMarks() {
+		return marks;
 	}
 
 	public void setProf(Teacher t) {

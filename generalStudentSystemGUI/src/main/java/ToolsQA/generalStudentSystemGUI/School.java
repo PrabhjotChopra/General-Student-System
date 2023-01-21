@@ -98,6 +98,8 @@ public class School implements ActionListener, FocusListener {
 						dashboard.add(currClass.getMain());
 						dashboard.add(currClass.getDaily());
 						dashboard.add(currClass.getOverallAtt());
+						dashboard.add(currClass.getDayChoice());
+						dashboard.add(currClass.getMarks());
 						currClass.goDash();
 						dashboard.add(currClass.getTab());
 						dashboard.revalidate();
@@ -178,7 +180,7 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		}
 		else if (e.getActionCommand().equals("Daily Attendance")) {
-			
+			dashboard.remove(currClass.getMarks());
 			dashboard.add(currClass.getDayChoice());
 			
 			dashboard.add(currClass.getSubAtt());
@@ -195,6 +197,7 @@ public class School implements ActionListener, FocusListener {
 			}
 		else if (e.getActionCommand().equals("Dashboard")) {
 			dashboard.add(currClass.getDayChoice());
+			dashboard.add(currClass.getMarks());
 			currClass.goDash();
 			
 			
@@ -240,7 +243,7 @@ public class School implements ActionListener, FocusListener {
 			
 			dashboard.remove(currClass.getSubAtt());
 			dashboard.add(currClass.getDayChoice());
-			
+			dashboard.add(currClass.getMarks());
 			
 			dashboard.add(currClass.overallAtt());
 		
@@ -264,6 +267,19 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 			
+		}
+		else if(e.getActionCommand().equals("dmarks")) {
+			
+			dashboard.remove(currClass.getDaily());
+			dashboard.remove(currClass.getOverallAtt());
+			dashboard.remove(currClass.getMain());
+			dashboard.remove(currClass.getDayChoice());
+			dashboard.remove(currClass.getMarks());
+			
+			currClass.goMarks();
+			
+			window.revalidate();
+			window.repaint();
 		}
 		
 	}
@@ -487,6 +503,7 @@ public class School implements ActionListener, FocusListener {
 		ourClass.setAttendance(test, isa);
 	
 		//Schedule timetable = new Schedule(students, teachers, courseOfferings, rooms);
+		
 		initialize();
 	}
 
