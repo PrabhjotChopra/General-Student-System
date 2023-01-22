@@ -271,6 +271,11 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		}
+		else if(e.getActionCommand().split(" ")[0].equals("submitMarks")) {
+			currClass.submitGrades(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		}
 		
 	}
 
@@ -496,6 +501,9 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addAssessment("DSA test", 2, 62);
 		ourClass.addAssessment("Graphics assignment", 3, 19);
 		ourClass.addAssessment("D&D", 3, 39);
+		ourClass.addAssessment("Binary Tree assignment", 3, 22);
+		ourClass.addAssessment("OOP Test", 2.5, 36);
+		ourClass.addAssessment("Searching/sorting assignment", 3, 26);
 		
 		ourClass.setGrade(isa, "DSA test", 34.0);
 		ourClass.setGrade(isa, "Graphics assignment", 19.0);

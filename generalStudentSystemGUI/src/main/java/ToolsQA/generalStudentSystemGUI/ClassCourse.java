@@ -38,8 +38,10 @@ public class ClassCourse extends Course {
 	private JPanel tab;
 	private JScrollPane pane;
 
-	JComboBox<String> dayChoice;
-
+	private JComboBox<String> dayChoice;
+	private JTextField midterming;
+	private LinkedList<JTextField> assMarks;
+	
 	// various menu jbuttons
 	private JButton main;
 	private JButton daily;
@@ -184,9 +186,12 @@ public class ClassCourse extends Course {
 		midterms.put(s, 0.0);
 		
 		
-		// add to grades
-		// add to midterms
-		// add to current grades
+		for(int i=0;i<assignments.size();i++) { 
+			// adds the new student to the assessment tables if they joined late
+			Hashtable<Student, Double> thisGrade = grades.get(assignments.get(i));
+			thisGrade.put(s, 0.0);
+			grades.replace(assignments.get(i), thisGrade);
+		}
 		
 
 	
@@ -204,10 +209,12 @@ public class ClassCourse extends Course {
 
 	public void setGrade(Student s, String assignmentName, Double marksEarned) {
 		
-		Assessment assign = new Assessment();
+		Assessment assign=null;
+		
 		for(int i=0;i<assignments.size();i++) {
-			if (assignments.get(i).getName().equals(assignmentName)) {
+			if (assignments.get(i).getName().trim().equals(assignmentName)) {
 				assign = assignments.get(i);
+				
 			}
 		}
 		
@@ -217,8 +224,6 @@ public class ClassCourse extends Course {
 		grades.replace(assign, marks);
 		
 		current.replace(s, gradeCalc(s));
-		
-
 		
 	}
 
@@ -250,15 +255,26 @@ public class ClassCourse extends Course {
 
 	public double gradeCalc(Student s) {
 		double grade = 0.0;
+		
+		double thisWeight = totalWeight;
+		for(int i=0;i<assignments.size();i++) {
+			if(grades.get(assignments.get(i)).get(s)<0) {
+				thisWeight-=assignments.get(i).getWeight();
+			}
+		}
+		
+		
 		for(int i=0;i<assignments.size();i++) {
 			
 			double mark = grades.get(assignments.get(i)).get(s) / (double) assignments.get(i).getTotalMarks(); 
 			// student marks/total marks for that assessment
 			mark*=100;
+			if(mark<0) {
+				continue;
+			}
 			
 			
-			
-			double weight = assignments.get(i).getWeight() / totalWeight; // how much that assessment is currently worth
+			double weight = assignments.get(i).getWeight() / thisWeight; // how much that assessment is currently worth
 			
 			
 			
@@ -453,7 +469,7 @@ public class ClassCourse extends Course {
 		
 		JPanel top = new JPanel();
 		top.setLayout(new BoxLayout(top, BoxLayout.LINE_AXIS));
-		JTextArea grade = new JTextArea("Current average: " + gradeCalc(s));
+		JTextArea grade = new JTextArea("Current average: " + gradeCalc(s) + "%");
 		grade.setEditable(false);
 		grade.setFont(Student.studentStandard);
 		
@@ -462,8 +478,14 @@ public class ClassCourse extends Course {
 			midterm = midterms.get(s);
 		}
 		
-		JTextField midterming = new JTextField(String.valueOf(midterm));
+		JTextArea thismid = new JTextArea("Midterm mark: ");
+		thismid.setEditable(false);
+		thismid.setFont(Student.studentStandard);
+		thismid.setMaximumSize(new Dimension(80, 25));
+		
+		midterming = new JTextField(String.valueOf(midterm));
 		midterming.setFont(Student.studentStandard);
+		midterming.setMaximumSize(new Dimension(midterming.getWidth(), 25));
 		
 		JTextArea percent = new JTextArea("%");
 		percent.setEditable(false);
@@ -471,11 +493,28 @@ public class ClassCourse extends Course {
 		
 		
 		
-		top.add(grade);
+		
+		top.add(thismid);
 		top.add(midterming);
 		top.add(percent);
 		
+		overview.add(grade);
 		overview.add(top);
+		overview.setMaximumSize(new Dimension(School.rect.width - 740, 300));
+		
+		JPanel info = new JPanel();
+		info.setLayout(new BoxLayout(info, BoxLayout.LINE_AXIS));
+		info.add(overview);
+		
+		JButton submitMarks = new JButton("Submit marks");
+		submitMarks.setFont(School.buttonFont);
+		submitMarks.addActionListener(new School());
+		submitMarks.setMaximumSize(new Dimension(200, 300));
+		submitMarks.setActionCommand("submitMarks " + s.getStudentNumber());
+		
+		
+		
+		info.add(submitMarks);
 		
 		
 		JPanel specificGrades = new JPanel();
@@ -483,6 +522,62 @@ public class ClassCourse extends Course {
 		specificGrades.setLayout(new BoxLayout(specificGrades, BoxLayout.PAGE_AXIS));
 		specificGrades.setBorder(BorderFactory.createLineBorder(Color.black));
 		// fill in the specific grades for assignments with the text field here
+		JTextArea headers = new JTextArea("Assignment name\t         Student Mark\t      Current Weight");
+		headers.setEditable(false);
+		headers.setFont(Student.studentStandard);
+		specificGrades.add(headers);
+		specificGrades.add(Box.createRigidArea(new Dimension(0,20)));
+		
+		
+		assMarks = new LinkedList<JTextField>();
+		for(int i=0;i<assignments.size();i++) {
+			JPanel thisGrade = new JPanel();
+			thisGrade.setLayout(new BoxLayout(thisGrade, BoxLayout.LINE_AXIS));
+			
+			JTextArea name = new JTextArea(assignments.get(i).getName());
+			name.setEditable(false);
+			name.setFont(Student.studentStandard);
+			name.setPreferredSize(new Dimension(330,30));
+			name.setMaximumSize(new Dimension(330,30));
+			
+			double studentValue = grades.get(assignments.get(i)).get(s);
+			
+			JTextField studentMark = new JTextField(String.valueOf(studentValue));
+			
+			studentMark.setFont(Student.studentStandard);
+			studentMark.setMaximumSize(new Dimension(80,25));
+			assMarks.add(studentMark);
+			
+			double thismark = ((double) Math.round(studentValue*1000/assignments.get(i).getTotalMarks())) /10;
+			double thisweight = ((double) Math.round(assignments.get(i).getWeight() *1000/ totalWeight)) / 10;
+			
+			if(thismark<0) {
+				thismark=0;
+			}
+			
+			JTextArea totalMark = new JTextArea("/" + assignments.get(i).getTotalMarks() + " (" + thismark + 
+					"%)");
+		
+			totalMark.setEditable(false);
+			totalMark.setFont(Student.studentStandard);
+			totalMark.setPreferredSize(new Dimension(184,25));
+			totalMark.setMaximumSize(new Dimension(184,25));
+			
+			JTextArea weight = new JTextArea(thisweight + "%");
+			weight.setEditable(false);
+			weight.setFont(Student.studentStandard);
+			
+			thisGrade.add(name);
+			thisGrade.add(studentMark);
+			thisGrade.add(totalMark);
+			thisGrade.add(weight);
+			
+			thisGrade.setBorder(BorderFactory.createLineBorder(Color.black));
+			specificGrades.add(thisGrade);
+			specificGrades.add(Box.createRigidArea(new Dimension(0,10)));
+		}
+		
+		
 		
 		
 		
@@ -494,8 +589,9 @@ public class ClassCourse extends Course {
 		gradePanel.getVerticalScrollBar().setUnitIncrement(10);
 		
 		
-		overview.setMaximumSize(new Dimension(tab.getWidth() - 340, overview.getHeight()));
-		gradePanel.setMaximumSize(new Dimension(tab.getWidth() - 340, gradePanel.getHeight()));
+		
+		gradePanel.setMaximumSize(new Dimension(School.rect.width - 540, 800));
+		
 		// adjust the max sizes so the overview is small and the assessment stuff is big
 		
 	
@@ -506,17 +602,19 @@ public class ClassCourse extends Course {
 		});
 		
 		
-		thisKid.add(overview);
+		thisKid.add(info);
 		thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
 		thisKid.add(gradePanel);
 
-		tab.setLayout(null);
+		tab.setLayout(new BoxLayout(tab, BoxLayout.LINE_AXIS));
 		tab.add(pane);
+		tab.add(Box.createRigidArea(new Dimension(20,0)));
 		tab.add(thisKid);
+		
+		pane.setMaximumSize(new Dimension(320,School.rect.height-355));
+		
 
-		pane.setSize(320, School.rect.height - 355);
-
-		thisKid.setBounds(320, tab.getY(), School.rect.width - 500, tab.getHeight());
+		
 
 		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
 		
@@ -540,6 +638,26 @@ public class ClassCourse extends Course {
 	
 	public void removeAss() {
 		
+	}
+	
+	public void submitGrades(int id) {
+		Student s = new Student();
+		for(int i=0;i<students.size();i++) {
+			if(students.get(i).getStudentNumber() == id) {
+				s = students.get(i);
+				break;
+			}
+		}
+		
+		try {
+			midterms.replace(s, Double.parseDouble(midterming.getText()));
+			
+			for(int i=0;i<assignments.size();i++) {
+				grades.get(assignments.get(i)).replace(s, Double.parseDouble(assMarks.get(i).getText()));
+			}
+			indStudentMarks(id);
+		}
+		catch(NumberFormatException e) {}
 	}
 	
 

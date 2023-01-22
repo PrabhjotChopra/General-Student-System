@@ -1,5 +1,6 @@
 package ToolsQA.generalStudentSystemGUI;
 
+
 public class Assessment {
 	private String name;
 	private double weight;
@@ -8,6 +9,8 @@ public class Assessment {
 	public Assessment() {}
 	public Assessment(String s, double w, int n) {
 		name = s;
+		
+
 		weight = w;
 		totalMarks = n;
 	}
