@@ -42,7 +42,13 @@ public class ClassCourse extends Course {
 	private JTextField title;
 	private JTextField totalMarks;
 	private JTextField weightfactor;
-
+	
+	
+	private JTextField assName;
+	private JTextField assWeight;
+	private JTextField totalAssMarks;
+	private JTextField result;
+	
 	// various menu jbuttons
 	private JButton main;
 	private JButton daily;
@@ -163,6 +169,13 @@ public class ClassCourse extends Course {
 		goBack.setFont(School.buttonFont);
 		goBack.addActionListener(new School());
 		goBack.setActionCommand("back to dash");
+		
+		result = new JTextField("");
+		result.setEditable(false);
+		result.setVisible(false);
+		result.setHorizontalAlignment(JTextField.CENTER);
+		result.setFont(new Font("Arial",1,25));
+		result.setMaximumSize(new Dimension(School.rect.width+50,35));
 
 	}
 
@@ -597,24 +610,29 @@ public class ClassCourse extends Course {
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
-
+		
+		
+		Dimension sidescroll = new Dimension(320,50);
 		for (int i = 0; i < assignments.size(); i++) {
 			if (!(ass.equals(assignments.get(i)))) {
 				
 				JButton b = assignments.get(i).getDetails();
-				b.setText(assignments.get(i).getName().trim());
+				b.setText(assignments.get(i).getName());
+				
 				JPanel temp = new JPanel(new GridLayout(1, 1));
 				temp.add(b);
+				temp.setMinimumSize(sidescroll);
+				temp.setMaximumSize(sidescroll);
 				container.add(temp);
 
 				container.add(Box.createRigidArea(new Dimension(0, 10)));
 			}
 		}
-		pane = new JScrollPane(container);
+		JScrollPane assPanel = new JScrollPane(container);
 
-		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		pane.getVerticalScrollBar().setUnitIncrement(16);
+		assPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		assPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		assPanel.getVerticalScrollBar().setUnitIncrement(16);
 
 		JPanel thisAss = new JPanel();
 		thisAss.setLayout(new BoxLayout(thisAss, BoxLayout.PAGE_AXIS));
@@ -690,6 +708,7 @@ public class ClassCourse extends Course {
 		
 		// add the text stuff here
 		overview.add(title);
+		overview.add(Box.createRigidArea(new Dimension(0, 10)));
 		overview.add(omarks);
 		overview.add(classAvg);
 		
@@ -783,11 +802,11 @@ public class ClassCourse extends Course {
 		thisAss.add(gradePanel);
 
 		tab.setLayout(new BoxLayout(tab, BoxLayout.LINE_AXIS));
-		tab.add(pane);
+		tab.add(assPanel);
 		tab.add(Box.createRigidArea(new Dimension(20, 0)));
 		tab.add(thisAss);
 
-		pane.setMaximumSize(new Dimension(320, School.rect.height - 355));
+		assPanel.setMaximumSize(new Dimension(320, School.rect.height - 355));
 
 		thisAss.setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -901,15 +920,59 @@ public class ClassCourse extends Course {
 		tab.removeAll();
 		tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
 		
-		JTextArea instructions = new JTextArea("Fill in the boxes below and click submit to add the assessment");
-		instructions.setFont(new Font("Arial",1,25));
+		JTextField instructions = new JTextField("Fill in the boxes below and click submit to add the assessment");
+		instructions.setFont(new Font("Arial",1,37));
 		instructions.setEditable(false);
+		
+		instructions.setMaximumSize(new Dimension(School.rect.width+50, 50));
+		
 		tab.add(instructions);
 		
 		JPanel fields = new JPanel();
 		fields.setLayout(new BoxLayout(fields, BoxLayout.LINE_AXIS));
 		// add the three text fields, their focus listeners, and the submit button
+		assName= new JTextField("Assessment name");
+		assName.setFont(Student.studentStandard);
+		assName.addFocusListener(new School());
 		
+		Dimension field = new Dimension(300, 30);
+		assName.setMaximumSize(field);
+		
+		
+		assWeight = new JTextField("Assessment weight factor");
+		assWeight.setFont(Student.studentStandard);
+		assWeight.addFocusListener(new School());
+		assWeight.setMaximumSize(field);
+		
+		
+		totalAssMarks = new JTextField("Total # of marks");
+		totalAssMarks.setFont(Student.studentStandard);
+		totalAssMarks.addFocusListener(new School());
+		totalAssMarks.setMaximumSize(field);
+		
+		JButton submitAss = new JButton("Add assessment");
+		submitAss.setFont(Student.studentStandard);
+		submitAss.setMaximumSize(new Dimension(250, 80));
+		submitAss.addActionListener(new School());
+		submitAss.setActionCommand("add assessment");
+		
+		fields.add(Box.createRigidArea(new Dimension(20,0)));
+		fields.add(assName);
+		fields.add(Box.createRigidArea(new Dimension(20,0)));
+		fields.add(assWeight);
+		fields.add(Box.createRigidArea(new Dimension(20,0)));
+		fields.add(totalAssMarks);
+		
+		
+		result.setVisible(false);
+		
+		
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
+		tab.add(fields);
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
+		tab.add(submitAss);
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
+		tab.add(result);
 		
 		if (addAss.getY() == 170) {
 			addAss.setLocation(addAss.getX(), 180);
@@ -919,19 +982,56 @@ public class ClassCourse extends Course {
 		}	
 		
 	}
+	public void addAssFromGUI() {
+		result.setVisible(true);
+		try {
+			String name = assName.getText();
+			name = name.replace(" ", "_");
+			double weight = Double.parseDouble(assWeight.getText());
+			int marks = Integer.parseInt(totalAssMarks.getText());
+			addAssessment(name,weight,marks);
+			result.setText("Assessment \"" + name + "\" successfully added");
+			
+			// successfully added message
+		}
+		catch (NumberFormatException e){
+			result.setText("Invalid or incomplete assessment information");
+			// invalid message
+		}
+		
+	}
 
 	public void removeAss() {
 		tab.removeAll();
 		tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
 		
 		JTextArea instructions = new JTextArea("Please enter the name of the assessment you wish to remove and click submit");
-		instructions.setFont(new Font("Arial",1,25));
+		instructions.setFont(new Font("Arial",1,31));
 		instructions.setEditable(false);
+		instructions.setMaximumSize(new Dimension(School.rect.width+50, 50));
 		tab.add(instructions);
 		
 		// add the one text field w/the focus listener and the submit button
+		assName= new JTextField("Assessment name");
+		assName.setFont(Student.studentStandard);
+		assName.addFocusListener(new School());
+		assName.setMaximumSize(new Dimension(300, 30));
 		
+		JButton removeAssess = new JButton("Remove assessment");
+		removeAssess.setFont(Student.studentStandard);
+		removeAssess.setMaximumSize(new Dimension(250, 80));
+		removeAssess.addActionListener(new School());
+		removeAssess.setActionCommand("remove assessment");
+		removeAssess.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
+		result.setVisible(false);
+		
+		tab.add(Box.createRigidArea(new Dimension(0,20)));
+		tab.add(assName);
+		tab.add(Box.createRigidArea(new Dimension(0,20)));
+		tab.add(removeAssess);
+		tab.add(Box.createRigidArea(new Dimension(0,20)));
+		tab.add(result);
 		
 		if (removeAss.getY() == 170) {
 			addAss.setLocation(addAss.getX(), 170);
@@ -939,6 +1039,26 @@ public class ClassCourse extends Course {
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 170);
 		}	
+	}
+	public void removeAssFromGUI() {
+		result.setVisible(true);
+		
+		String name = assName.getText();
+		name = name.replace(" ", "_");
+		if(name.equals("Assessment name")) {
+			name = "";
+		}
+		
+		for(int i=0;i<assignments.size();i++) {
+			if(assignments.get(i).getName().toLowerCase().equals(name.toLowerCase().strip())) {
+				removeAssessment(assignments.get(i));
+				result.setText("Assessment \"" + name + "\" successfully removed");
+				return;
+			}
+		}
+		result.setText("Assessment \"" + name + "\" not found");
+		
+		
 	}
 
 	public void submitAssGrades(String nameid) {
@@ -968,7 +1088,15 @@ public class ClassCourse extends Course {
 			
 			addAssessment(ass);
 			for(int i=0;i<students.size();i++) {
-				grades.get(ass).put(students.get(i), Double.parseDouble(assMarks.get(i).getText()));
+				String temp = assMarks.get(i).getText();
+				double newGrade = 0.0;
+				if(temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a")) {
+					newGrade=-1;
+				}
+				else {
+					newGrade = Double.parseDouble(temp);
+				}
+				grades.get(ass).put(students.get(i), newGrade);
 			}
 			
 			
@@ -990,12 +1118,21 @@ public class ClassCourse extends Course {
 			midterms.replace(s, Double.parseDouble(midterming.getText()));
 
 			for (int i = 0; i < assignments.size(); i++) {
-				grades.get(assignments.get(i)).replace(s, Double.parseDouble(assMarks.get(i).getText()));
+				String temp = assMarks.get(i).getText();
+				double newGrade = 0.0;
+				if(temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a")) {
+					newGrade=-1;
+				}
+				else {
+					newGrade = Double.parseDouble(temp);
+				}
+				
+				
+				grades.get(assignments.get(i)).replace(s, newGrade);
 			}
 
 			indStudentMarks(id);
-		} catch (NumberFormatException e) {
-		}
+		} catch (NumberFormatException e) {}
 	}
 
 	public void submitAttendance() {
@@ -1188,7 +1325,7 @@ public class ClassCourse extends Course {
 			if (students.get(i).getStudentNumber() == id) {
 				s = students.get(i);
 				currKid = id;
-
+				break;
 			}
 		}
 
@@ -1673,5 +1810,14 @@ public class ClassCourse extends Course {
 
 	public void setAttendance(Attend[] a, Student s) {
 		attendance.replace(s, a);
+	}
+	public JTextField getAssName() {
+		return assName;
+	}
+	public JTextField getAssWeight() {
+		return assWeight;
+	}
+	public JTextField getTotalAssMarks() {
+		return totalAssMarks;
 	}
 }

@@ -301,6 +301,16 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		}
+		else if(e.getActionCommand().equals("add assessment")) {
+			currClass.addAssFromGUI();
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("remove assessment")) {
+			currClass.removeAssFromGUI();
+			window.revalidate();
+			window.repaint();
+		}
 		
 	}
 
@@ -414,8 +424,16 @@ public class School implements ActionListener, FocusListener {
 				}
 				
 			}
+			if(currClass.getAssName().getText().equals("Assessment name") && e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("");
+			}
+			if(currClass.getAssWeight().getText().equals("Assessment weight factor") && e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("");
+			}
+			if(currClass.getTotalAssMarks().getText().equals("Total # of marks") && e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("");
+			}
 		}
-		
 		
 		if (lastName.getText().equals("Enter your last name here") && e.getComponent() == lastName) {
 			lastName.setText("");
@@ -428,6 +446,7 @@ public class School implements ActionListener, FocusListener {
 			password.setText("");
 		}
 		
+		
 	}
 
 	public void focusLost(FocusEvent e) {
@@ -438,6 +457,15 @@ public class School implements ActionListener, FocusListener {
 					currClass.getStudents().get(i).setMinsLate("Time arrived");
 				}
 				
+			}
+			if(currClass.getAssName().getText().equals("") && e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("Assessment name");
+			}
+			if(currClass.getAssWeight().getText().equals("") && e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("Assessment weight factor");
+			}
+			if(currClass.getTotalAssMarks().getText().equals("") && e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("Total # of marks");
 			}
 		}
 		
@@ -451,6 +479,7 @@ public class School implements ActionListener, FocusListener {
 		if (password.getText().equals("") && e.getComponent() == password) {
 			password.setText("Enter the password here");
 		}
+		
 	}
 
 	public Teacher teacherLogin() {
@@ -530,6 +559,12 @@ public class School implements ActionListener, FocusListener {
 		ourClass.addAssessment("OOP_Test", 2.5, 36);
 		ourClass.addAssessment("Searching/sorting_assignment", 3, 26);
 		ourClass.addAssessment("wwdqd", 3, 26);
+		ourClass.addAssessment("wasdqd", 3, 26);
+		ourClass.addAssessment("wwdddd", 3, 26);
+		ourClass.addAssessment("waqd", 3, 26);
+		ourClass.addAssessment("asdqwd", 3, 26);
+		ourClass.addAssessment("wawwdwd", 3, 26);
+		ourClass.addAssessment("dddd", 3, 26);
 		
 		ourClass.setGrade(isa, "DSA_test", 34.0);
 		ourClass.setGrade(isa, "Graphics_assignment", 19.0);
