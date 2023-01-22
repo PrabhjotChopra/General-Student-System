@@ -143,6 +143,9 @@ public class Teacher {
 	public String getLastName() {
 		return lastName;
 	}
+	public String getFirstName() {
+		return firstName;
+	}
 
 	public int getID() {
 		return ID;

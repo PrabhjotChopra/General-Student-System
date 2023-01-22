@@ -97,8 +97,8 @@ public class ClassCourse extends Course {
 		tab.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		dashboard = new JTextArea("Name: " + this.getName() + "\nCode: " + this.getCode() + "- 0" + courseNum
-				+ "\nType: " + this.getType() + "\nRoom: " + room + "\nPeriod: " + period);
-		dashboard.setFont(School.buttonFont);
+				+ "\nType: " + this.getType() + "\nRoom: " + room + "\nPeriod: " + period + "\nTeacher: " + prof.getFirstName().charAt(0) + ". " + prof.getLastName());
+		dashboard.setFont(new Font("Arial",1,25));
 		dashboard.setEditable(false);
 		tab.add(dashboard);
 
@@ -1406,12 +1406,13 @@ public class ClassCourse extends Course {
 		stats.add(latePercent);
 		stats.add(abPercent);
 		stats.add(totalMins);
+		
 
 		int specificlates = 0;
 		int specificabsents = 0;
 		int specificmins = 0;
-
-		if (courseDay + 1 >= 5) {
+		
+		if (courseDay >= 4) {
 			for (int i = courseDay - 4; i <= courseDay; i++) {
 				if (studentData[i] != null) {
 					if (studentData[i].getPresent()) {
@@ -1436,7 +1437,7 @@ public class ClassCourse extends Course {
 
 			stats.add(lastweek);
 		}
-		if (courseDay + 1 >= 10) {
+		if (courseDay >= 9) {
 			specificlates = 0;
 			specificabsents = 0;
 			specificmins = 0;
@@ -1465,7 +1466,7 @@ public class ClassCourse extends Course {
 			stats.add(twoweeks);
 		}
 
-		if (courseDay + 1 >= 20) {
+		if (courseDay >= 19) {
 			specificlates = 0;
 			specificabsents = 0;
 			specificmins = 0;
@@ -1492,6 +1493,8 @@ public class ClassCourse extends Course {
 			lastmonth.setFont(Student.studentStandard);
 			stats.add(lastmonth);
 		}
+		
+		
 		final JScrollPane statistics = new JScrollPane(stats);
 		statistics.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		statistics.getVerticalScrollBar().setUnitIncrement(10);
@@ -1532,19 +1535,28 @@ public class ClassCourse extends Course {
 		attPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		attPanel.getVerticalScrollBar().setUnitIncrement(10);
 
-		statistics.setMaximumSize(new Dimension(School.rect.width - 540, statistics.getHeight()));
-		attPanel.setMaximumSize(new Dimension(School.rect.width - 540, attPanel.getHeight()));
-
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				statistics.getVerticalScrollBar().setValue(0);
 				attPanel.getVerticalScrollBar().setValue(0);
 			}
 		});
-
-		thisKid.add(statistics);
-		thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
-		thisKid.add(attPanel);
+		
+		if(courseDay<5) {
+			
+			thisKid.add(stats);
+			thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
+			thisKid.add(attending);
+		}
+		else {
+			statistics.setMaximumSize(new Dimension(School.rect.width - 540, statistics.getHeight()));
+			attPanel.setMaximumSize(new Dimension(School.rect.width - 540, attPanel.getHeight()));
+			
+			thisKid.add(statistics);
+			thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
+			thisKid.add(attPanel);
+		}
+		
 
 		tab.setLayout(null);
 		tab.add(pane);
@@ -1576,13 +1588,63 @@ public class ClassCourse extends Course {
 		School.dashboard.add(marks);
 		School.dashboard.add(subAtt);
 		
-		
+		sortKids();
 		changeAttDay(4);
 		tab.removeAll();
-		tab.setLayout(new BoxLayout(tab, BoxLayout.Y_AXIS));
-		tab.add(dashboard);
+		tab.setLayout(new GridLayout(1,2));
+		
+		
+		
+		JPanel info = new JPanel();
+		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+		
+		JTextField infohead = new JTextField("Class Information");
+		infohead.setEditable(false);
+		infohead.setFont(new Font("Arial",1,40));
+		infohead.setHorizontalAlignment(JTextField.CENTER);
+		
+		info.add(infohead);
+		String[] dashboardParts = dashboard.getText().split("\n");
+		dashboard.setText(dashboardParts[0]+"\n"+dashboardParts[1]+"\n"+dashboardParts[2]+"\n"+dashboardParts[3]+"\n"+dashboardParts[4] + "\nNumber of students: " + students.size());
+		info.add(dashboard);
+		infohead.setMaximumSize(new Dimension(900, 50));
+		
+		
+		JPanel container = new JPanel();
+		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+		for(int i=0;i<students.size();i++) {
+			JTextArea temp = students.get(i).tabbedName();
+			temp.setFont(new Font("Arial",1,25));
+			container.add(temp);
+			
+			container.add(Box.createRigidArea(new Dimension(0,10)));
+		}
+		
+		final JScrollPane kids = new JScrollPane(container, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		kids.getVerticalScrollBar().setUnitIncrement(16);
+		
+		JPanel classlist = new JPanel();
+		classlist.setLayout(new BoxLayout(classlist, BoxLayout.PAGE_AXIS));
+		
+		JTextField classy = new JTextField("Class List");
+		classy.setEditable(false);
+		classy.setFont(new Font("Arial",1,40));
+		classy.setHorizontalAlignment(JTextField.CENTER);
+		
+		classlist.add(classy);
+		classlist.add(kids);
+		
+		
+		tab.add(info);
+		tab.add(classlist);
 		tab.revalidate();
 		tab.repaint();
+		
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				kids.getVerticalScrollBar().setValue(0);
+			}
+		});
 
 		if (main.getY() == 170) {
 			daily.setLocation(daily.getX(), 170);

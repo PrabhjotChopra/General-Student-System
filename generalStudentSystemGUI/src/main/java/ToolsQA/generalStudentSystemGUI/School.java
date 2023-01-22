@@ -173,10 +173,8 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		}
 		else if (e.getActionCommand().equals("Daily Attendance")) {
-			dashboard.remove(currClass.getMarks());
 			
-			dashboard.add(currClass.getSubAtt());
-			dashboard.add(currClass.addDailys());
+			currClass.addDailys();
 			currClass.changeAttDay(1);
 			window.add(dashboard);
 			
