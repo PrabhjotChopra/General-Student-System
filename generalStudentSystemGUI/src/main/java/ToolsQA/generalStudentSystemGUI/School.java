@@ -272,7 +272,32 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		}
 		else if(e.getActionCommand().split(" ")[0].equals("submitMarks")) {
-			currClass.submitGrades(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			currClass.submitIndGrades(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("assDash")) {
+			currClass.assMarks();
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().split(" ")[0].equals("submitAssMarks")) {
+			currClass.submitAssGrades(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().split(" ")[0].equals("indAss")) {
+			currClass.indAss(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("addAss")) {
+			currClass.addAss();
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("removeAss")) {
+			currClass.removeAss();
 			window.revalidate();
 			window.repaint();
 		}
@@ -498,15 +523,16 @@ public class School implements ActionListener, FocusListener {
 		ourClass.setAttendance(test, isa);
 		
 		
-		ourClass.addAssessment("DSA test", 2, 62);
-		ourClass.addAssessment("Graphics assignment", 3, 19);
+		ourClass.addAssessment("DSA_test", 2, 62);
+		ourClass.addAssessment("Graphics_assignment", 3, 19);
 		ourClass.addAssessment("D&D", 3, 39);
-		ourClass.addAssessment("Binary Tree assignment", 3, 22);
-		ourClass.addAssessment("OOP Test", 2.5, 36);
-		ourClass.addAssessment("Searching/sorting assignment", 3, 26);
+		ourClass.addAssessment("Binary_Tree_assignment", 3, 22);
+		ourClass.addAssessment("OOP_Test", 2.5, 36);
+		ourClass.addAssessment("Searching/sorting_assignment", 3, 26);
+		ourClass.addAssessment("wwdqd", 3, 26);
 		
-		ourClass.setGrade(isa, "DSA test", 34.0);
-		ourClass.setGrade(isa, "Graphics assignment", 19.0);
+		ourClass.setGrade(isa, "DSA_test", 34.0);
+		ourClass.setGrade(isa, "Graphics_assignment", 19.0);
 		ourClass.setGrade(isa, "D&D", 36.0);
 		
 		
