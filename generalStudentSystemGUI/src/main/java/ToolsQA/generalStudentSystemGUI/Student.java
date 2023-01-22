@@ -31,6 +31,7 @@ public class Student {
 	private String[] reasons;
 	
 	private JButton studentAttB;
+	private JButton studentMarkB;
 	
 	public Student() {}
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
@@ -103,11 +104,16 @@ public class Student {
 		
 		
 		
-		studentAttB = new JButton("View Individual");
+		studentAttB = new JButton();
 		studentAttB.addActionListener(new School());
 		studentAttB.setActionCommand("overAtt " + studentNumber);
-		studentAttB.setFont(Student.studentStandard);
+		studentAttB.setFont(studentStandard);
 		
+		
+		studentMarkB = new JButton();
+		studentMarkB.addActionListener(new School());
+		studentMarkB.setActionCommand("studentGrades " + studentNumber);
+		studentMarkB.setFont(studentStandard);
 
 	}
 
@@ -231,6 +237,9 @@ public class Student {
 	}
 	public JButton getStudentAttB() {
 		return studentAttB;
+	}
+	public JButton getStudentMarkB() {
+		return studentMarkB;
 	}
 	public boolean wantsCourse(Course c) {
 		Enumeration<Course> courses = courseReqs.keys();

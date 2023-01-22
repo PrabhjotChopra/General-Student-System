@@ -1,6 +1,7 @@
 package ToolsQA.generalStudentSystemGUI;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +15,10 @@ import com.formdev.flatlaf.FlatDarkLaf;
 public class ClassCourse extends Course {
 	private int courseNum;
 	private LinkedList<Student> students = new LinkedList<Student>();
+	private LinkedList<Assessment> assignments = new LinkedList<Assessment>();
 	private Hashtable<Assessment, Hashtable<Student, Double>> grades = new Hashtable<Assessment, Hashtable<Student, Double>>();
 	private Hashtable<Student, Double> midterms = new Hashtable<Student, Double>();
-	private Hashtable<Student, Double> finals = new Hashtable<Student, Double>();
+	
 	private Hashtable<Student, Double> current = new Hashtable<Student, Double>();
 	private Hashtable<Student, Attend[]> attendance = new Hashtable<Student, Attend[]>();
 	private Teacher prof;
@@ -123,9 +125,9 @@ public class ClassCourse extends Course {
 		subAtt.setFont(School.buttonFont);
 		subAtt.addActionListener(new School());
 		
-		marks = new JButton("Marks Dashboard");
+		marks = new JButton("Grades and Assessments");
 		marks.setActionCommand("dmarks");
-		marks.setBounds(965, 170, 200, 75);
+		marks.setBounds(965, 170, 280, 75);
 		marks.setFont(School.buttonFont);
 		marks.addActionListener(new School());
 		
@@ -135,27 +137,32 @@ public class ClassCourse extends Course {
 		marksDash.setBounds(100, 180, 200, 75);
 		marksDash.setFont(School.buttonFont);
 		marksDash.addActionListener(new School());
+		marksDash.setActionCommand("marksDash");
 
 		assDash = new JButton("Assessments");
 		assDash.setBounds(320, 170, 200, 75);
 		assDash.setFont(School.buttonFont);
 		assDash.addActionListener(new School());
+		assDash.setActionCommand("assDash");
 
 		addAss = new JButton("Add assessment");
 		addAss.setBounds(540, 170, 200, 75);
 		addAss.setFont(School.buttonFont);
 		addAss.addActionListener(new School());
+		addAss.setActionCommand("addAss");
 		
 		removeAss = new JButton("Remove assessment");
 		removeAss.setBounds(760, 170, 240, 75);
 		removeAss.setFont(School.buttonFont);
 		removeAss.addActionListener(new School());
+		removeAss.setActionCommand("removeAss");
 		
 		goBack = new JButton("Back to dashboard");
 		goBack.setBounds(1020, 170, 220, 75);
 		goBack.setFont(School.buttonFont);
 		goBack.addActionListener(new School());
-
+		goBack.setActionCommand("back to dash");
+		
 	}
 
 	public void addStudent(Student s) {
@@ -173,79 +180,353 @@ public class ClassCourse extends Course {
 		}
 
 		attendance.put(s, temp);
-
+		current.put(s, 0.0);
+		midterms.put(s, 0.0);
+		
+		
 		// add to grades
-		// add to all gui hashtables (remember to initialize each value)
+		// add to midterms
+		// add to current grades
+		
 
-		// add all the ui's that aren't student fields
+	
 
 	}
 
 	public void removeStudent(Student s) {
 		students.remove(s);
 		attendance.remove(s);
-
-		// remove from attendance
+		
 		// remove from grades
+		// remove from midterms
+		// remove from current grades
 	}
 
-	public void setGrade(Student s, Assessment assign, Double marksEarned) {
+	public void setGrade(Student s, String assignmentName, Double marksEarned) {
+		
+		Assessment assign = new Assessment();
+		for(int i=0;i<assignments.size();i++) {
+			if (assignments.get(i).getName().equals(assignmentName)) {
+				assign = assignments.get(i);
+			}
+		}
+		
+		
 		Hashtable<Student, Double> marks = grades.get(assign);
-		marks.replace(s, marksEarned / (double) assign.getTotalMarks());
-
-		current.replace(s, gradeCalc(s));
+		marks.replace(s, marksEarned);
 		grades.replace(assign, marks);
+		
+		current.replace(s, gradeCalc(s));
+		
+
+		
 	}
 
 	public void addAssessment(String name, double weight, int totalMarks) {
 		Assessment assess = new Assessment(name, weight, totalMarks);
 		Hashtable<Student, Double> marks = new Hashtable<Student, Double>();
 		totalWeight += weight;
-		for (Student s : getStudents()) {
+		for (Student s : students) {
 			marks.put(s, 0.0);
 		}
 
 		grades.put(assess, marks);
+		assignments.add(assess);
 	}
 
 	public void removeAssessment(Assessment assess) {
 		totalWeight -= assess.getWeight();
 		grades.remove(assess);
-
+		assignments.remove(assess);
+		
 		Enumeration<Student> e = current.keys();
 		while (e.hasMoreElements()) {
 			Student kid = e.nextElement();
 			current.replace(kid, gradeCalc(kid));
 		}
+		
 
 	}
 
 	public double gradeCalc(Student s) {
 		double grade = 0.0;
-		Enumeration<Assessment> e = grades.keys();
-		while (e.hasMoreElements()) {
-			Assessment assign = e.nextElement();
-			double mark = grades.get(assign).get(s) / (double) assign.getTotalMarks(); // student marks/total marks for
-																						// that assessment
-			double weight = assign.getWeight() / totalWeight; // how much that assessment is currently worth
+		for(int i=0;i<assignments.size();i++) {
+			
+			double mark = grades.get(assignments.get(i)).get(s) / (double) assignments.get(i).getTotalMarks(); 
+			// student marks/total marks for that assessment
+			mark*=100;
+			
+			
+			
+			double weight = assignments.get(i).getWeight() / totalWeight; // how much that assessment is currently worth
+			
+			
+			
 			grade += mark * weight;
 
 		}
+		
+		grade = ((double) Math.round(grade*10)) /10; // rounds grade to 1 decimal place
+		
 		return grade;
 	}
 	
 	
 	public void goMarks() {
+		
+		
+		School.dashboard.remove(daily);
+		School.dashboard.remove(main);
+		School.dashboard.remove(overallAtt);
+		School.dashboard.remove(dayChoice);
+		School.dashboard.remove(marks);
+		
 		School.dashboard.add(marksDash);
 		School.dashboard.add(assDash);
 		School.dashboard.add(addAss);
 		School.dashboard.add(removeAss);
 		School.dashboard.add(goBack);
 		
+		studentMarks();
+		
 		
 	}
 	
 	public void studentMarks() {
+		sortKids();
+
+		tab.removeAll();
+
+		Box container = Box.createVerticalBox();
+
+		for (int i = 0; i < students.size(); i++) { 
+			JPanel thisStudentMark = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			thisStudentMark.setSize(School.rect.width - 200, 20);
+			thisStudentMark.setBorder(BorderFactory.createLineBorder(Color.black));
+
+			
+			double midgrade = 0.0;
+			if(midterms.get(students.get(i))!=null) {
+				midgrade = midterms.get(students.get(i));
+			}
+			
+			JTextArea midterm = new JTextArea("Midterm grade: " + midgrade + "%\t");
+			midterm.setEditable(false);
+			midterm.setFont(Student.studentStandard);
+			
+			JTextArea currentGrade = new JTextArea("Current Grade: " + gradeCalc(students.get(i)) + "%\t");
+			currentGrade.setEditable(false);
+			currentGrade.setFont(Student.studentStandard);
+			
+			
+			thisStudentMark.add(Box.createRigidArea(new Dimension(0, 5)));
+			thisStudentMark.add(students.get(i).tabbedName());
+			thisStudentMark.add(Box.createRigidArea(new Dimension(20, 0)));
+			thisStudentMark.add(currentGrade);
+			thisStudentMark.add(Box.createRigidArea(new Dimension(20, 0)));
+			thisStudentMark.add(midterm);
+			thisStudentMark.add(Box.createRigidArea(new Dimension(20, 0)));
+			
+			JButton b = students.get(i).getStudentMarkB(); 
+			b.setText("View Individual");
+			b.setFont(Student.studentStandard);
+			thisStudentMark.add(b);
+
+			container.add(thisStudentMark);
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
+
+		}
+
+		
+
+		pane = new JScrollPane(container);
+
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.getVerticalScrollBar().setUnitIncrement(16);
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   public void run() { 
+			       pane.getVerticalScrollBar().setValue(0);      
+			   }
+		});
+		
+		JTextField header = new JTextField(getCode() + "-0" + courseNum + " Grades");
+		header.setEditable(false);
+		header.setFont(new Font("Arial", 1, 50));
+		header.setHorizontalAlignment(JTextField.CENTER);
+		
+		
+		double average = 0.0;
+		double stdev = 0.0;
+		for(int i=0;i<students.size();i++) {
+			average+=gradeCalc(students.get(i));
+		}
+		average /= students.size();
+		
+		
+		for(int i=0; i<students.size();i++) {
+			stdev += Math.pow(gradeCalc(students.get(i)) - average, 2);
+		}
+		stdev = Math.sqrt(stdev / students.size());
+		
+		average = ((double)Math.round(average*10)) / 10; // rounds to 1 decimal place
+		stdev = ((double)Math.round(stdev*10)) / 10; // rounds to 1 decimal place
+		
+		JTextArea stats = new JTextArea("Class Average: " + average + "%\t\t Standard Deviation " + stdev+"%");
+		stats.setEditable(false);
+		stats.setFont(new Font("Arial", 1, 30));
+		
+		
+		
+		tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
+	
+		
+		tab.add(header);
+		tab.add(stats);
+		tab.add(pane);
+		tab.revalidate();
+		tab.repaint();
+
+		if (marksDash.getY() == 170) {
+			addAss.setLocation(addAss.getX(), 170);
+			removeAss.setLocation(removeAss.getX(), 170);	
+			assDash.setLocation(assDash.getX(), 170);
+			marksDash.setLocation(marksDash.getX(), 180);
+
+		}
+
+		
+	}
+	
+	public void indStudentMarks(int id) {
+		
+		Student s = new Student();
+		for (int i = 0; i < students.size(); i++) {
+			if (students.get(i).getStudentNumber() == id) {
+				s = students.get(i);
+				currKid = id;
+
+			}
+		}
+
+		tab.removeAll();
+
+		
+		JPanel container = new JPanel();
+		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+
+		for (int i = 0; i < students.size(); i++) {
+			if (!(s.equals(students.get(i)))) {
+				JButton b = students.get(i).getStudentMarkB();
+				b.setText(students.get(i).tabbedName().getText());
+				b.setFont(new Font("Arial", 1, 25));
+
+				JPanel temp = new JPanel(new GridLayout(1, 1));
+				temp.add(b);
+				container.add(temp);
+
+				container.add(Box.createRigidArea(new Dimension(0, 10)));
+			}
+		}
+		pane = new JScrollPane(container);
+
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		pane.getVerticalScrollBar().setUnitIncrement(16);
+
+		
+		
+
+		JPanel thisKid = new JPanel();
+		thisKid.setLayout(new BoxLayout(thisKid, BoxLayout.PAGE_AXIS));
+		
+		
+		JPanel overview = new JPanel();
+		overview.setLayout(new BoxLayout(overview, BoxLayout.PAGE_AXIS));
+		overview.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		// add the stats here
+		JTextArea title = new JTextArea(s.getLastName() + ", " + s.getFirstName());
+		title.setEditable(false);
+		title.setFont(new Font("Arial", 1, 40));
+		
+		overview.add(title);
+		
+		JPanel top = new JPanel();
+		top.setLayout(new BoxLayout(top, BoxLayout.LINE_AXIS));
+		JTextArea grade = new JTextArea("Current average: " + gradeCalc(s));
+		grade.setEditable(false);
+		grade.setFont(Student.studentStandard);
+		
+		double midterm = 0.0;
+		if (midterms.get(s)!=null) {
+			midterm = midterms.get(s);
+		}
+		
+		JTextField midterming = new JTextField(String.valueOf(midterm));
+		midterming.setFont(Student.studentStandard);
+		
+		JTextArea percent = new JTextArea("%");
+		percent.setEditable(false);
+		percent.setFont(Student.studentStandard);
+		
+		
+		
+		top.add(grade);
+		top.add(midterming);
+		top.add(percent);
+		
+		overview.add(top);
+		
+		
+		JPanel specificGrades = new JPanel();
+		
+		specificGrades.setLayout(new BoxLayout(specificGrades, BoxLayout.PAGE_AXIS));
+		specificGrades.setBorder(BorderFactory.createLineBorder(Color.black));
+		// fill in the specific grades for assignments with the text field here
+		
+		
+		
+		
+		
+		final JScrollPane gradePanel = new JScrollPane(specificGrades);
+
+		gradePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		gradePanel.getVerticalScrollBar().setUnitIncrement(10);
+		
+		
+		overview.setMaximumSize(new Dimension(tab.getWidth() - 340, overview.getHeight()));
+		gradePanel.setMaximumSize(new Dimension(tab.getWidth() - 340, gradePanel.getHeight()));
+		// adjust the max sizes so the overview is small and the assessment stuff is big
+		
+	
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   public void run() { 
+				   gradePanel.getVerticalScrollBar().setValue(0);
+			   }
+		});
+		
+		
+		thisKid.add(overview);
+		thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
+		thisKid.add(gradePanel);
+
+		tab.setLayout(null);
+		tab.add(pane);
+		tab.add(thisKid);
+
+		pane.setSize(320, School.rect.height - 355);
+
+		thisKid.setBounds(320, tab.getY(), School.rect.width - 500, tab.getHeight());
+
+		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		
+
+		tab.revalidate();
+		tab.repaint();
+	}
+	
+	public void indAss() {
 		
 	}
 	
@@ -261,9 +542,6 @@ public class ClassCourse extends Course {
 		
 	}
 	
-	public void backToAtt() {
-		
-	}
 
 	public void submitAttendance() {
 
@@ -361,10 +639,14 @@ public class ClassCourse extends Course {
 	}
 
 	public JPanel overallAtt() {
+		School.dashboard.remove(subAtt);
+		School.dashboard.add(marks);
+		
+		
 		sortKids();
 
 		tab.removeAll();
-
+		
 		Box container = Box.createVerticalBox();
 
 		for (int i = 0; i < students.size(); i++) { // thank god for java's auto garbage collection
@@ -496,9 +778,11 @@ public class ClassCourse extends Course {
 		JPanel stats = new JPanel();
 		stats.setLayout(new BoxLayout(stats, BoxLayout.PAGE_AXIS));
 		// add the stats here
-		JTextArea title = new JTextArea(s.getLastName() + ", " + s.getFirstName());
+		JTextField title = new JTextField(s.getLastName() + ", " + s.getFirstName());
 		title.setEditable(false);
 		title.setFont(new Font("Arial", 1, 40));
+		
+		
 		
 		stats.add(title);
 		
@@ -705,6 +989,19 @@ public class ClassCourse extends Course {
 
 	public void goDash() {
 		
+		School.dashboard.remove(marksDash);
+		School.dashboard.remove(assDash);
+		School.dashboard.remove(addAss);
+		School.dashboard.remove(removeAss);
+		School.dashboard.remove(goBack);
+		
+		
+		School.dashboard.add(main);
+		School.dashboard.add(daily);
+		School.dashboard.add(overallAtt);
+		School.dashboard.add(dayChoice);
+		School.dashboard.add(marks);
+		School.dashboard.remove(subAtt);
 		
 		
 		changeAttDay(4);
