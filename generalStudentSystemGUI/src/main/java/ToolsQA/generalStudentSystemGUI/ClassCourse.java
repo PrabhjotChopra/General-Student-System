@@ -28,7 +28,9 @@ public class ClassCourse extends Course {
 	private int courseDay;
 	private LocalTime start;
 	private int days;
-
+	private double bonus = 1.1;
+	private int nameLen = 28;
+	
 	private int currKid;
 	private JButton baseDisplay;
 
@@ -42,13 +44,12 @@ public class ClassCourse extends Course {
 	private JTextField title;
 	private JTextField totalMarks;
 	private JTextField weightfactor;
-	
-	
+
 	private JTextField assName;
 	private JTextField assWeight;
 	private JTextField totalAssMarks;
 	private JTextField result;
-	
+
 	// various menu jbuttons
 	private JButton main;
 	private JButton daily;
@@ -97,8 +98,9 @@ public class ClassCourse extends Course {
 		tab.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		dashboard = new JTextArea("Name: " + this.getName() + "\nCode: " + this.getCode() + "- 0" + courseNum
-				+ "\nType: " + this.getType() + "\nRoom: " + room + "\nPeriod: " + period + "\nTeacher: " + prof.getFirstName().charAt(0) + ". " + prof.getLastName());
-		dashboard.setFont(new Font("Arial",1,25));
+				+ "\nType: " + this.getType() + "\nRoom: " + room + "\nPeriod: " + period + "\nTeacher: "
+				+ prof.getFirstName().charAt(0) + ". " + prof.getLastName());
+		dashboard.setFont(new Font("Arial", 1, 25));
 		dashboard.setEditable(false);
 		tab.add(dashboard);
 
@@ -169,13 +171,13 @@ public class ClassCourse extends Course {
 		goBack.setFont(School.buttonFont);
 		goBack.addActionListener(new School());
 		goBack.setActionCommand("back to dash");
-		
+
 		result = new JTextField("");
 		result.setEditable(false);
 		result.setVisible(false);
 		result.setHorizontalAlignment(JTextField.CENTER);
-		result.setFont(new Font("Arial",1,25));
-		result.setMaximumSize(new Dimension(School.rect.width+50,35));
+		result.setFont(new Font("Arial", 1, 25));
+		result.setMaximumSize(new Dimension(School.rect.width + 50, 35));
 
 	}
 
@@ -245,6 +247,7 @@ public class ClassCourse extends Course {
 		grades.put(assess, marks);
 		assignments.add(assess);
 	}
+
 	public void addAssessment(Assessment assess) {
 		Hashtable<Student, Double> marks = new Hashtable<Student, Double>();
 		totalWeight += assess.getWeight();
@@ -430,16 +433,18 @@ public class ClassCourse extends Course {
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
 
 		for (int i = 0; i < students.size(); i++) {
-			if (!(s.equals(students.get(i)))) {
-				JButton b = students.get(i).getStudentMarkB();
-				b.setText(students.get(i).tabbedName().getText());
-				b.setFont(new Font("Arial", 1, 25));
+			JButton b = students.get(i).getStudentMarkB();
+			b.setText(students.get(i).tabbedName().getText());
+			b.setFont(new Font("Arial", 1, 25));
+			b.setBackground(null);
+			JPanel temp = new JPanel(new GridLayout(1, 1));
+			temp.add(b);
+			container.add(temp);
 
-				JPanel temp = new JPanel(new GridLayout(1, 1));
-				temp.add(b);
-				container.add(temp);
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
 
-				container.add(Box.createRigidArea(new Dimension(0, 10)));
+			if (s.equals(students.get(i))) {
+				b.setBackground(Color.decode("#42a1e1"));
 			}
 		}
 		pane = new JScrollPane(container);
@@ -533,17 +538,20 @@ public class ClassCourse extends Course {
 			JTextField studentMark = new JTextField(String.valueOf(studentValue));
 
 			studentMark.setFont(Student.studentStandard);
-			studentMark.setMaximumSize(new Dimension(80, 25));
+			studentMark.setMaximumSize(new Dimension(120, 25));
 			assMarks.add(studentMark);
 
 			double thismark = ((double) Math.round(studentValue * 1000 / assignments.get(i).getTotalMarks())) / 10;
 			double thisweight = ((double) Math.round(assignments.get(i).getWeight() * 1000 / totalWeight)) / 10;
-
-			if (thismark < 0) {
-				thismark = -1;
+			JTextArea totalMark;
+			if (thismark >= 0) {
+				totalMark = new JTextArea("/" + assignments.get(i).getTotalMarks() + " (" + thismark + "%)");
+			}
+			else {
+				totalMark = new JTextArea("/" + assignments.get(i).getTotalMarks() + " (no mark)");
 			}
 
-			JTextArea totalMark = new JTextArea("/" + assignments.get(i).getTotalMarks() + " (" + thismark + "%)");
+			
 
 			totalMark.setEditable(false);
 			totalMark.setFont(Student.studentStandard);
@@ -597,7 +605,7 @@ public class ClassCourse extends Course {
 	}
 
 	public void indAss(String nameid) {
-		
+
 		Assessment ass = new Assessment();
 		for (int i = 0; i < assignments.size(); i++) {
 			if (assignments.get(i).getName().equals(nameid)) {
@@ -605,28 +613,31 @@ public class ClassCourse extends Course {
 
 			}
 		}
-		
+
 		tab.removeAll();
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
-		
-		
-		Dimension sidescroll = new Dimension(320,50);
-		for (int i = 0; i < assignments.size(); i++) {
-			if (!(ass.equals(assignments.get(i)))) {
-				
-				JButton b = assignments.get(i).getDetails();
-				b.setText(assignments.get(i).getName());
-				
-				JPanel temp = new JPanel(new GridLayout(1, 1));
-				temp.add(b);
-				temp.setMinimumSize(sidescroll);
-				temp.setMaximumSize(sidescroll);
-				container.add(temp);
 
-				container.add(Box.createRigidArea(new Dimension(0, 10)));
+		Dimension sidescroll = new Dimension(320, 50);
+		for (int i = 0; i < assignments.size(); i++) {
+
+			JButton b = assignments.get(i).getDetails();
+			b.setText(assignments.get(i).getName());
+			b.setBackground(null);
+			if (ass.equals(assignments.get(i))) {
+
+				b.setBackground(Color.decode("#42a1e1"));
+
 			}
+			JPanel temp = new JPanel(new GridLayout(1, 1));
+			temp.add(b);
+			temp.setMinimumSize(sidescroll);
+			temp.setMaximumSize(sidescroll);
+			container.add(temp);
+
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
+			
 		}
 		JScrollPane assPanel = new JScrollPane(container);
 
@@ -636,86 +647,73 @@ public class ClassCourse extends Course {
 
 		JPanel thisAss = new JPanel();
 		thisAss.setLayout(new BoxLayout(thisAss, BoxLayout.PAGE_AXIS));
-		
-		
-		
+
 		JPanel overview = new JPanel();
 		overview.setLayout(new BoxLayout(overview, BoxLayout.PAGE_AXIS));
 		overview.setBorder(BorderFactory.createLineBorder(Color.black));
-		overview.setMaximumSize(new Dimension(tab.getWidth()-340, 300));
-		
-		
+		overview.setMaximumSize(new Dimension(tab.getWidth() - 340, 300));
+
 		title = new JTextField(ass.getName());
 		title.setFont(new Font("Arial", 1, 40));
-		title.setMaximumSize(new Dimension(tab.getWidth()-540, 50));
-		
-		
-		
+		title.setMaximumSize(new Dimension(tab.getWidth() - 540, 50));
+
 		// add the stats here (weight factor and total marks)
 		JPanel omarks = new JPanel();
 		omarks.setLayout(new BoxLayout(omarks, BoxLayout.LINE_AXIS));
-		
+
 		JTextArea tmarks = new JTextArea("Total marks: ");
 		tmarks.setEditable(false);
 		tmarks.setFont(Student.studentStandard);
 		tmarks.setMaximumSize(new Dimension(150, 30));
-		
+
 		totalMarks = new JTextField(String.valueOf(ass.getTotalMarks()));
 		totalMarks.setFont(Student.studentStandard);
 		totalMarks.setMaximumSize(new Dimension(50, 30));
 		omarks.add(tmarks);
 		omarks.add(totalMarks);
-				
-		
-		
+
 		JTextArea weighting = new JTextArea("Weight factor: ");
 		weighting.setEditable(false);
 		weighting.setFont(Student.studentStandard);
 		weighting.setMaximumSize(new Dimension(150, 30));
-				
+
 		weightfactor = new JTextField(String.valueOf(ass.getWeight()));
 		weightfactor.setFont(Student.studentStandard);
-		weightfactor.setMaximumSize(new Dimension(60, 25));
-		
+		weightfactor.setMaximumSize(new Dimension(80, 25));
+
 		double thisweight = ((double) Math.round(ass.getWeight() * 1000 / totalWeight)) / 10;
-		
+
 		JTextArea weight = new JTextArea("(" + thisweight + "% of total)");
 		weight.setEditable(false);
 		weight.setFont(Student.studentStandard);
 		weight.setMaximumSize(new Dimension(200, 30));
-		
-		
+
 		omarks.add(weighting);
 		omarks.add(weightfactor);
 		omarks.add(weight);
-		
-		double average =0.0;
-		double completed =0;
-		for(int i=0;i<students.size();i++) {
-			if(grades.get(ass).get(students.get(i))>=0) {
-				average+=grades.get(ass).get(students.get(i));
+
+		double average = 0.0;
+		double completed = 0;
+		for (int i = 0; i < students.size(); i++) {
+			if (grades.get(ass).get(students.get(i)) >= 0) {
+				average += grades.get(ass).get(students.get(i));
 				completed++;
 			}
 		}
-		
+
 		average = ((double) Math.round(average * 10 / completed)) / 10;
 
 		JTextArea classAvg = new JTextArea("Class Average for this assignment: " + average + "%");
 		classAvg.setEditable(false);
 		classAvg.setFont(Student.studentStandard);
-	
-		
-		
+
 		// add the text stuff here
 		overview.add(title);
 		overview.add(Box.createRigidArea(new Dimension(0, 10)));
 		overview.add(omarks);
 		overview.add(classAvg);
-		
-		
-		
+
 		// rest of stuff
-		
 
 		JPanel info = new JPanel();
 		info.setLayout(new BoxLayout(info, BoxLayout.LINE_AXIS));
@@ -757,25 +755,26 @@ public class ClassCourse extends Course {
 			JTextField studentMark = new JTextField(String.valueOf(studentValue));
 
 			studentMark.setFont(Student.studentStandard);
-			studentMark.setMaximumSize(new Dimension(80, 25));
+			studentMark.setMaximumSize(new Dimension(120, 25));
 			assMarks.add(studentMark);
 
 			double thismark = ((double) Math.round(studentValue * 1000 / ass.getTotalMarks())) / 10;
+			JTextArea totalMark;
+			if (thismark >=0) {
+				totalMark = new JTextArea("/" + ass.getTotalMarks() + " (" + thismark + "%)");
 
-			if (thismark < 0) {
-				thismark = -1;
+			}
+			else {
+				totalMark = new JTextArea("/" + ass.getTotalMarks() + " (no mark)");
 			}
 
-			JTextArea totalMark = new JTextArea("/" + ass.getTotalMarks() + " (" + thismark + "%)");
-
+			
 			totalMark.setEditable(false);
 			totalMark.setFont(Student.studentStandard);
-			
 
 			thisGrade.add(name);
 			thisGrade.add(studentMark);
 			thisGrade.add(totalMark);
-		
 
 			thisGrade.setBorder(BorderFactory.createLineBorder(Color.black));
 			specificGrades.add(thisGrade);
@@ -864,7 +863,7 @@ public class ClassCourse extends Course {
 
 			JButton b = assignments.get(i).getDetails();
 			b.setText("View Details");
-
+			b.setBackground(null);
 			b.setFont(Student.studentStandard);
 
 			thisAss.add(name);
@@ -919,150 +918,211 @@ public class ClassCourse extends Course {
 	public void addAss() {
 		tab.removeAll();
 		tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
-		
+
 		JTextField instructions = new JTextField("Fill in the boxes below and click submit to add the assessment");
-		instructions.setFont(new Font("Arial",1,37));
+		instructions.setFont(new Font("Arial", 1, 37));
 		instructions.setEditable(false);
-		
-		instructions.setMaximumSize(new Dimension(School.rect.width+50, 50));
-		
+
+		instructions.setMaximumSize(new Dimension(School.rect.width + 50, 50));
+
 		tab.add(instructions);
-		
+
 		JPanel fields = new JPanel();
 		fields.setLayout(new BoxLayout(fields, BoxLayout.LINE_AXIS));
 		// add the three text fields, their focus listeners, and the submit button
-		assName= new JTextField("Assessment name");
+		assName = new JTextField("Assessment name");
 		assName.setFont(Student.studentStandard);
 		assName.addFocusListener(new School());
-		
+
 		Dimension field = new Dimension(300, 30);
 		assName.setMaximumSize(field);
-		
-		
+
 		assWeight = new JTextField("Assessment weight factor");
 		assWeight.setFont(Student.studentStandard);
 		assWeight.addFocusListener(new School());
 		assWeight.setMaximumSize(field);
-		
-		
+		assWeight.setBackground(null);
+
 		totalAssMarks = new JTextField("Total # of marks");
 		totalAssMarks.setFont(Student.studentStandard);
 		totalAssMarks.addFocusListener(new School());
 		totalAssMarks.setMaximumSize(field);
-		
+		totalAssMarks.setBackground(null);
+
 		JButton submitAss = new JButton("Add assessment");
 		submitAss.setFont(Student.studentStandard);
 		submitAss.setMaximumSize(new Dimension(250, 80));
 		submitAss.addActionListener(new School());
 		submitAss.setActionCommand("add assessment");
-		
-		fields.add(Box.createRigidArea(new Dimension(20,0)));
+
+		fields.add(Box.createRigidArea(new Dimension(20, 0)));
 		fields.add(assName);
-		fields.add(Box.createRigidArea(new Dimension(20,0)));
+		fields.add(Box.createRigidArea(new Dimension(20, 0)));
 		fields.add(assWeight);
-		fields.add(Box.createRigidArea(new Dimension(20,0)));
+		fields.add(Box.createRigidArea(new Dimension(20, 0)));
 		fields.add(totalAssMarks);
-		
-		
+
 		result.setVisible(false);
-		
-		
+
 		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(fields);
 		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(submitAss);
 		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(result);
-		
+
 		if (addAss.getY() == 170) {
 			addAss.setLocation(addAss.getX(), 180);
 			removeAss.setLocation(removeAss.getX(), 170);
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 170);
-		}	
-		
+		}
+
 	}
+
 	public void addAssFromGUI() {
 		result.setVisible(true);
-		try {
-			String name = assName.getText();
-			name = name.replace(" ", "_");
-			double weight = Double.parseDouble(assWeight.getText());
-			int marks = Integer.parseInt(totalAssMarks.getText());
-			addAssessment(name,weight,marks);
-			result.setText("Assessment \"" + name + "\" successfully added");
-			
-			// successfully added message
-		}
-		catch (NumberFormatException e){
-			result.setText("Invalid or incomplete assessment information");
-			// invalid message
-		}
+		String name = assName.getText().strip();
 		
+		if (name.equals("Assessment name")) {
+			name ="";
+		}
+		name = name.replace(" ", "_");
+
+		if (name.length() == 0) {
+			name = "Untitled";
+		}
+		if (name.length() > nameLen) {
+			name = name.substring(0, nameLen);
+		}
+
+		double weight;
+		int marks;
+		boolean worked = true;
+		assWeight.setBackground(null);
+		totalAssMarks.setBackground(null);
+		for (int i = 0; i < assignments.size(); i++) {
+			if (assignments.get(i).getName().equals(name)) {
+				result.setText("Assignment \"" + name + "\" already exists");
+				return;
+			}
+		}
+		try {
+			weight = Double.parseDouble(assWeight.getText());
+			if (weight > 100) {
+				weight = 100;
+			}
+			if(weight<0) {
+				weight=0;
+			}
+
+		}
+
+		catch (NumberFormatException e) {
+			result.setText("Invalid or incomplete assessment information");
+			assWeight.setBackground(Color.decode("#cc473d"));
+			weight = 0.0;
+			// invalid message
+			worked = false;
+		}
+		try {
+			marks = (int) Double.parseDouble(totalAssMarks.getText());
+			if (marks > 300) {
+				marks = 300;
+			}
+			if (marks<0) {
+				marks=0;
+			}
+		}
+
+		catch (NumberFormatException e) {
+			result.setText("Invalid or incomplete assessment information");
+
+			marks = 0;
+			totalAssMarks.setBackground(Color.decode("#cc473d"));
+			// invalid message
+			worked = false;
+		}
+		if (worked) {
+			addAssessment(name, weight, marks);
+			result.setText("Assessment \"" + name + "\" successfully added");
+		}
+
+		// successfully added message
+
 	}
 
 	public void removeAss() {
 		tab.removeAll();
 		tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
-		
-		JTextArea instructions = new JTextArea("Please enter the name of the assessment you wish to remove and click submit");
-		instructions.setFont(new Font("Arial",1,31));
+
+		JTextArea instructions = new JTextArea(
+				"Please enter the name of the assessment you wish to remove and click submit");
+		instructions.setFont(new Font("Arial", 1, 31));
 		instructions.setEditable(false);
-		instructions.setMaximumSize(new Dimension(School.rect.width+50, 50));
+		instructions.setMaximumSize(new Dimension(School.rect.width + 50, 50));
 		tab.add(instructions);
-		
+
 		// add the one text field w/the focus listener and the submit button
-		assName= new JTextField("Assessment name");
+		assName = new JTextField("Assessment name");
 		assName.setFont(Student.studentStandard);
 		assName.addFocusListener(new School());
 		assName.setMaximumSize(new Dimension(300, 30));
-		
+
 		JButton removeAssess = new JButton("Remove assessment");
 		removeAssess.setFont(Student.studentStandard);
 		removeAssess.setMaximumSize(new Dimension(250, 80));
 		removeAssess.addActionListener(new School());
 		removeAssess.setActionCommand("remove assessment");
 		removeAssess.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
+
 		result.setVisible(false);
-		
-		tab.add(Box.createRigidArea(new Dimension(0,20)));
+
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(assName);
-		tab.add(Box.createRigidArea(new Dimension(0,20)));
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(removeAssess);
-		tab.add(Box.createRigidArea(new Dimension(0,20)));
+		tab.add(Box.createRigidArea(new Dimension(0, 20)));
 		tab.add(result);
-		
+
 		if (removeAss.getY() == 170) {
 			addAss.setLocation(addAss.getX(), 170);
 			removeAss.setLocation(removeAss.getX(), 180);
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 170);
-		}	
+		}
 	}
+
 	public void removeAssFromGUI() {
 		result.setVisible(true);
-		
-		String name = assName.getText();
-		name = name.replace(" ", "_");
-		if(name.equals("Assessment name")) {
+
+		String name = assName.getText().strip();
+		if (name.equals("Assessment name")) {
 			name = "";
 		}
-		
-		for(int i=0;i<assignments.size();i++) {
-			if(assignments.get(i).getName().toLowerCase().equals(name.toLowerCase().strip())) {
+		name = name.replace(" ", "_");
+
+		if (name.length() == 0) {
+			name = "Untitled";
+		}
+		if (name.length() > nameLen) {
+			name = name.substring(0, nameLen);
+		}
+
+		for (int i = 0; i < assignments.size(); i++) {
+			if (assignments.get(i).getName().toLowerCase().equals(name.toLowerCase().strip())) {
 				removeAssessment(assignments.get(i));
 				result.setText("Assessment \"" + name + "\" successfully removed");
 				return;
 			}
 		}
 		result.setText("Assessment \"" + name + "\" not found");
-		
-		
+
 	}
 
 	public void submitAssGrades(String nameid) {
 		Assessment ass = new Assessment();
+
 		for (int i = 0; i < assignments.size(); i++) {
 			if (assignments.get(i).getName().trim().equals(nameid)) {
 				ass = assignments.get(i);
@@ -1070,39 +1130,81 @@ public class ClassCourse extends Course {
 			}
 		}
 		
-		try {
-			removeAssessment(ass);
-			
-			if(title.getText().length()>0) {
-				ass.setName(title.getText());
+		//removeAssessment(ass);
+		String name = title.getText();
+
+		name.strip();
+
+		if (name.length() > 0) {
+			if (name.length() > nameLen) {
+				name = name.substring(0, nameLen);
 			}
-			
-			
-			ass.setTotalMarks(Integer.parseInt(totalMarks.getText()));
-			double tempWeight = ass.getWeight();
-			
-			ass.setWeight(Double.parseDouble(weightfactor.getText()));
-			
-			totalWeight-=tempWeight;
-			totalWeight+=Double.parseDouble(weightfactor.getText());
-			
-			addAssessment(ass);
-			for(int i=0;i<students.size();i++) {
-				String temp = assMarks.get(i).getText();
-				double newGrade = 0.0;
-				if(temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a")) {
-					newGrade=-1;
-				}
-				else {
-					newGrade = Double.parseDouble(temp);
-				}
-				grades.get(ass).put(students.get(i), newGrade);
-			}
-			
-			
-			indAss(ass.getName());
+			ass.setName(name);
 		}
-		catch(NumberFormatException e) {}
+
+		totalWeight -= ass.getWeight();
+
+		double tempWeight;
+		int tempmarks;
+
+		try {
+			tempmarks = (int) Double.parseDouble(totalMarks.getText().strip());
+
+			if (tempmarks > 300) {
+				tempmarks = 300;
+			}
+			if (tempmarks<0) {
+				tempmarks=0;
+			}
+		} catch (NumberFormatException e) {
+			tempmarks = ass.getTotalMarks();
+		}
+		ass.setTotalMarks(tempmarks);
+
+		try {
+			tempWeight = Double.parseDouble(weightfactor.getText().strip());
+			if (tempWeight > 100) {
+				tempWeight = 100;
+			}
+			if(tempWeight<0) {
+				tempWeight=0;
+			}
+		} catch (NumberFormatException e) {
+			tempWeight = ass.getWeight();
+		}
+
+		ass.setWeight(tempWeight);
+		totalWeight += tempWeight;
+
+		//addAssessment(ass);
+		for (int i = 0; i < students.size(); i++) {
+			String temp = assMarks.get(i).getText().strip();
+			if (temp.length() > 6) {
+				temp = temp.substring(0, 6);
+			}
+
+			double thismark;
+			if (temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a") || 
+					temp.toLowerCase().equals("nomark") || temp.toLowerCase().equals("no mark")) {
+				thismark = -1;
+			} else {
+
+				try {
+					thismark = Double.parseDouble(temp);
+					if (thismark > bonus * ass.getTotalMarks()) {
+						thismark = Math.round(bonus * ass.getTotalMarks());
+					}
+
+				} catch (NumberFormatException e) {
+					thismark = grades.get(ass).get(students.get(i));
+				}
+
+			}
+			grades.get(ass).put(students.get(i), thismark);
+		}
+
+		indAss(ass.getName());
+
 	}
 
 	public void submitIndGrades(int id) {
@@ -1114,25 +1216,47 @@ public class ClassCourse extends Course {
 			}
 		}
 
-		try {
-			midterms.replace(s, Double.parseDouble(midterming.getText()));
+		String middy = midterming.getText().strip();
+		if (middy.length() > 5) {
+			middy = middy.substring(0, 5);
+		}
 
-			for (int i = 0; i < assignments.size(); i++) {
-				String temp = assMarks.get(i).getText();
-				double newGrade = 0.0;
-				if(temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a")) {
-					newGrade=-1;
-				}
-				else {
-					newGrade = Double.parseDouble(temp);
-				}
-				
-				
-				grades.get(assignments.get(i)).replace(s, newGrade);
+		try {
+			if (Double.parseDouble(middy) <= 100) {
+				midterms.replace(s, Double.parseDouble(middy));
 			}
 
-			indStudentMarks(id);
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			midterming.setText(String.valueOf(midterms.get(s)));
+		}
+
+		for (int i = 0; i < assignments.size(); i++) {
+			String temp = assMarks.get(i).getText().strip();
+
+			if (temp.length() > 6) {
+				temp = temp.substring(0, 6);
+			}
+			double newGrade = 0.0;
+			if (temp.toLowerCase().equals("na") || temp.toLowerCase().equals("n/a") || 
+					temp.toLowerCase().equals("nomark") || temp.toLowerCase().equals("no mark")) {
+				newGrade = -1;
+			} else {
+				try {
+					newGrade = Double.parseDouble(temp);
+					if(newGrade>bonus*assignments.get(i).getTotalMarks()) {
+						newGrade = Math.round(bonus * assignments.get(i).getTotalMarks());
+					}
+				} catch (NumberFormatException e) {
+					newGrade = grades.get(assignments.get(i)).get(s);
+				}
+
+			}
+
+			grades.get(assignments.get(i)).replace(s, newGrade);
+		}
+
+		indStudentMarks(id);
+
 	}
 
 	public void submitAttendance() {
@@ -1164,7 +1288,7 @@ public class ClassCourse extends Course {
 						}
 
 						diff = (int) start.until(lateness, ChronoUnit.MINUTES);
-						if (diff > 74) {
+						if (diff > 74 || diff < 1) {
 							diff = 1;
 						}
 						setLate(students.get(i), diff, lateness);
@@ -1227,8 +1351,7 @@ public class ClassCourse extends Course {
 	}
 
 	public JPanel overallAtt() {
-		
-		
+
 		subAtt.setEnabled(false);
 		sortKids();
 
@@ -1335,16 +1458,18 @@ public class ClassCourse extends Course {
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
 
 		for (int i = 0; i < students.size(); i++) {
-			if (!(s.equals(students.get(i)))) {
-				JButton b = students.get(i).getStudentAttB();
-				b.setText(students.get(i).tabbedName().getText());
-				b.setFont(new Font("Arial", 1, 25));
+			JButton b = students.get(i).getStudentAttB();
+			b.setText(students.get(i).tabbedName().getText());
+			b.setFont(new Font("Arial", 1, 25));
+			b.setBackground(null);
+			JPanel temp = new JPanel(new GridLayout(1, 1));
+			temp.add(b);
+			container.add(temp);
 
-				JPanel temp = new JPanel(new GridLayout(1, 1));
-				temp.add(b);
-				container.add(temp);
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
 
-				container.add(Box.createRigidArea(new Dimension(0, 10)));
+			if (s.equals(students.get(i))) {
+				b.setBackground(Color.decode("#42a1e1"));
 			}
 		}
 		pane = new JScrollPane(container);
@@ -1370,7 +1495,7 @@ public class ClassCourse extends Course {
 		int lates = 0;
 		int absents = 0;
 		int minsLost = 0;
-
+		boolean hasNulls = false;
 		for (int j = 0; j <= courseDay; j++) {
 			if (studentData[j] != null) {
 				if (studentData[j].getPresent()) {
@@ -1382,6 +1507,9 @@ public class ClassCourse extends Course {
 					absents++;
 					minsLost += 75;
 				}
+			}
+			else {
+				hasNulls=true;
 			}
 
 		}
@@ -1406,13 +1534,12 @@ public class ClassCourse extends Course {
 		stats.add(latePercent);
 		stats.add(abPercent);
 		stats.add(totalMins);
-		
 
 		int specificlates = 0;
 		int specificabsents = 0;
 		int specificmins = 0;
-		
-		if (courseDay >= 4) {
+
+		if (courseDay >= 4 && !hasNulls) {
 			for (int i = courseDay - 4; i <= courseDay; i++) {
 				if (studentData[i] != null) {
 					if (studentData[i].getPresent()) {
@@ -1437,7 +1564,7 @@ public class ClassCourse extends Course {
 
 			stats.add(lastweek);
 		}
-		if (courseDay >= 9) {
+		if (courseDay >= 9 && !hasNulls) {
 			specificlates = 0;
 			specificabsents = 0;
 			specificmins = 0;
@@ -1466,7 +1593,7 @@ public class ClassCourse extends Course {
 			stats.add(twoweeks);
 		}
 
-		if (courseDay >= 19) {
+		if (courseDay >= 19 && !hasNulls) {
 			specificlates = 0;
 			specificabsents = 0;
 			specificmins = 0;
@@ -1493,8 +1620,7 @@ public class ClassCourse extends Course {
 			lastmonth.setFont(Student.studentStandard);
 			stats.add(lastmonth);
 		}
-		
-		
+
 		final JScrollPane statistics = new JScrollPane(stats);
 		statistics.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		statistics.getVerticalScrollBar().setUnitIncrement(10);
@@ -1502,13 +1628,13 @@ public class ClassCourse extends Course {
 		JPanel attending = new JPanel();
 
 		attending.setLayout(new BoxLayout(attending, BoxLayout.PAGE_AXIS));
-
+		boolean hasAtt = false;
 		for (int i = 0; i <= courseDay; i++) {
 			Attend temp = studentData[i];
 			if (temp == null) {
 				continue;
 			}
-
+			hasAtt = true;
 			JTextArea thisday = new JTextArea("Attendance on day " + (i + 1) + ":\t");
 			if (temp.getPresent()) {
 				if (temp.getLate()) {
@@ -1541,20 +1667,29 @@ public class ClassCourse extends Course {
 				attPanel.getVerticalScrollBar().setValue(0);
 			}
 		});
-		
-		if(courseDay<5) {
+		if (hasAtt) {
 			
-			thisKid.add(stats);
-			thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
-			thisKid.add(attending);
+
+			if (courseDay < 5) {
+
+				thisKid.add(stats);
+				thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
+				thisKid.add(attending);
+			} else {
+				statistics.setMaximumSize(new Dimension(School.rect.width - 540, statistics.getHeight()));
+				attPanel.setMaximumSize(new Dimension(School.rect.width - 540, attPanel.getHeight()));
+
+				thisKid.add(statistics);
+				thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
+				thisKid.add(attPanel);
+			}
 		}
 		else {
-			statistics.setMaximumSize(new Dimension(School.rect.width - 540, statistics.getHeight()));
-			attPanel.setMaximumSize(new Dimension(School.rect.width - 540, attPanel.getHeight()));
 			
 			thisKid.add(statistics);
 			thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
 			thisKid.add(attPanel);
+			
 		}
 		
 
@@ -1587,59 +1722,59 @@ public class ClassCourse extends Course {
 		School.dashboard.add(dayChoice);
 		School.dashboard.add(marks);
 		School.dashboard.add(subAtt);
-		
+
 		sortKids();
 		changeAttDay(4);
 		tab.removeAll();
-		tab.setLayout(new GridLayout(1,2));
-		
-		
-		
+		tab.setLayout(new GridLayout(1, 2));
+
 		JPanel info = new JPanel();
 		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
-		
+
 		JTextField infohead = new JTextField("Class Information");
 		infohead.setEditable(false);
-		infohead.setFont(new Font("Arial",1,40));
+		infohead.setFont(new Font("Arial", 1, 40));
 		infohead.setHorizontalAlignment(JTextField.CENTER);
-		
+
 		info.add(infohead);
 		String[] dashboardParts = dashboard.getText().split("\n");
-		dashboard.setText(dashboardParts[0]+"\n"+dashboardParts[1]+"\n"+dashboardParts[2]+"\n"+dashboardParts[3]+"\n"+dashboardParts[4] + "\nNumber of students: " + students.size());
+		dashboard.setText(dashboardParts[0] + "\n" + dashboardParts[1] + "\n" + dashboardParts[2] + "\n"
+				+ dashboardParts[3] + "\n" + dashboardParts[4] + "\nNumber of students: " + students.size());
 		info.add(dashboard);
 		infohead.setMaximumSize(new Dimension(900, 50));
-		
-		
+
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
-		for(int i=0;i<students.size();i++) {
+		for (int i = 0; i < students.size(); i++) {
 			JTextArea temp = students.get(i).tabbedName();
-			temp.setFont(new Font("Arial",1,25));
+			temp.setFont(new Font("Arial", 1, 25));
+			temp.setMaximumSize(new Dimension(600, 30));
+			temp.setPreferredSize(new Dimension(600, 30));
 			container.add(temp);
-			
-			container.add(Box.createRigidArea(new Dimension(0,10)));
+
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
 		}
-		
-		final JScrollPane kids = new JScrollPane(container, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+		final JScrollPane kids = new JScrollPane(container, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		kids.getVerticalScrollBar().setUnitIncrement(16);
-		
+
 		JPanel classlist = new JPanel();
 		classlist.setLayout(new BoxLayout(classlist, BoxLayout.PAGE_AXIS));
-		
+
 		JTextField classy = new JTextField("Class List");
 		classy.setEditable(false);
-		classy.setFont(new Font("Arial",1,40));
+		classy.setFont(new Font("Arial", 1, 40));
 		classy.setHorizontalAlignment(JTextField.CENTER);
-		
+
 		classlist.add(classy);
 		classlist.add(kids);
-		
-		
+
 		tab.add(info);
 		tab.add(classlist);
 		tab.revalidate();
 		tab.repaint();
-		
+
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				kids.getVerticalScrollBar().setValue(0);
@@ -1873,12 +2008,15 @@ public class ClassCourse extends Course {
 	public void setAttendance(Attend[] a, Student s) {
 		attendance.replace(s, a);
 	}
+
 	public JTextField getAssName() {
 		return assName;
 	}
+
 	public JTextField getAssWeight() {
 		return assWeight;
 	}
+
 	public JTextField getTotalAssMarks() {
 		return totalAssMarks;
 	}

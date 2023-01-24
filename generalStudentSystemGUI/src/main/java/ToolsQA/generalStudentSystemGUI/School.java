@@ -131,11 +131,14 @@ public class School implements ActionListener, FocusListener {
 
 				window.add(currProf.getHeader());
 				
-				dashboard.add(currProf.getSem1());
+				JButton b = currProf.getSem1();
+				b.setBackground(Color.decode("#42a1e1"));
+				dashboard.add(b);
 				dashboard.add(currProf.getSem2());
 				dashboard.add(currProf.getCourses(1));
 				window.add(dashboard);
-
+				
+				
 				window.revalidate();
 				window.repaint();
 
@@ -158,9 +161,12 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		} else if (e.getActionCommand().equals("Semester 2")) {
 			currProf.switchSem(2);
-
+			window.revalidate();
+			window.repaint();
 		} else if (e.getActionCommand().equals("Semester 1")) {
 			currProf.switchSem(1);
+			window.revalidate();
+			window.repaint();
 		} else if (e.getActionCommand().equals("Close app")) {
 			System.exit(0);
 		} else if (e.getActionCommand().equals("Classes")) {
@@ -323,8 +329,10 @@ public class School implements ActionListener, FocusListener {
 
 		window.setSize(500, 300);
 		window.setLocationRelativeTo(null);
+		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
+		window.setResizable(false);
 		
 		
 		loginChoice = new JPanel();
@@ -507,7 +515,7 @@ public class School implements ActionListener, FocusListener {
 		// test data
 		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
 		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5, 30,1,15);
-		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 8, ics4u);
+		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
 		
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
 		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Danny", "Song", 2));
