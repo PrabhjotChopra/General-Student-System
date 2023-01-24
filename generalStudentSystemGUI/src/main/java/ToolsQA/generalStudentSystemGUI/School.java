@@ -8,6 +8,9 @@ import javax.swing.text.BadLocationException;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Hashtable;
@@ -15,20 +18,24 @@ import java.util.LinkedList;
 
 public class School implements ActionListener, FocusListener {
 
-	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-	public static LocalTime[] periodStarts = {LocalTime.of(8, 15), LocalTime.of(9, 37), LocalTime.of(11, 58), LocalTime.of(13, 20)};
+	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+			.getDefaultConfiguration().getBounds();
+	public static LocalTime[] periodStarts = { LocalTime.of(8, 15), LocalTime.of(9, 37), LocalTime.of(11, 58),
+			LocalTime.of(13, 20) };
 
 	public static Font buttonFont = new Font("Arial", 1, 20);
-	
+
 	public static int sem1days = 90;
 	public static int sem2days = 90;
-	
 
 	static LinkedList<Student> students = new LinkedList<Student>();
 	static LinkedList<Teacher> teachers = new LinkedList<Teacher>();
 	static LinkedList<Course> courseOfferings = new LinkedList<Course>();
 	static LinkedList<ClassCourse> currentClasses = new LinkedList<ClassCourse>();
 	static LinkedList<String> rooms = new LinkedList<String>();
+	static final String USERNAME = "root";// DBMS connection username
+	static final String PASSWORD = "329228654sql";// DBMS connection password
+	static final String URL = "jdbc:mysql://localhost:3306/finals";// DBMS connection URL
 	
 	static boolean teacher;
 	static boolean admin;
@@ -92,19 +99,12 @@ public class School implements ActionListener, FocusListener {
 				if (currProf.getClasses()[i] != null) {
 					if (e.getSource() == currProf.getClasses()[i].getBaseDisplay()) {
 						currClass = currProf.getClasses()[i];
-						
-						
+
 						dashboard.removeAll();
-						dashboard.add(currClass.getMain());
-						dashboard.add(currClass.getDaily());
-						dashboard.add(currClass.getOverallAtt());
-						dashboard.add(currClass.getDayChoice());
-						dashboard.add(currClass.getMarks());
 						currClass.goDash();
 						dashboard.add(currClass.getTab());
-						dashboard.revalidate();
-						dashboard.repaint();
-						
+
+						window.revalidate();
 						window.repaint();
 					}
 				}
@@ -126,7 +126,7 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		} else if (e.getSource() == submitTeacherLogin) { // edit to check login credentials
 			Teacher loginner = teacherLogin();
-			
+
 			if (loginner != null) {
 				currProf = loginner;
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -137,8 +137,10 @@ public class School implements ActionListener, FocusListener {
 				dashboard = new JPanel(null);
 
 				window.add(currProf.getHeader());
-				
-				dashboard.add(currProf.getSem1());
+
+				JButton b = currProf.getSem1();
+				b.setBackground(Color.decode("#42a1e1"));
+				dashboard.add(b);
 				dashboard.add(currProf.getSem2());
 				dashboard.add(currProf.getCourses(1));
 				window.add(dashboard);
@@ -165,9 +167,12 @@ public class School implements ActionListener, FocusListener {
 			window.repaint();
 		} else if (e.getActionCommand().equals("Semester 2")) {
 			currProf.switchSem(2);
-
+			window.revalidate();
+			window.repaint();
 		} else if (e.getActionCommand().equals("Semester 1")) {
 			currProf.switchSem(1);
+			window.revalidate();
+			window.repaint();
 		} else if (e.getActionCommand().equals("Close app")) {
 			System.exit(0);
 		} else if (e.getActionCommand().equals("Classes")) {
@@ -178,127 +183,135 @@ public class School implements ActionListener, FocusListener {
 			dashboard.add(currProf.getCourses(1));
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Daily Attendance")) {
-			dashboard.remove(currClass.getMarks());
-			dashboard.add(currClass.getDayChoice());
-			
-			dashboard.add(currClass.getSubAtt());
-			
-			dashboard.add(currClass.addDailys());
+		} else if (e.getActionCommand().equals("Daily Attendance")) {
+
+			currClass.addDailys();
 			currClass.changeAttDay(1);
 			window.add(dashboard);
-			
+
 			window.revalidate();
 			window.repaint();
-			
-			
-			
-			}
-		else if (e.getActionCommand().equals("Dashboard")) {
-			dashboard.add(currClass.getDayChoice());
-			dashboard.add(currClass.getMarks());
+
+		} else if (e.getActionCommand().equals("Dashboard")) {
 			currClass.goDash();
-			
-			
-			dashboard.remove(currClass.getSubAtt());
+
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Present")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getPresent()) {
+		} else if (e.getActionCommand().equals("Present")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getPresent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setPresent(temp);
 				}
 			}
-		}
-		else if (e.getActionCommand().equals("Absent")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getAbsent()) {
+		} else if (e.getActionCommand().equals("Absent")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getAbsent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setAbsent(temp);
 				}
 			}
-		}
-		else if (e.getActionCommand().equals("Late")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getLate()) {
+		} else if (e.getActionCommand().equals("Late")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getLate()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setLate(temp);
 				}
 			}
-		}
-		else if(e.getActionCommand().equals("Day Choice")) {
+		} else if (e.getActionCommand().equals("Day Choice")) {
 			currClass.changeAttDay(1);
 			window.revalidate();
 			window.repaint();
-		}
-		else if(e.getActionCommand().equals("Submit Attendance")) {
+		} else if (e.getActionCommand().equals("Submit Attendance")) {
 			currClass.submitAttendance();
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Overall Attendance")) {
-			
-			dashboard.remove(currClass.getSubAtt());
-			dashboard.add(currClass.getDayChoice());
-			dashboard.add(currClass.getMarks());
-			
-			dashboard.add(currClass.overallAtt());
-		
-			
+		} else if (e.getActionCommand().equals("Overall Attendance")) {
+
+			currClass.overallAtt();
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Until day x")) {
+		} else if (e.getActionCommand().equals("Until day x")) {
 			currClass.changeAttDay(2);
 			window.revalidate();
 			window.repaint();
+
 		}
-		
+
 		else if (e.getActionCommand().split(" ")[0].equals("overAtt")) {
 			currClass.indAtt(Integer.parseInt(e.getActionCommand().split(" ")[1]));
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("indAtt")) {
+		} else if (e.getActionCommand().equals("indAtt")) {
 			currClass.changeAttDay(3);
 			window.revalidate();
 			window.repaint();
-			
-		}
-		else if(e.getActionCommand().equals("dmarks")) {
-			
-			dashboard.remove(currClass.getDaily());
-			dashboard.remove(currClass.getOverallAtt());
-			dashboard.remove(currClass.getMain());
-			dashboard.remove(currClass.getDayChoice());
-			dashboard.remove(currClass.getMarks());
-			
+
+		} else if (e.getActionCommand().equals("dmarks")) {
+
 			currClass.goMarks();
-			
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("marksDash")) {
+			currClass.studentMarks();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("studentGrades")) {
+			currClass.indStudentMarks(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("back to dash")) {
+			currClass.goDash();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("submitMarks")) {
+			currClass.submitIndGrades(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("assDash")) {
+			currClass.assMarks();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("submitAssMarks")) {
+			currClass.submitAssGrades(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("indAss")) {
+			currClass.indAss(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("addAss")) {
+			currClass.addAss();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("removeAss")) {
+			currClass.removeAss();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("add assessment")) {
+			currClass.addAssFromGUI();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("remove assessment")) {
+			currClass.removeAssFromGUI();
 			window.revalidate();
 			window.repaint();
 		}
-		
+
 	}
 
-	
-	
-	
-
-	public static void initialize() { // initializes login selection and login interface
+	public static void initialize() throws SQLException { // initializes login selection and login interface
 		FlatDarkLaf.setup();
 
 		window = new JFrame("General Student System");
 
 		window.setSize(500, 300);
 		window.setLocationRelativeTo(null);
+
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-		
-		
+		window.setResizable(false);
+
 		loginChoice = new JPanel();
 		loginChoice.setLayout(new GridLayout(2, 1));
 
@@ -380,23 +393,153 @@ public class School implements ActionListener, FocusListener {
 		adminLogin.add(submitAdminLogin);
 		submitAdminLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		adminLogin.add(Box.createRigidArea(new Dimension(0, 20)));
+		
+		
+
+		// Load JDBC driver
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// Connect to SQL Server
+			Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+			// Download table data into 2D array
+			String[] newclass = { "student_id", "Attendance", "Late", "Absent_reason" };
+			String[] clweights = { "Assginment_name", "Weight_factor" };
+			// adding teachers
+			Teacher teac = null;
+			Course cor = null;
+			ClassCourse ourClass = null;
+			String currentclass = null;
+			String[][] coursez = connectioncheck.downloadTable("course", con);
+			String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
+			String[][] running = connectioncheck.downloadTable("running_course", con);
+			String[][] stu = connectioncheck.downloadTable("students", con);
+			String[][] attendance = null;
+			String[][] Marks;
+			String[][] weights;
+
+			for (int l = 1; l < teacherinfo.length; l++) {
+				if (teacherinfo[l][1] != null) {
+					String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
+					String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
+					int teacher_id = Integer.parseInt((teacherinfo[l][0]));
+					LinkedList teachables = populateList(teacherinfo[l][2]);
+					teac = (new Teacher(first, last, teacher_id, teachables));
+					for (int i = 1; i < running.length; i++) {
+						if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
+							currentclass = null;
+							if (running[i][1] != null) {
+								currentclass = running[i][0].toLowerCase();
+								attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
+								Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
+								weights = connectioncheck.downloadTable(currentclass + "_weights", con);
+
+								for (int k = 1; k < coursez.length; k++) {
+									if (coursez[k][0] != null) {
+										String Course_id = coursez[k][0];
+										String coursename = coursez[k][1];
+										String dpt = coursez[k][2];
+										int pri = Integer.parseInt(coursez[k][3]);
+										LinkedList rms = populateList(coursez[k][4]);
+										cor = new Course(coursename, Course_id + "1", dpt, rms, pri, 30, 1, 15);
+										courseOfferings.add(cor);
+									}
+
+									if (currentclass != null && coursez[k][1] != null
+											&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
+										ourClass = new ClassCourse(1, teac, running[1][2],
+												Integer.parseInt(running[1][3]), cor);
+									}
+								}
+								
+								for (int z = 1; z<weights.length-1; z++) {
+									
+									if (weights[z][0]!=null) {
+
+									ourClass.addAssessment(weights[z][0], Double.parseDouble(weights[z][1]), Integer.parseInt(weights[z][2]));
+									//ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
+								}
+								}	
+								
+								for (int a = 1; a < attendance.length; a++) {
+
+									for (int j = 1; j < stu.length; j++) {
+
+										if (stu[j][1] != null) {
+											if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
+												int id = Integer.parseInt(stu[j][0]);
+												String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
+												String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
+												int grade = Integer.parseInt(stu[j][2]);
+												Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
+														firsts, lasts, id);
+												ourClass.addStudent(ex);
+												Attend[] test = ourClass.getAttendance(ex);
+												
+													String[] att = populateArray(attendance[a][1]);
+													String[] ltime = populateArray(attendance[a][2]);
+													String[] areason = populateArray(attendance[a][3]);
+													test = presents(att, ltime, areason);
+												
+												ourClass.setAttendance(test, ex);
+												for (int z = 1; z<weights.length; z++) {
+													
+													if (weights[z][0]!=null) {
+														System.out.println(weights[z][0]);
+													ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
+												}
+												}	
+											}
+										}
+									}		
+									
+								}
+								
+								
+								teac.addClass(ourClass, 2);
+								teachers.add(teac);
+							}
+						}
+					}
+
+				}
+			}
+			con.close();
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
 	}
 
 	public void focusGained(FocusEvent e) {
-		
-		if(teacher) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
+
+		if (teacher) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				Student temp = currClass.getStudents().get(i);
-				if(e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("Time arrived")) {
+				if (e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("Time arrived")) {
 					currClass.getStudents().get(i).setMinsLate("");
-					
+
 				}
-				
+
+			}
+			if (currClass.getAssName().getText().equals("Assessment name")
+					&& e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("");
+			}
+			if (currClass.getAssWeight().getText().equals("Assessment weight factor")
+					&& e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("");
+			}
+			if (currClass.getTotalAssMarks().getText().equals("Total # of marks")
+					&& e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("");
 			}
 		}
-		
-		
+
 		if (lastName.getText().equals("Enter your last name here") && e.getComponent() == lastName) {
 			lastName.setText("");
 		}
@@ -407,21 +550,30 @@ public class School implements ActionListener, FocusListener {
 		if (password.getText().equals("Enter the password here") && e.getComponent() == password) {
 			password.setText("");
 		}
-		
+
 	}
 
 	public void focusLost(FocusEvent e) {
-		if(teacher) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
+		if (teacher) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				Student temp = currClass.getStudents().get(i);
-				if(e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("")) {
+				if (e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("")) {
 					currClass.getStudents().get(i).setMinsLate("Time arrived");
 				}
-				
+
+			}
+			if (currClass.getAssName().getText().equals("") && e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("Assessment name");
+			}
+			if (currClass.getAssWeight().getText().equals("") && e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("Assessment weight factor");
+			}
+			if (currClass.getTotalAssMarks().getText().equals("")
+					&& e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("Total # of marks");
 			}
 		}
-		
-		
+
 		if (lastName.getText().equals("") && e.getComponent() == lastName) {
 			lastName.setText("Enter your last name here");
 		}
@@ -431,6 +583,7 @@ public class School implements ActionListener, FocusListener {
 		if (password.getText().equals("") && e.getComponent() == password) {
 			password.setText("Enter the password here");
 		}
+
 	}
 
 	public Teacher teacherLogin() {
@@ -455,56 +608,85 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
-	public static void main(String[] args) {
+	public static LinkedList<String> populateList(String input) {
+        LinkedList<String> list = new LinkedList<>();
+        String[] words = input.split(" ");
+        for (String word : words) {
+            list.add(word);
+        }
+        return list;
+    }
 
-		// test data
-		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
-		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5, 30,1,15);
-		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 8, ics4u);
-		
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Danny", "Song", 2));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Lawrence", "Huang", 3));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Doris", "Zhang", 4));
-		
-		Student isa = new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5);
-		ourClass.addStudent(isa);
-		Student varun = new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10);
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Naheen", "Mahboob", 6));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Ahmed", "Sinjab", 7));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Calvin", "Cao", 9));
-		ourClass.addStudent(varun);
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdulmuhaimin", "Ali", 11));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Trevor", "Bliss", 12));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Victor", "Reznov", 13));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Sofia", "Odegaard", 14));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Tanya", "Poulouchina", 15));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Minjae", "Kim", 16));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Mashrur", "Khandaker", 17));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Cason", "Cook", 18));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Nathan", "Killinger", 19));
-		
-		mckay.addClass(ourClass, 2);
+    public static String[] populateArray(String input) {
+        return input.split(" ");
+    }
 
-		teachers.add(mckay);
-		
-		Attend[] test = ourClass.getAttendance(isa);
-		test[0] = new Attend(true, true, 20, "");
-		test[1] = new Attend(true, false, 0, "");
-		test[2] = new Attend(true, false, 0, "");
-		test[3] = new Attend(false, false, 0, "Illness or injury");
-		test[4] = new Attend(true, true, 15, "");
-		test[5] = new Attend(true, true, 20, "");
-		test[6] = new Attend(true, false, 0, "");
-		test[7] = new Attend(true, false, 0, "");
-		test[8] = new Attend(false, false, 0, "Appointment");
-		test[9] = new Attend(true, true, 15, "");
-		ourClass.setAttendance(test, isa);
-	
-		//Schedule timetable = new Schedule(students, teachers, courseOfferings, rooms);
-		
-		initialize();
+    public static Attend[] presents(String[] in, String[] late, String[] abreason) {
+        boolean present = false;
+        boolean late2 = false;
+        int minutesLate = 0;
+        int lcount=-1;
+        int acount=-1;
+        String reason = "";
+        Attend[] att =new Attend[in.length];
+        for (int i = 0; i < in.length; i++) {
+            present = false;
+            late2 = false;
+            if (in[i].equals("0")) {
+                present = true;
+                late2 = false;
+                att[i] = new Attend(present, late2, minutesLate, reason);
+            }
+
+            if (in[i].equals("1")) {
+                lcount++;
+                present = true;
+                late2 = true;
+                minutesLate = Integer.parseInt(late[lcount]);
+
+                att[i] = new Attend(present, late2, minutesLate, reason);
+
+            }
+
+            if (in[i].equals("2")) {
+                acount ++;
+                switch (abreason[acount]) {
+                case "1":
+                    reason = "Illness or injury";
+                    break;
+                case "2":
+                    reason = "Appointment";
+                    break;
+                case "3":
+                    reason = "Religious day";
+                    break;
+                case "4":
+                    reason = "Bereavement";
+                    break;
+                case "5":
+                    reason = "School transportation cancellation";
+                    break;
+                case "6":
+                    reason = "Parent-approved absence";
+                    break;
+                default:
+                    reason = "Not approved by parent";
+                    break;
+                }
+                att[i] = new Attend(present, late2, minutesLate, reason);
+
+            }
+
+        }
+        return att;
+
+    }
+
+		public static void main(String[] args) throws SQLException {
+			// test data
+
+			
+			initialize();
+
+		}
 	}
-
-}

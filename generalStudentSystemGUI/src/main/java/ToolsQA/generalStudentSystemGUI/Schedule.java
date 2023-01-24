@@ -7,6 +7,10 @@ public class Schedule {
 	
 	@SuppressWarnings("unchecked")
 	private LinkedList<ClassCourse>[] madeSchedule = new LinkedList[8];
+	private LinkedList<Student> kids = new LinkedList<Student>();
+	private LinkedList<Student> teachers = new LinkedList<Student>();
+	private LinkedList<Student> courses = new LinkedList<Student>();
+	private LinkedList<Student> classes = new LinkedList<Student>();
 	
 	// courses should be added to the courses linkedlist based on absolute priority (i.e. gr12 english, then gr12 math, then gr12 science and so on)
 	public Schedule(LinkedList<Student> students, LinkedList<Teacher> teachers, LinkedList<Course> courses, LinkedList<String> rooms) {
@@ -91,7 +95,7 @@ public class Schedule {
 					while(!(thisProf.addClass(thisClass, 1))) { // if this teacher doesn't have room then we randomly pick another
 						thisProf = teachersAvailable.get((int) (Math.random() * teachersAvailable.size()));
 					}
-					// we're gonna assume that there's always enough teachers and that the school isn't under staffed like that
+					// we're gonna assume that there's always enough teachers and that the school isn't under staffed
 					// this is a course scheduler, not a cost-of-living/wage/bureaucracy fixer
 					
 					thisClass.setProf(thisProf);
@@ -120,6 +124,12 @@ public class Schedule {
 			
 			
 		} // end for loop for adding courses
+		
+		for(int i=0;i<students.size();i++) {
+			
+		}
+		
+		
 		
 	} // end schedule constructor
 	

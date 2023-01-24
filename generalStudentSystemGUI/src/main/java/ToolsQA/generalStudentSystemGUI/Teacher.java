@@ -109,8 +109,11 @@ public class Teacher {
 				}
 
 			}
+			sem1.setBackground(Color.decode("#42a1e1"));
+			sem2.setBackground(null);
 			courses.revalidate();
 			courses.repaint();
+			
 
 		} else if (sem == 2 && sem1.getY() - sem2.getY() == 20) {
 			sem1.setLocation(sem1.getX(), sem1.getY() - 20);
@@ -122,9 +125,12 @@ public class Teacher {
 				}
 
 			}
+			sem2.setBackground(Color.decode("#42a1e1"));
+			sem1.setBackground(null);
 			courses.revalidate();
 			courses.repaint();
 		}
+		
 
 	}
 
@@ -142,6 +148,9 @@ public class Teacher {
 
 	public String getLastName() {
 		return lastName;
+	}
+	public String getFirstName() {
+		return firstName;
 	}
 
 	public int getID() {
