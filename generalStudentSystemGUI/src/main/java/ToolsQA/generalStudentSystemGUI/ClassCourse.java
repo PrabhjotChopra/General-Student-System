@@ -176,8 +176,8 @@ public class ClassCourse extends Course {
 		result.setEditable(false);
 		result.setVisible(false);
 		result.setHorizontalAlignment(JTextField.CENTER);
-		result.setFont(new Font("Arial", 1, 25));
-		result.setMaximumSize(new Dimension(School.rect.width + 50, 35));
+		result.setFont(Student.studentStandard);
+		result.setMaximumSize(new Dimension(School.rect.width + 50, 40));
 
 	}
 
@@ -990,7 +990,8 @@ public class ClassCourse extends Course {
 		name = name.replace(" ", "_");
 
 		if (name.length() == 0) {
-			name = "Untitled";
+			result.setText("Please enter an assignment name");
+			return;
 		}
 		if (name.length() > nameLen) {
 			name = name.substring(0, nameLen);
@@ -1006,14 +1007,24 @@ public class ClassCourse extends Course {
 				result.setText("Assignment \"" + name + "\" already exists");
 				return;
 			}
+			
 		}
+		result.setText("");
+		result.setHorizontalAlignment(JTextField.CENTER);
 		try {
 			weight = Double.parseDouble(assWeight.getText());
 			if (weight > 100) {
-				weight = 100;
+				result.setHorizontalAlignment(JTextField.LEFT);
+				result.setText("Assessment is too heavily weighted (max weight factor of 100)");
+				worked = false;
+				assWeight.setBackground(Color.decode("#cc473d"));
+				
 			}
 			if(weight<0) {
-				weight=0;
+				result.setHorizontalAlignment(JTextField.LEFT);
+				result.setText("Assessment must have a positive weight factor");
+				worked = false;
+				assWeight.setBackground(Color.decode("#cc473d"));
 			}
 
 		}
@@ -1028,10 +1039,17 @@ public class ClassCourse extends Course {
 		try {
 			marks = (int) Double.parseDouble(totalAssMarks.getText());
 			if (marks > 300) {
-				marks = 300;
+				result.setHorizontalAlignment(JTextField.LEFT);
+				result.setText(result.getText() + "\tToo many marks for assessment (max 300)");
+				worked = false;
+				totalAssMarks.setBackground(Color.decode("#cc473d"));
 			}
-			if (marks<0) {
-				marks=0;
+			if (marks<5) {
+				result.setHorizontalAlignment(JTextField.LEFT);
+				result.setText(result.getText() + "\tToo few marks for assessment (min 5)");
+				worked = false;
+				totalAssMarks.setBackground(Color.decode("#cc473d"));
+				
 			}
 		}
 
@@ -1045,7 +1063,8 @@ public class ClassCourse extends Course {
 		}
 		if (worked) {
 			addAssessment(name, weight, marks);
-			result.setText("Assessment \"" + name + "\" successfully added");
+			result.setText("Assessment \"" + name + "\" successfully added with weight factor " +weight 
+					+" and " + marks + " total marks.");
 		}
 
 		// successfully added message
@@ -1103,7 +1122,9 @@ public class ClassCourse extends Course {
 		name = name.replace(" ", "_");
 
 		if (name.length() == 0) {
-			name = "Untitled";
+			result.setText("Please enter an assessment name");
+			return;
+			
 		}
 		if (name.length() > nameLen) {
 			name = name.substring(0, nameLen);
@@ -1130,7 +1151,7 @@ public class ClassCourse extends Course {
 			}
 		}
 		
-		//removeAssessment(ass);
+		
 		String name = title.getText();
 
 		name.strip();
@@ -1153,8 +1174,8 @@ public class ClassCourse extends Course {
 			if (tempmarks > 300) {
 				tempmarks = 300;
 			}
-			if (tempmarks<0) {
-				tempmarks=0;
+			if (tempmarks<5) {
+				tempmarks=5;
 			}
 		} catch (NumberFormatException e) {
 			tempmarks = ass.getTotalMarks();
@@ -1176,7 +1197,7 @@ public class ClassCourse extends Course {
 		ass.setWeight(tempWeight);
 		totalWeight += tempWeight;
 
-		//addAssessment(ass);
+		
 		for (int i = 0; i < students.size(); i++) {
 			String temp = assMarks.get(i).getText().strip();
 			if (temp.length() > 6) {
@@ -1191,6 +1212,9 @@ public class ClassCourse extends Course {
 
 				try {
 					thismark = Double.parseDouble(temp);
+					if(thismark<0) {
+						thismark=-1;
+					}
 					if (thismark > bonus * ass.getTotalMarks()) {
 						thismark = Math.round(bonus * ass.getTotalMarks());
 					}
@@ -1243,6 +1267,9 @@ public class ClassCourse extends Course {
 			} else {
 				try {
 					newGrade = Double.parseDouble(temp);
+					if(newGrade<0) {
+						newGrade=-1;
+					}
 					if(newGrade>bonus*assignments.get(i).getTotalMarks()) {
 						newGrade = Math.round(bonus * assignments.get(i).getTotalMarks());
 					}
@@ -1290,6 +1317,7 @@ public class ClassCourse extends Course {
 						diff = (int) start.until(lateness, ChronoUnit.MINUTES);
 						if (diff > 74 || diff < 1) {
 							diff = 1;
+							
 						}
 						setLate(students.get(i), diff, lateness);
 					}
