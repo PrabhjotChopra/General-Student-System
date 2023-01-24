@@ -31,6 +31,7 @@ public class Student {
 	private String[] reasons;
 	
 	private JButton studentAttB;
+	private JButton studentMarkB;
 	
 	public Student() {}
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
@@ -86,6 +87,7 @@ public class Student {
 		
 		
 		daily.add(Box.createRigidArea(new Dimension(0, 5)));
+		
 		daily.add(tabbedName());
 		daily.add(Box.createRigidArea(new Dimension(20, 0)));
 		daily.add(present);
@@ -103,11 +105,16 @@ public class Student {
 		
 		
 		
-		studentAttB = new JButton("View Individual");
+		studentAttB = new JButton();
 		studentAttB.addActionListener(new School());
 		studentAttB.setActionCommand("overAtt " + studentNumber);
-		studentAttB.setFont(Student.studentStandard);
+		studentAttB.setFont(studentStandard);
 		
+		
+		studentMarkB = new JButton();
+		studentMarkB.addActionListener(new School());
+		studentMarkB.setActionCommand("studentGrades " + studentNumber);
+		studentMarkB.setFont(studentStandard);
 
 	}
 
@@ -122,17 +129,13 @@ public class Student {
 		absentReason.setBackground(null);
 	}
 	public JTextArea tabbedName() {
-		String padName = lastName + ", " + firstName + "\t";
-		FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
-		double width = (studentStandard.getStringBounds(padName, frc).getWidth());
+		JTextArea name = new JTextArea(lastName + ", " + firstName);
 		
-		if (width<138.91) {
-			padName += "\t";
-		}
-		
-		JTextArea name = new JTextArea(padName);
 		name.setEditable(false);
 		name.setFont(studentStandard);
+		name.setMaximumSize(new Dimension(250,25));
+		name.setPreferredSize(new Dimension(250,25));
+		
 		return name;
 	}
 
@@ -231,6 +234,9 @@ public class Student {
 	}
 	public JButton getStudentAttB() {
 		return studentAttB;
+	}
+	public JButton getStudentMarkB() {
+		return studentMarkB;
 	}
 	public boolean wantsCourse(Course c) {
 		Enumeration<Course> courses = courseReqs.keys();
