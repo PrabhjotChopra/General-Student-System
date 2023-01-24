@@ -12,6 +12,12 @@ public class Attend {
 		minutesLate = m;
 		reason = s;
 	}
+	/**
+	 * 
+	 */
+	public Attend() {
+		// TODO Auto-generated constructor stub
+	}
 	public boolean getPresent() {
 		return present;
 	}

@@ -23,14 +23,15 @@ public class Student {
 	private JPanel daily;
 	public static Font studentStandard = new Font("Arial", 1, 20);
 
-	private JTextField absentReason;
+	private JComboBox<String> absentReason;
 	private JTextField minsLate;
 	private JButton present;
 	private JButton absent;
 	private JButton late;
-	
+	private String[] reasons;
 	
 	private JButton studentAttB;
+	private JButton studentMarkB;
 	
 	public Student() {}
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
@@ -69,12 +70,20 @@ public class Student {
 		minsLate.setFocusable(false);
 		
 		
+		reasons = new String[7];
+		reasons[1] = "Illness or injury";
+		reasons[2] = "Appointment";
+		reasons[3] = "Religious day";
+		reasons[4] = "Bereavement";
+		reasons[5] = "School transportation cancellation";
+		reasons[6] = "Parent-approved absence";
+		reasons[0] = "Not approved by parent";
 		
-		absentReason = new JTextField(13);
-		absentReason.setText("Reason for absence");
+		
+		absentReason = new JComboBox<String>(reasons);
 		absentReason.setFont(studentStandard);
-		absentReason.addFocusListener(new School());
-		absentReason.setFocusable(false);
+		absentReason.setEnabled(false);
+			
 		
 		
 		daily.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -95,11 +104,16 @@ public class Student {
 		
 		
 		
-		studentAttB = new JButton("View Individual");
+		studentAttB = new JButton();
 		studentAttB.addActionListener(new School());
 		studentAttB.setActionCommand("overAtt " + studentNumber);
-		studentAttB.setFont(Student.studentStandard);
+		studentAttB.setFont(studentStandard);
 		
+		
+		studentMarkB = new JButton();
+		studentMarkB.addActionListener(new School());
+		studentMarkB.setActionCommand("studentGrades " + studentNumber);
+		studentMarkB.setFont(studentStandard);
 
 	}
 
@@ -110,7 +124,7 @@ public class Student {
 
 		minsLate.setFocusable(false);
 		minsLate.setBackground(null);
-		absentReason.setFocusable(false);
+		absentReason.setEnabled(false);
 		absentReason.setBackground(null);
 	}
 	public JTextArea tabbedName() {
@@ -135,19 +149,19 @@ public class Student {
 
 		minsLate.setFocusable(false);
 		minsLate.setBackground(null);
-		absentReason.setFocusable(false);
+		absentReason.setEnabled(false);
 		absentReason.setBackground(null);
 	}
 
 	public void rAbsent() {
-		absent.setBackground(Color.decode("#dc143c"));
+		absent.setBackground(Color.decode("#cc473d"));
 		present.setBackground(null);
 		late.setBackground(null);
 
 		minsLate.setFocusable(false);
 		minsLate.setBackground(null);
-		absentReason.setFocusable(true);
-		absentReason.setBackground(Color.decode("#dc143c"));
+		absentReason.setEnabled(true);
+		absentReason.setBackground(Color.decode("#cc473d"));
 	}
 
 	public void bLate() {
@@ -157,7 +171,7 @@ public class Student {
 
 		minsLate.setFocusable(true);
 		minsLate.setBackground(Color.decode("#104E8B"));
-		absentReason.setFocusable(false);
+		absentReason.setEnabled(false);
 		absentReason.setBackground(null);
 
 	}
@@ -182,7 +196,7 @@ public class Student {
 		return daily;
 	}
 
-	public JTextField getAbsentReason() {
+	public JComboBox<String> getAbsentReason() {
 		return absentReason;
 	}
 
@@ -190,9 +204,16 @@ public class Student {
 		return minsLate;
 	}
 
-	public void setAbsentReason(String s) {
-		absentReason.setText(s);
+	public void setAbsentReason(int n) {
+		absentReason.setSelectedIndex(n);
 
+	}
+	public void setAbsentReason(String s) {
+		for(int i=0; i<reasons.length;i++) {
+			if(s.equals(reasons[i])) {
+				absentReason.setSelectedIndex(i);
+			}
+		}
 	}
 
 	public void setMinsLate(String s) {
@@ -216,6 +237,9 @@ public class Student {
 	}
 	public JButton getStudentAttB() {
 		return studentAttB;
+	}
+	public JButton getStudentMarkB() {
+		return studentMarkB;
 	}
 	public boolean wantsCourse(Course c) {
 		Enumeration<Course> courses = courseReqs.keys();

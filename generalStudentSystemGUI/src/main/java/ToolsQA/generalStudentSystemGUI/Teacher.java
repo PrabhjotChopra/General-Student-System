@@ -8,7 +8,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 
 public class Teacher {
 	private LinkedList<String> teachables;
-	private ClassCourse[] classes = new ClassCourse[6];
+	private ClassCourse[] classes = new ClassCourse[8];
 	private int ID;
 	private String firstName;
 	private String lastName;
@@ -17,7 +17,9 @@ public class Teacher {
 	private JButton sem2;
 	private JPanel courses;
 
-	public Teacher() {}
+	public Teacher() {
+	}
+
 	public Teacher(String f, String l, int ID, LinkedList<String> teachables) {
 		this.ID = ID;
 		this.teachables = teachables;
@@ -25,7 +27,6 @@ public class Teacher {
 		lastName = l;
 
 		FlatDarkLaf.setup();
-		
 
 		sem1 = new JButton("Semester 1");
 		sem1.setBounds(100, 180, 200, 75);
@@ -44,30 +45,26 @@ public class Teacher {
 		header.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		JTextArea welcome = new JTextArea("Welcome, " + firstName.charAt(0) + ". " + lastName);
-		
 
 		welcome.setFont(new Font("Arial", 1, 50));
 		header.add(welcome);
 		welcome.setAlignmentX(0);
 		welcome.setEditable(false);
-		
+
 		JButton classes = new JButton("Classes");
 		classes.addActionListener(new School());
-		
-		
+
 		classes.setFont(new Font("Arial", 1, 40));
 		header.add(classes);
 		classes.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		header.add(Box.createRigidArea(new Dimension(20, 0)));
-		
+
 		JButton exit = new JButton("Close app");
 		exit.addActionListener(new School());
-		
+
 		exit.setFont(new Font("Arial", 1, 40));
 		header.add(exit);
 		exit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		
-		
 
 		courses = new JPanel();
 		courses.setLayout(new BoxLayout(courses, BoxLayout.Y_AXIS));
@@ -75,33 +72,28 @@ public class Teacher {
 		courses.setBorder(BorderFactory.createLineBorder(Color.black));
 
 	}
-	
-	
+
 	// add courses in order in the teacher's courses array
 	public boolean addClass(ClassCourse c, int sem) throws NullPointerException {
 		sem--;
-		sem *= 3;
+		sem *= 4;
 
-		int endSem = sem + 3;
+		int endSem = sem + 4;
+		int coursesThisSem = 0;
 		for (int i = sem; i < endSem; i++) {
-			
-			if (classes[i] == null && i == c.getPeriod()) { // if the teacher is free the period the course is running
-				
-				classes[i] = c;
-
-				courses.add(c.getBaseDisplay());
-				return true; // there was room to add the class in the teacher's schedule and it was added
-			}
-			else {
-				if(classes[i]!=null) {
-					if(classes[i].getPeriod() == c.getPeriod()) {
-						// if the teacher is alr teaching a class in that period then return false
-						return false;
-					}
-				}
-				
+			if(classes[i]!=null) {
+				coursesThisSem++;
 			}
 		}
+
+		if (classes[c.getPeriod() - 1] == null && coursesThisSem != 3) { // if the teacher is free the period the course
+																			// is running
+			
+			classes[c.getPeriod() - 1] = c;
+
+			return true; // there was room to add the class in the teacher's schedule and it was added
+		}
+
 		return false; // no room to add a class to teacher's schedule
 	}
 
@@ -111,7 +103,7 @@ public class Teacher {
 			sem2.setLocation(sem2.getX(), sem2.getY() - 20);
 
 			courses.removeAll();
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 4; i++) {
 				if (classes[i] != null) {
 					courses.add(classes[i].getBaseDisplay());
 				}
@@ -124,11 +116,11 @@ public class Teacher {
 			sem1.setLocation(sem1.getX(), sem1.getY() - 20);
 			sem2.setLocation(sem2.getX(), sem2.getY() + 20);
 			courses.removeAll();
-			for (int i = 0; i < 3; i++) {
-				if(classes[i+3]!=null) {
-					courses.add(classes[i + 3].getBaseDisplay());
+			for (int i = 4; i < 8; i++) {
+				if (classes[i] != null) {
+					courses.add(classes[i].getBaseDisplay());
 				}
-				
+
 			}
 			courses.revalidate();
 			courses.repaint();
@@ -136,12 +128,23 @@ public class Teacher {
 
 	}
 
-	public JPanel getCourses() {
+	public JPanel getCourses(int sem) {
+		sem--;
+		sem *= 4;
+		for (int i = sem; i < sem + 4; i++) {
+			if (classes[i] != null) {
+				courses.add(classes[i].getBaseDisplay());
+			}
+
+		}
 		return courses;
 	}
 
 	public String getLastName() {
 		return lastName;
+	}
+	public String getFirstName() {
+		return firstName;
 	}
 
 	public int getID() {
@@ -159,10 +162,12 @@ public class Teacher {
 	public JButton getSem2() {
 		return sem2;
 	}
+
 	public ClassCourse[] getClasses() {
 		return classes;
 	}
-	public LinkedList<String> getTeachables(){
+
+	public LinkedList<String> getTeachables() {
 		return teachables;
 	}
 }

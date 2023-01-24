@@ -8,6 +8,9 @@ import javax.swing.text.BadLocationException;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Hashtable;
@@ -15,21 +18,22 @@ import java.util.LinkedList;
 
 public class School implements ActionListener, FocusListener {
 
-	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-	public static LocalTime[] periodStarts = {LocalTime.of(8, 15), LocalTime.of(9, 37), LocalTime.of(11, 58), LocalTime.of(13, 20)};
+	public static Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+			.getDefaultConfiguration().getBounds();
+	public static LocalTime[] periodStarts = { LocalTime.of(8, 15), LocalTime.of(9, 37), LocalTime.of(11, 58),
+			LocalTime.of(13, 20) };
 
 	public static Font buttonFont = new Font("Arial", 1, 20);
-	
+
 	public static int sem1days = 90;
 	public static int sem2days = 90;
-	
 
 	static LinkedList<Student> students = new LinkedList<Student>();
 	static LinkedList<Teacher> teachers = new LinkedList<Teacher>();
 	static LinkedList<Course> courseOfferings = new LinkedList<Course>();
 	static LinkedList<ClassCourse> currentClasses = new LinkedList<ClassCourse>();
 	static LinkedList<String> rooms = new LinkedList<String>();
-	
+
 	static boolean teacher;
 	static boolean admin;
 
@@ -88,21 +92,16 @@ public class School implements ActionListener, FocusListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (teacher) {
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 8; i++) {
 				if (currProf.getClasses()[i] != null) {
 					if (e.getSource() == currProf.getClasses()[i].getBaseDisplay()) {
 						currClass = currProf.getClasses()[i];
-						
-						
+
 						dashboard.removeAll();
-						dashboard.add(currClass.getMain());
-						dashboard.add(currClass.getDaily());
-						dashboard.add(currClass.getOverallAtt());
 						currClass.goDash();
 						dashboard.add(currClass.getTab());
-						dashboard.revalidate();
-						dashboard.repaint();
-						
+
+						window.revalidate();
 						window.repaint();
 					}
 				}
@@ -122,10 +121,12 @@ public class School implements ActionListener, FocusListener {
 			window.add(adminLogin);
 			window.revalidate();
 			window.repaint();
+
 		} else if (e.getSource() == submitTeacherLogin) { // edit to check login credentials
 			Teacher loginner = teacherLogin();
-			
+
 			if (loginner != null) {
+
 				currProf = loginner;
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 				window.remove(teacherLogin);
@@ -135,10 +136,10 @@ public class School implements ActionListener, FocusListener {
 				dashboard = new JPanel(null);
 
 				window.add(currProf.getHeader());
-				
+
 				dashboard.add(currProf.getSem1());
 				dashboard.add(currProf.getSem2());
-				dashboard.add(currProf.getCourses());
+				dashboard.add(currProf.getCourses(1));
 				window.add(dashboard);
 
 				window.revalidate();
@@ -173,91 +174,125 @@ public class School implements ActionListener, FocusListener {
 			dashboard.removeAll();
 			dashboard.add(currProf.getSem1());
 			dashboard.add(currProf.getSem2());
-			dashboard.add(currProf.getCourses());
+			dashboard.add(currProf.getCourses(1));
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Daily Attendance")) {
-			
-			dashboard.add(currClass.getDayChoice());
-			
-			dashboard.add(currClass.getSubAtt());
-			
-			dashboard.add(currClass.addDailys());
+		} else if (e.getActionCommand().equals("Daily Attendance")) {
+
+			currClass.addDailys();
 			currClass.changeAttDay(1);
 			window.add(dashboard);
-			
+
 			window.revalidate();
 			window.repaint();
-			
-			
-			
-			}
-		else if (e.getActionCommand().equals("Dashboard")) {
+
+		} else if (e.getActionCommand().equals("Dashboard")) {
 			currClass.goDash();
-			dashboard.remove(currClass.getDayChoice());
-			
-			dashboard.remove(currClass.getSubAtt());
+
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Present")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getPresent()) {
+		} else if (e.getActionCommand().equals("Present")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getPresent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setPresent(temp);
 				}
 			}
-		}
-		else if (e.getActionCommand().equals("Absent")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getAbsent()) {
+		} else if (e.getActionCommand().equals("Absent")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getAbsent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setAbsent(temp);
 				}
 			}
-		}
-		else if (e.getActionCommand().equals("Late")) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
-				if(e.getSource() == currClass.getStudents().get(i).getLate()) {
+		} else if (e.getActionCommand().equals("Late")) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
+				if (e.getSource() == currClass.getStudents().get(i).getLate()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setLate(temp);
 				}
 			}
-		}
-		else if(e.getActionCommand().equals("Day Choice")) {
+		} else if (e.getActionCommand().equals("Day Choice")) {
 			currClass.changeAttDay(1);
-			
-		}
-		else if(e.getActionCommand().equals("Submit Attendance")) {
-			currClass.submitAttendance();
-		}
-		else if (e.getActionCommand().equals("Overall Attendance")) {
-			
-			dashboard.remove(currClass.getSubAtt());
-			dashboard.add(currClass.getDayChoice());
-			
-			
-			dashboard.add(currClass.overallAtt());
-		
-			
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Until day x")) {
+		} else if (e.getActionCommand().equals("Submit Attendance")) {
+			currClass.submitAttendance();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("Overall Attendance")) {
+
+			currClass.overallAtt();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("Until day x")) {
 			currClass.changeAttDay(2);
 			window.revalidate();
 			window.repaint();
-		}
-		
-		else if (e.getActionCommand().substring(0,7).equals("overAtt")) {
-			currClass.indAtt(Integer.parseInt(e.getActionCommand().substring(8)));
-		}
-	}
 
-	
-	
-	
+		}
+
+		else if (e.getActionCommand().split(" ")[0].equals("overAtt")) {
+			currClass.indAtt(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("indAtt")) {
+			currClass.changeAttDay(3);
+			window.revalidate();
+			window.repaint();
+
+		} else if (e.getActionCommand().equals("dmarks")) {
+
+			currClass.goMarks();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("marksDash")) {
+			currClass.studentMarks();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("studentGrades")) {
+			currClass.indStudentMarks(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("back to dash")) {
+			currClass.goDash();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("submitMarks")) {
+			currClass.submitIndGrades(Integer.parseInt(e.getActionCommand().split(" ")[1]));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("assDash")) {
+			currClass.assMarks();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("submitAssMarks")) {
+			currClass.submitAssGrades(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().split(" ")[0].equals("indAss")) {
+			currClass.indAss(e.getActionCommand().split(" ")[1]);
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("addAss")) {
+			currClass.addAss();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("removeAss")) {
+			currClass.removeAss();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("add assessment")) {
+			currClass.addAssFromGUI();
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("remove assessment")) {
+			currClass.removeAssFromGUI();
+			window.revalidate();
+			window.repaint();
+		}
+
+	}
 
 	public static void initialize() { // initializes login selection and login interface
 		FlatDarkLaf.setup();
@@ -268,8 +303,7 @@ public class School implements ActionListener, FocusListener {
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-		
-		
+
 		loginChoice = new JPanel();
 		loginChoice.setLayout(new GridLayout(2, 1));
 
@@ -355,21 +389,30 @@ public class School implements ActionListener, FocusListener {
 	}
 
 	public void focusGained(FocusEvent e) {
-		
-		if(teacher) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
+
+		if (teacher) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				Student temp = currClass.getStudents().get(i);
-				if(e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("Time arrived")) {
+				if (e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("Time arrived")) {
 					currClass.getStudents().get(i).setMinsLate("");
-					
+
 				}
-				else if(e.getSource() == temp.getAbsentReason() && temp.getAbsentReason().getText().equals("Reason for absence")) {
-					currClass.getStudents().get(i).setAbsentReason("");
-				}
+
+			}
+			if (currClass.getAssName().getText().equals("Assessment name")
+					&& e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("");
+			}
+			if (currClass.getAssWeight().getText().equals("Assessment weight factor")
+					&& e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("");
+			}
+			if (currClass.getTotalAssMarks().getText().equals("Total # of marks")
+					&& e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("");
 			}
 		}
-		
-		
+
 		if (lastName.getText().equals("Enter your last name here") && e.getComponent() == lastName) {
 			lastName.setText("");
 		}
@@ -380,23 +423,30 @@ public class School implements ActionListener, FocusListener {
 		if (password.getText().equals("Enter the password here") && e.getComponent() == password) {
 			password.setText("");
 		}
-		
+
 	}
 
 	public void focusLost(FocusEvent e) {
-		if(teacher) {
-			for(int i=0;i<currClass.getStudents().size();i++) {
+		if (teacher) {
+			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				Student temp = currClass.getStudents().get(i);
-				if(e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("")) {
+				if (e.getSource() == temp.getMinsLate() && temp.getMinsLate().getText().equals("")) {
 					currClass.getStudents().get(i).setMinsLate("Time arrived");
 				}
-				else if(e.getSource() == temp.getAbsentReason() && temp.getAbsentReason().getText().equals("")) {
-					currClass.getStudents().get(i).setAbsentReason("Reason for absence");
-				}
+
+			}
+			if (currClass.getAssName().getText().equals("") && e.getComponent().equals(currClass.getAssName())) {
+				currClass.getAssName().setText("Assessment name");
+			}
+			if (currClass.getAssWeight().getText().equals("") && e.getComponent().equals(currClass.getAssWeight())) {
+				currClass.getAssWeight().setText("Assessment weight factor");
+			}
+			if (currClass.getTotalAssMarks().getText().equals("")
+					&& e.getComponent().equals(currClass.getTotalAssMarks())) {
+				currClass.getTotalAssMarks().setText("Total # of marks");
 			}
 		}
-		
-		
+
 		if (lastName.getText().equals("") && e.getComponent() == lastName) {
 			lastName.setText("Enter your last name here");
 		}
@@ -406,6 +456,7 @@ public class School implements ActionListener, FocusListener {
 		if (password.getText().equals("") && e.getComponent() == password) {
 			password.setText("Enter the password here");
 		}
+
 	}
 
 	public Teacher teacherLogin() {
@@ -430,39 +481,161 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
-	public static void main(String[] args) {
-
-		// test data
-		Teacher mckay = new Teacher("Kyle", "McKay", 12345, new LinkedList<String>());
-		Course ics4u = new Course("Grade 12 Computer Science", "ICS4U1", "Computer Studies", new LinkedList<String>(), 5, 30,1,15);
-		ClassCourse ourClass = new ClassCourse(1, mckay, "129", 2, ics4u);
-		
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Prabhjot", "Chopra", 1));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Danny", "Song", 2));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Lawrence", "Huang", 3));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Doris", "Zhang", 4));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Isa", "Alif", 5));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Naheen", "Mahboob", 6));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Ahmed", "Sinjab", 7));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Dayeon", "Choi", 8));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Calvin", "Cao", 9));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Varun", "Basdeo", 10));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Abdulmuhaimin", "Ali", 11));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Trevor", "Bliss", 12));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Victor", "Reznov", 13));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Sofia", "Odegaard", 14));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Tanya", "Poulouchina", 15));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Minjae", "Kim", 16));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Mashrur", "Khandaker", 17));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Cason", "Cook", 18));
-		ourClass.addStudent(new Student(new Hashtable<Course, Boolean>(), 12, "Nathan", "Killinger", 19));
-		
-		mckay.addClass(ourClass, 1);
-
-		teachers.add(mckay);
-		
-		//Schedule timetable = new Schedule(students, teachers, courseOfferings, rooms);
-		initialize();
+	public static LinkedList<String> populateList(String input) {
+		LinkedList<String> list = new LinkedList<>();
+		String[] words = input.split(" ");
+		for (String word : words) {
+			list.add(word);
+		}
+		return list;
 	}
 
+	public static String[] populateArray(String input) {
+		return input.split(" ");
+	}
+	
+	public static boolean[] presents (String [] in){
+		
+		for (int y = 0; y< in.length;y++) {
+			//if 
+		}
+		return null;
+		
+	}
+
+	public static void main(String[] args) throws SQLException {
+		// test data
+	
+		final String USERNAME = "root";// DBMS connection username
+		final String PASSWORD = "!Sjsshs1177";// DBMS connection password
+		final String URL = "jdbc:mysql://localhost:3306/finals";// DBMS connection URL
+
+		// Load JDBC driver
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// Connect to SQL Server
+			Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+			// Download table data into 2D array
+			String[] newclass = { "student_id", "Attendance", "Late", "Absent_reason" };
+			String[] clweights = { "Assginment_name", "Weight_factor" };
+			// adding teachers
+			Teacher teac = null;
+			Course cor = null;
+			ClassCourse ourClass = null;
+			String currentclass = null;
+			String[][] coursez = connectioncheck.downloadTable("course", con);
+			String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
+			String[][] running = connectioncheck.downloadTable("running_course", con);
+			String[][] stu = connectioncheck.downloadTable("students", con);
+			String[][] attendance = null;
+			String[][] Marks;
+			String[][] weights;
+
+			for (int l = 1; l < teacherinfo.length; l++) {
+				if (teacherinfo[l][1] != null) {
+					String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
+					String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
+					int teacher_id = Integer.parseInt((teacherinfo[l][0]));
+					LinkedList teachables = populateList(teacherinfo[l][2]);
+					teac = (new Teacher(first, last, teacher_id, teachables));
+					System.out.println(teac.getID());
+			for (int i = 1; i < running.length; i++) {
+				if (running[i][1]!=null&& Integer.parseInt(running[i][1]) ==(teac.getID())){
+				currentclass = null;
+				if (running[i][1] != null) {
+					currentclass = running[i][0].toLowerCase();
+					attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
+					Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
+					weights = connectioncheck.downloadTable(currentclass + "_weights", con);
+
+				
+				for (int k = 1; k < coursez.length; k++) {
+					if (coursez[k][0] != null) {
+						String Course_id = coursez[k][0];
+						String coursename = coursez[k][1];
+						String dpt = coursez[k][2];
+						int pri = Integer.parseInt(coursez[k][3]);
+						LinkedList rms = populateList(coursez[k][4]);
+						cor = new Course(coursename, Course_id +"1", dpt, rms, pri, 30, 1, 15);
+						courseOfferings.add(cor);
+					}
+					
+					if (currentclass != null && coursez[k][1] != null&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
+						System.out.println(cor.getCode() + " " + cor.getName()+ " "+ cor.getType());
+						ourClass = new ClassCourse(1, teac, running[1][2], Integer.parseInt(running[1][3]), cor);
+					}
+				}
+		
+				for (int a = 1; a < attendance.length; a++) {
+					for (int j = 1; j < stu.length; j++) {
+						if (stu[j][1] != null) {
+							if (attendance[a][0]!=null&& attendance[a][0].equals(stu[j][0])) {
+								int id = Integer.parseInt(stu[j][0]);
+								String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
+								String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
+								int grade = Integer.parseInt(stu[j][2]);
+								Student ex = new Student(new Hashtable<Course, Boolean>(), grade, firsts, lasts, id);
+								ourClass.addStudent(ex);
+								String[] att = populateArray(attendance[a][1]);
+								
+								for (int x =0; x<att.length; x++)
+								{
+									
+									//if ()
+									//String p = att[x];
+									//String Reason;
+									
+									//test[x] = new Attend ();
+
+								}
+								//for (int y =0; )
+								
+								
+								boolean present;
+								boolean late;
+								int minutesLate;
+								String [] reason= populateArray(attendance[a][1]);
+								Attend[] test = ourClass.getAttendance(ex);
+							
+								
+								
+								ourClass.setAttendance(test, ex);
+
+								test[0] = new Attend(true, true, 20, "");
+								test[1] = new Attend(true, false, 0, "");
+								test[2] = new Attend(true, false, 0, "");
+								test[3] = new Attend(false, false, 0, "Illness or injury");
+								test[4] = new Attend(true, true, 15, "");
+								test[5] = new Attend(true, true, 20, "");
+								test[6] = new Attend(true, false, 0, "");
+								test[7] = new Attend(true, false, 0, "");
+								test[8] = new Attend(false, false, 0, "Appointment");
+								test[9] = new Attend(true, true, 15, "");
+								ourClass.setAttendance(test, ex);
+							}
+						}
+					}
+				}
+				teac.addClass(ourClass, 2);
+				teachers.add(teac);				
+			}
+			}
+			}
+
+			
+				}
+			}
+			con.close();
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		initialize();
+
+	}
 }
