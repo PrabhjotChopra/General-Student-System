@@ -36,7 +36,7 @@ public class School implements ActionListener, FocusListener {
 	static final String USERNAME = "root";// DBMS connection username
 	static final String PASSWORD = "329228654sql";// DBMS connection password
 	static final String URL = "jdbc:mysql://localhost:3306/finals";// DBMS connection URL
-	
+
 	static boolean teacher;
 	static boolean student;
 
@@ -53,7 +53,7 @@ public class School implements ActionListener, FocusListener {
 	static JPanel teacherLogin;
 	static JPanel studentLogin;
 	static JFrame window;
-	
+
 	static JTextArea incorrect;
 	static JPanel dashboard;
 
@@ -68,8 +68,6 @@ public class School implements ActionListener, FocusListener {
 	public void removeStudent(Student s) {
 		students.remove(s);
 	}
-
-	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -135,10 +133,10 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		} else if (e.getSource() == submitstudentLogin) {
-			
-			if (studentLogin() !=null) {
+
+			if (studentLogin() != null) {
 				currKid = studentLogin();
-				
+
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 				window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				window.remove(studentLogin);
@@ -158,8 +156,7 @@ public class School implements ActionListener, FocusListener {
 
 				window.revalidate();
 				window.repaint();
-				
-				
+
 				System.out.println("worked!!");
 			} else {
 				incorrect.setText("No student found");
@@ -184,8 +181,7 @@ public class School implements ActionListener, FocusListener {
 			currKid.switchSem(2);
 			window.revalidate();
 			window.repaint();
-		}
-		else if (e.getActionCommand().equals("Close app")) {
+		} else if (e.getActionCommand().equals("Close app")) {
 			System.exit(0);
 		} else if (e.getActionCommand().equals("Classes")) {
 
@@ -285,11 +281,11 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().split(" ")[0].equals("submitAssMarks")) {
-			currClass.submitAssGrades(e.getActionCommand().substring(e.getActionCommand().indexOf(" ")+1));
+			currClass.submitAssGrades(e.getActionCommand().substring(e.getActionCommand().indexOf(" ") + 1));
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().split(" ")[0].equals("indAss")) {
-			currClass.indAss(e.getActionCommand().substring(e.getActionCommand().indexOf(" ")+1));
+			currClass.indAss(e.getActionCommand().substring(e.getActionCommand().indexOf(" ") + 1));
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().equals("addAss")) {
@@ -314,6 +310,128 @@ public class School implements ActionListener, FocusListener {
 
 	@SuppressWarnings("rawtypes")
 	public static void initialize() throws SQLException { // initializes login selection and login interface
+		// Load JDBC driver
+
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// Connect to SQL Server
+			Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+			// adding teachers
+			Teacher teac = null;
+			Course cor = null;
+			ClassCourse ourClass = null;
+			String currentclass = null;
+			String[][] coursez = connectioncheck.downloadTable("course", con);
+			String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
+			String[][] running = connectioncheck.downloadTable("running_course", con);
+			String[][] stu = connectioncheck.downloadTable("students", con);
+			String[][] attendance = null;
+			String[][] Marks;
+			String[][] weights;
+
+			for (int l = 1; l < teacherinfo.length; l++) {
+				if (teacherinfo[l][1] != null) {
+					String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
+					String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
+					int teacher_id = Integer.parseInt((teacherinfo[l][0]));
+					LinkedList teachables = populateList(teacherinfo[l][2]);
+					teac = (new Teacher(first, last, teacher_id, teachables));
+					for (int i = 1; i < running.length; i++) {
+						if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
+							currentclass = null;
+							if (running[i][1] != null) {
+								currentclass = running[i][0].toLowerCase();
+								attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
+								Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
+								weights = connectioncheck.downloadTable(currentclass + "_weights", con);
+
+								for (int k = 1; k < coursez.length; k++) {
+									if (coursez[k][0] != null) {
+										String Course_id = coursez[k][0];
+										String coursename = coursez[k][1];
+										String dpt = coursez[k][2];
+										int pri = Integer.parseInt(coursez[k][3]);
+										LinkedList rms = populateList(coursez[k][4]);
+										cor = new Course(coursename, Course_id + "1", dpt, rms, pri, 30, 1, 15);
+										courseOfferings.add(cor);
+									}
+
+									if (currentclass != null && coursez[k][1] != null
+											&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
+										ourClass = new ClassCourse(1, teac, running[1][2],
+												Integer.parseInt(running[1][3]), cor);
+									}
+								}
+
+								for (int z = 1; z < weights.length - 1; z++) {
+
+									if (weights[z][0] != null) {
+
+										ourClass.addAssessment(weights[z][0], Double.parseDouble(weights[z][1]),
+												Integer.parseInt(weights[z][2]));
+										// ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
+									}
+								}
+
+								for (int j = 1; j < stu.length; j++) {
+									for (int a = 1; a < attendance.length; a++) {
+										if (stu[j][1] != null) {
+											if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
+												int id = Integer.parseInt(stu[j][0]);
+												String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
+												String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
+												int grade = Integer.parseInt(stu[j][2]);
+												Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
+														firsts, lasts, id);
+												String[] sch = populateArray(stu[j][4]);
+												for (int q = 0; q < sch.length; q++) {
+													if (currentclass.equals(sch[q])) {
+														ex.addClass(ourClass);
+
+													}
+												}
+												ourClass.addStudent(ex);
+												if (studentsearch(students, ex.getFirstName()) == false) {
+													students.add(ex);
+													System.out.println(ex.getFirstName());
+												}
+
+												Attend[] test = ourClass.getAttendance(ex);
+												String[] att = populateArray(attendance[a][1]);
+												String[] ltime = populateArray(attendance[a][2]);
+												String[] areason = populateArray(attendance[a][3]);
+												test = presents(att, ltime, areason);
+
+												ourClass.setAttendance(test, ex);
+												for (int z = 1; z < weights.length - 1; z++) {
+													if (weights[z][0] != null) {
+														ourClass.setGrade(ex, weights[z][0],
+																Double.parseDouble(Marks[a][z]));
+													}
+												}
+											}
+										}
+
+									}
+
+								}
+								currentClasses.add(ourClass);
+								teac.addClass(ourClass, 2);
+								teachers.add(teac);
+							}
+						}
+					}
+
+				}
+			}
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		FlatDarkLaf.setup();
 
 		window = new JFrame("General Student System");
@@ -347,7 +465,7 @@ public class School implements ActionListener, FocusListener {
 		JTextArea login = new JTextArea("Enter your login information in the boxes below");
 		login.setEditable(false);
 		lastName = new JTextField("Enter your last name here");
-		ID = new JTextField("Enter your 5-digit teacher ID here");
+		ID = new JTextField("Enter your teacher ID here");
 		lastName.addFocusListener(new School());
 		ID.addFocusListener(new School());
 
@@ -378,7 +496,7 @@ public class School implements ActionListener, FocusListener {
 
 		JTextField pass = new JTextField("Enter your student number to login");
 		pass.setEditable(false);
-		
+
 		studentLogin = new JPanel();
 		studentLogin.setLayout(new BoxLayout(studentLogin, BoxLayout.PAGE_AXIS));
 
@@ -407,139 +525,16 @@ public class School implements ActionListener, FocusListener {
 		studentLogin.add(submitstudentLogin);
 		submitstudentLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		studentLogin.add(Box.createRigidArea(new Dimension(0, 20)));
-		
-		
+	}
 
-		// Load JDBC driver
-				try {
-					Class.forName("com.mysql.cj.jdbc.Driver");
-
-					// Connect to SQL Server
-					Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-
-					// Download table data into 2D array
-					
-					// adding teachers
-					Teacher teac = null;
-					Course cor = null;
-					ClassCourse ourClass = null;
-					String currentclass = null;
-					String[][] coursez = connectioncheck.downloadTable("course", con);
-					String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
-					String[][] running = connectioncheck.downloadTable("running_course", con);
-					String[][] stu = connectioncheck.downloadTable("students", con);
-					String[][] attendance = null;
-					String[][] Marks;
-					String[][] weights;
-
-					for (int l = 1; l < teacherinfo.length; l++) {
-						if (teacherinfo[l][1] != null) {
-							String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
-							String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
-							int teacher_id = Integer.parseInt((teacherinfo[l][0]));
-							LinkedList teachables = populateList(teacherinfo[l][2]);
-							teac = (new Teacher(first, last, teacher_id, teachables));
-							for (int i = 1; i < running.length; i++) {
-								if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
-									currentclass = null;
-									if (running[i][1] != null) {
-										currentclass = running[i][0].toLowerCase();
-										attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
-										Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
-										weights = connectioncheck.downloadTable(currentclass + "_weights", con);
-
-										for (int k = 1; k < coursez.length; k++) {
-											if (coursez[k][0] != null) {
-												String Course_id = coursez[k][0];
-												String coursename = coursez[k][1];
-												String dpt = coursez[k][2];
-												int pri = Integer.parseInt(coursez[k][3]);
-												LinkedList rms = populateList(coursez[k][4]);
-												cor = new Course(coursename, Course_id + "1", dpt, rms, pri, 30, 1, 15);
-												courseOfferings.add(cor);
-											}
-
-											if (currentclass != null && coursez[k][1] != null
-													&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
-												ourClass = new ClassCourse(1, teac, running[1][2],
-														Integer.parseInt(running[1][3]), cor);
-											}
-										}
-
-										for (int z = 1; z < weights.length - 1; z++) {
-
-											if (weights[z][0] != null) {
-
-												ourClass.addAssessment(weights[z][0], Double.parseDouble(weights[z][1]),
-														Integer.parseInt(weights[z][2]));
-												// ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
-											}
-										}
-									
-										for (int j = 1; j < stu.length; j++) {
-										for (int a = 1; a < attendance.length; a++) {
-												if (stu[j][1] != null) {
-													if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
-														int id = Integer.parseInt(stu[j][0]);
-														String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
-														String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
-														int grade = Integer.parseInt(stu[j][2]);
-														Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
-																firsts, lasts, id);
-														ourClass.addStudent(ex);
-														Attend[] test = ourClass.getAttendance(ex);
-
-														String[] att = populateArray(attendance[a][1]);
-														String[] ltime = populateArray(attendance[a][2]);
-														String[] areason = populateArray(attendance[a][3]);
-														test = presents(att, ltime, areason);
-
-														ourClass.setAttendance(test, ex);
-														for (int z = 1; z < weights.length - 1; z++) {
-															if (weights[z][0] != null) {
-																ourClass.setGrade(ex, weights[z][0],
-																		Double.parseDouble(Marks[a][z]));
-															}
-														}
-													}
-												}
-												
-											}
-											
-										}
-										currentClasses.add(ourClass);
-										teac.addClass(ourClass, 2);
-										teachers.add(teac);
-									}
-								}
-							}
-
-						}
-					}
-					for (int s = 0; s<stu.length; s++) {
-						try {
-						int id = Integer.parseInt(stu[s][0]);
-						String firsts = stu[s][1].substring(0, stu[s][1].indexOf(" ") + 1);
-						String lasts = stu[s][1].substring(stu[s][1].indexOf(" ") + 1);
-						int grade = Integer.parseInt(stu[s][2]);
-						Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
-								firsts, lasts, id);
-						ourClass.addStudent(ex);
-						students.add(ex);
-						}
-						catch(NumberFormatException e) {
-							continue;
-						}
-
-					}
-					con.close();
-
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
+	public static boolean studentsearch(LinkedList<Student> students, String name) {
+		for (Student student : students) {
+			if (student.getFirstName().equals(name)) {
+				return true;
 			}
+		}
+		return false;
+	}
 
 	public void focusGained(FocusEvent e) {
 
@@ -570,7 +565,7 @@ public class School implements ActionListener, FocusListener {
 			lastName.setText("");
 		}
 
-		if (ID.getText().equals("Enter your 5-digit teacher ID here") && e.getComponent() == ID) {
+		if (ID.getText().equals("Enter your teacher ID here") && e.getComponent() == ID) {
 			ID.setText("");
 		}
 		if (password.getText().equals("Enter your student number here") && e.getComponent() == password) {
@@ -604,7 +599,7 @@ public class School implements ActionListener, FocusListener {
 			lastName.setText("Enter your last name here");
 		}
 		if (ID.getText().equals("") && e.getComponent() == ID) {
-			ID.setText("Enter your 5-digit teacher ID here");
+			ID.setText("Enter your teacher ID here");
 		}
 		if (password.getText().equals("") && e.getComponent() == password) {
 			password.setText("Enter your student number here");
@@ -633,104 +628,104 @@ public class School implements ActionListener, FocusListener {
 		return null;
 
 	}
+
 	public Student studentLogin() {
-		
-		if(students.isEmpty()) {
+
+		if (students.isEmpty()) {
 			return null;
 		}
 		int enterNum;
 		try {
 			enterNum = Integer.parseInt(password.getText().strip());
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return null;
 		}
-		
-		for(int i=0;i<students.size();i++) {
+
+		for (int i = 0; i < students.size(); i++) {
 			System.out.println(students.get(i).getStudentNumber());
 			if (students.get(i).getStudentNumber() == enterNum) {
 				return students.get(i);
 			}
 		}
 		return null;
-		
+
 	}
 
 	public static LinkedList<String> populateList(String input) {
-        LinkedList<String> list = new LinkedList<>();
-        String[] words = input.split(" ");
-        for (String word : words) {
-            list.add(word);
-        }
-        return list;
-    }
-
-    public static String[] populateArray(String input) {
-        return input.split(" ");
-    }
-
-    public static Attend[] presents(String[] in, String[] late, String[] abreason) {
-        boolean present = false;
-        boolean late2 = false;
-        int minutesLate = 0;
-        int lcount=-1;
-        int acount=-1;
-        String reason = "";
-        Attend[] att =new Attend[in.length];
-        for (int i = 0; i < in.length; i++) {
-            present = false;
-            late2 = false;
-            if (in[i].equals("0")) {
-                present = true;
-                late2 = false;
-                att[i] = new Attend(present, late2, minutesLate, reason);
-            }
-
-            if (in[i].equals("1")) {
-                lcount++;
-                present = true;
-                late2 = true;
-                minutesLate = Integer.parseInt(late[lcount]);
-
-                att[i] = new Attend(present, late2, minutesLate, reason);
-
-            }
-
-            if (in[i].equals("2")) {
-                acount ++;
-                switch (abreason[acount]) {
-                case "1":
-                    reason = "Illness or injury";
-                    break;
-                case "2":
-                    reason = "Appointment";
-                    break;
-                case "3":
-                    reason = "Religious day";
-                    break;
-                case "4":
-                    reason = "Bereavement";
-                    break;
-                case "5":
-                    reason = "School transportation cancellation";
-                    break;
-                case "6":
-                    reason = "Parent-approved absence";
-                    break;
-                default:
-                    reason = "Not approved by parent";
-                    break;
-                }
-                att[i] = new Attend(present, late2, minutesLate, reason);
-
-            }
-
-        }
-        return att;
-
-    }
-
-		public static void main(String[] args) throws SQLException {
-			initialize();
+		LinkedList<String> list = new LinkedList<>();
+		String[] words = input.split(" ");
+		for (String word : words) {
+			list.add(word);
 		}
+		return list;
+	}
+
+	public static String[] populateArray(String input) {
+		return input.split(" ");
+	}
+
+	public static Attend[] presents(String[] in, String[] late, String[] abreason) {
+		boolean present = false;
+		boolean late2 = false;
+		int minutesLate = 0;
+		int lcount = -1;
+		int acount = -1;
+		String reason = "";
+		Attend[] att = new Attend[in.length];
+		for (int i = 0; i < in.length; i++) {
+			present = false;
+			late2 = false;
+			if (in[i].equals("0")) {
+				present = true;
+				late2 = false;
+				att[i] = new Attend(present, late2, minutesLate, reason);
+			}
+
+			if (in[i].equals("1")) {
+				lcount++;
+				present = true;
+				late2 = true;
+				minutesLate = Integer.parseInt(late[lcount]);
+
+				att[i] = new Attend(present, late2, minutesLate, reason);
+
+			}
+
+			if (in[i].equals("2")) {
+				acount++;
+				switch (abreason[acount]) {
+				case "1":
+					reason = "Illness or injury";
+					break;
+				case "2":
+					reason = "Appointment";
+					break;
+				case "3":
+					reason = "Religious day";
+					break;
+				case "4":
+					reason = "Bereavement";
+					break;
+				case "5":
+					reason = "School transportation cancellation";
+					break;
+				case "6":
+					reason = "Parent-approved absence";
+					break;
+				default:
+					reason = "Not approved by parent";
+					break;
+				}
+				att[i] = new Attend(present, late2, minutesLate, reason);
+
+			}
+
+		}
+		return att;
+
+	}
+
+	public static void main(String[] args) throws SQLException {
+		initialize();
+	}
 }
