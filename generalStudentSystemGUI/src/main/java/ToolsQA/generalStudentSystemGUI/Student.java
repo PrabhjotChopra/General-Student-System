@@ -40,6 +40,7 @@ public class Student {
 	private JPanel courses;
 	
 	public Student() {}
+	// The below code is creating a student object and creating its relevant gui components.
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
 		courseReqs = requests;
 		year = grade;
@@ -67,7 +68,7 @@ public class Student {
 		header.setBounds(100, 0, School.rect.width - 200, 150);
 		header.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		JTextArea welcome = new JTextArea("Welcome, " + firstName +  lastName);
+		JTextArea welcome = new JTextArea("Welcome, " + firstName + " " + lastName);
 
 		welcome.setFont(new Font("Arial", 1, 50));
 		header.add(welcome);
@@ -168,6 +169,9 @@ public class Student {
 
 	}
 
+	/**
+	 * It sets the background of the buttons to null, and sets the background of the text fields to null
+	 */
 	public void setNull() {
 		present.setBackground(null);
 		absent.setBackground(null);
@@ -178,6 +182,11 @@ public class Student {
 		absentReason.setEnabled(false);
 		absentReason.setBackground(null);
 	}
+	/**
+	 * This function creates a JTextArea with the student's name in it
+	 * 
+	 * @return A JTextArea with the student's name.
+	 */
 	public JTextArea tabbedName() {
 		JTextArea name = new JTextArea(lastName + ", " + firstName);
 		
@@ -189,6 +198,10 @@ public class Student {
 		return name;
 	}
 
+/**
+ * It sets the background of the present button to green, and the background of the other two buttons
+ * to null
+ */
 	public void gPresent() {
 		present.setBackground(Color.decode("#006d0c"));
 		absent.setBackground(null);
@@ -200,6 +213,10 @@ public class Student {
 		absentReason.setBackground(null);
 	}
 
+	/**
+	 * It sets the background of the absent button to red, and the background of the present and late
+	 * buttons to null
+	 */
 	public void rAbsent() {
 		absent.setBackground(Color.decode("#cc473d"));
 		present.setBackground(null);
@@ -211,6 +228,11 @@ public class Student {
 		absentReason.setBackground(Color.decode("#cc473d"));
 	}
 
+	/**
+	 * When the user clicks on the "Late" button, the "Late" button will be highlighted, the "Absent" and
+	 * "Present" buttons will be unhighlighted, the "Minutes Late" text field will be enabled, and the
+	 * "Absent Reason" text field will be disabled
+	 */
 	public void bLate() {
 		late.setBackground(Color.decode("#104E8B"));
 		absent.setBackground(null);
@@ -223,10 +245,21 @@ public class Student {
 
 	}
 
+
+	/**
+	 * This function adds a class to the schedule
+	 * 
+	 * @param c The class to be added
+	 */
 	public void addClass(ClassCourse c) {
 		classes[c.getPeriod() - 1] = c;
 	}
 
+	/**
+	 * This function removes a class from the schedule
+	 * 
+	 * @param period The period of the class you want to remove.
+	 */
 	public void removeClass(int period) {
 		classes[period - 1] = null;
 	}
@@ -255,6 +288,11 @@ public class Student {
 		absentReason.setSelectedIndex(n);
 
 	}
+	/**
+	 * sets the reason for absence for a certain day
+	 * 
+	 * @param s the inputted reason
+	 */
 	public void setAbsentReason(String s) {
 		for(int i=0; i<reasons.length;i++) {
 			if(s.equals(reasons[i])) {
@@ -288,6 +326,12 @@ public class Student {
 	public JButton getStudentMarkB() {
 		return studentMarkB;
 	}
+	/**
+	 * If the course is in the course requests, return true. Otherwise, return false
+	 * 
+	 * @param c The course that is being checked for
+	 * @return A boolean value.
+	 */
 	public boolean wantsCourse(Course c) {
 		Enumeration<Course> courses = courseReqs.keys();
 		
@@ -309,6 +353,12 @@ public class Student {
 	public JButton getSem2() {
 		return sem2;
 	}
+	/**
+	 * gets you the course GUIs for a specific semester
+	 * 
+	 * @param sem the semester you want to get the courses from
+	 * @return A JPanel with a list of courses.
+	 */
 	public JPanel getCourses(int sem) {
 		sem--;
 		sem *= 4;
@@ -320,6 +370,7 @@ public class Student {
 		}
 		return courses;
 	}
+	// Switching the semester and adjusting the gui components accordingly
 	public void switchSem(int sem) {
 		if (sem == 1 && sem2.getY() - sem1.getY() == 20) {
 			sem1.setLocation(sem1.getX(), sem1.getY() + 20);

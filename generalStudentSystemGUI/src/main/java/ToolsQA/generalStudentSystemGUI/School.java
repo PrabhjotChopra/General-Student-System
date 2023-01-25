@@ -61,6 +61,7 @@ public class School implements ActionListener, FocusListener {
 	static ClassCourse currClass;
 	static Student currKid;
 
+	// Adding and removing students from the students list.
 	public void addStudent(Student s) {
 		students.add(s);
 	}
@@ -70,6 +71,8 @@ public class School implements ActionListener, FocusListener {
 	}
 
 	@Override
+	// Checking if the user is a teacher, and if they are, it is checking if the user has clicked on a
+	// class. If they have, it is setting the current class to the class that was clicked on.
 	public void actionPerformed(ActionEvent e) {
 		if (teacher) {
 			for (int i = 0; i < 8; i++) {
@@ -87,6 +90,9 @@ public class School implements ActionListener, FocusListener {
 				}
 			}
 		}
+		// Checking if the user is a student and if the user is a student, it is checking if the user clicked
+		// on a class. If the user clicked on a class, it is setting the current class to the class that the
+		// user clicked on.
 		else if (student) {
 			for (int i = 0; i < 8; i++) {
 				if (currKid.getClasses()[i] != null) {
@@ -104,6 +110,7 @@ public class School implements ActionListener, FocusListener {
 			}
 		}
 
+		// adds login screens based on the login selection
 		if (e.getSource() == tLogin) {
 
 			window.remove(loginChoice);
@@ -120,6 +127,7 @@ public class School implements ActionListener, FocusListener {
 		} else if (e.getSource() == submitTeacherLogin) { // edit to check login credentials
 			Teacher loginner = teacherLogin();
 
+			// if a teacher with those credentials is found, their data is added and their interface is opened
 			if (loginner != null) {
 				currProf = loginner;
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -224,26 +232,31 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 
-		} else if (e.getActionCommand().equals("Dashboard")) {
+		} // Checking if the user wants to go back to the dashboard
+		else if (e.getActionCommand().equals("Dashboard")) {
 			currClass.goDash();
 
 			window.revalidate();
 			window.repaint();
-		} else if (e.getActionCommand().equals("Present")) {
+		} // Checking if the button that was pressed is the present button. If it is, it will set the student
+		// to present.
+		else if (e.getActionCommand().equals("Present")) {
 			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				if (e.getSource() == currClass.getStudents().get(i).getPresent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setPresent(temp);
 				}
 			}
-		} else if (e.getActionCommand().equals("Absent")) {
+		}// Checking if the button is clicked and if it is, it will set the student to absent.
+		 else if (e.getActionCommand().equals("Absent")) {
 			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				if (e.getSource() == currClass.getStudents().get(i).getAbsent()) {
 					Student temp = currClass.getStudents().get(i);
 					currClass.setAbsent(temp);
 				}
 			}
-		} else if (e.getActionCommand().equals("Late")) {
+		} // Checking if the button is pressed and if it is, it will add the student to the late list.
+		else if (e.getActionCommand().equals("Late")) {
 			for (int i = 0; i < currClass.getStudents().size(); i++) {
 				if (e.getSource() == currClass.getStudents().get(i).getLate()) {
 					Student temp = currClass.getStudents().get(i);
@@ -381,11 +394,13 @@ public class School implements ActionListener, FocusListener {
 						if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
 							currentclass = null;
 							if (running[i][1] != null) {
+								// Downloading the attendance, marks and weights of the current class.
 								currentclass = running[i][0].toLowerCase();
 								attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
 								Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
 								weights = connectioncheck.downloadTable(currentclass + "_weights", con);
 
+								// Creating a new course object and adding it to the courseOfferings list.
 								for (int k = 1; k < coursez.length; k++) {
 									if (coursez[k][0] != null) {
 										String Course_id = coursez[k][0];
@@ -397,12 +412,15 @@ public class School implements ActionListener, FocusListener {
 										courseOfferings.add(cor);
 									}
 
+									// Checking if the current class is not null and if the coursez[k][1] is not null and if the
+									// coursez[k][0] is equal to the current class.
 									if (currentclass != null && coursez[k][1] != null
 											&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
 										ourClass = new ClassCourse(1, teac, running[1][2],
 												Integer.parseInt(running[1][3]), cor);
 									}
 								}
+								// Adding the assessment to the class.
 
 								for (int z = 1; z < weights.length - 1; z++) {
 
@@ -416,6 +434,7 @@ public class School implements ActionListener, FocusListener {
 
 								for (int j = 1; j < stu.length; j++) {
 									for (int a = 1; a < attendance.length; a++) {
+										// Adding the student to the class.
 										if (stu[j][1] != null) {
 											if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
 												int id = Integer.parseInt(stu[j][0]);
@@ -440,6 +459,7 @@ public class School implements ActionListener, FocusListener {
 													
 												}
 
+											// Populating the attendance array with the attendance data from the excel file.
 												Attend[] test = ourClass.getAttendance(ex);
 												String[] att = populateArray(attendance[a][1]);
 												String[] ltime = populateArray(attendance[a][2]);
@@ -474,6 +494,11 @@ public class School implements ActionListener, FocusListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
+		
+		// initializing base non-specific gui components (all of the non-full-screen ones)
 		FlatDarkLaf.setup();
 
 		window = new JFrame("General Student System");
@@ -569,6 +594,14 @@ public class School implements ActionListener, FocusListener {
 		studentLogin.add(Box.createRigidArea(new Dimension(0, 20)));
 	}
 
+	/**
+	 * This function takes a linked list of students and a name and returns true if the name is in the
+	 * list and false otherwise
+	 * 
+	 * @param students LinkedList of Student objects
+	 * @param name The name of the student you want to search for.
+	 * @return A boolean value.
+	 */
 	public static boolean studentsearch(LinkedList<Student> students, String name) {
 		for (Student student : students) {
 			if (student.getFirstName().equals(name)) {
@@ -671,6 +704,12 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
+	/**
+	 * It checks if the student number entered by the user matches any of the student numbers in the
+	 * arraylist. If it does, it returns the student object. If it doesn't, it returns null
+	 * 
+	 * @return The student object is being returned.
+	 */
 	public Student studentLogin() {
 
 		if (students.isEmpty()) {
@@ -693,6 +732,12 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
+/**
+ * It takes a string, splits it into words, and returns a linked list of those words
+ * 
+ * @param input The string to be converted to a LinkedList
+ * @return A LinkedList of Strings
+ */
 	public static LinkedList<String> populateList(String input) {
 		LinkedList<String> list = new LinkedList<>();
 		String[] words = input.split(" ");
@@ -702,10 +747,24 @@ public class School implements ActionListener, FocusListener {
 		return list;
 	}
 
+/**
+ * It takes a string, splits it into an array of strings, and returns the array
+ * 
+ * @param input The string to be split.
+ * @return The method is returning an array of strings.
+ */
 	public static String[] populateArray(String input) {
 		return input.split(" ");
 	}
 
+/**
+ * It takes in three arrays of strings, and returns an array of Attend objects
+ * 
+ * @param in an array of strings that represent the attendance status of each day of the month.
+ * @param late an array of strings that contains the number of minutes late for each student
+ * @param abreason String[]
+ * @return An array of Attend objects
+ */
 	public static Attend[] presents(String[] in, String[] late, String[] abreason) {
 		boolean present = false;
 		boolean late2 = false;
@@ -717,12 +776,15 @@ public class School implements ActionListener, FocusListener {
 		for (int i = 0; i < in.length; i++) {
 			present = false;
 			late2 = false;
+
+			// if present and on time
 			if (in[i].equals("0")) {
 				present = true;
 				late2 = false;
 				att[i] = new Attend(present, late2, minutesLate, reason);
 			}
 
+			// if late
 			if (in[i].equals("1")) {
 				lcount++;
 				present = true;
@@ -733,9 +795,11 @@ public class School implements ActionListener, FocusListener {
 
 			}
 
+			// if absent
 			if (in[i].equals("2")) {
 				acount++;
 				switch (abreason[acount]) {
+				// reasons for absence (options taken from parent portal)
 				case "1":
 					reason = "Illness or injury";
 					break;

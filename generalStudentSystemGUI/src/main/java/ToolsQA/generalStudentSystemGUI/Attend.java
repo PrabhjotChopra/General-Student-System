@@ -6,6 +6,7 @@ public class Attend {
 	private int minutesLate;
 	private String reason;
 	
+	// A constructor for the attendance of an individual student on an individual day
 	public Attend(boolean p, boolean l, int m, String s) {
 		present = p;
 		late = l;

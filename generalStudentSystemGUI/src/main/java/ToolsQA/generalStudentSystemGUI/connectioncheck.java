@@ -7,6 +7,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class connectioncheck {
+	/**
+	 * It takes a table name and a connection as input, and returns a 2D array of strings containing the
+	 * table's data
+	 * 
+	 * @param tableName The name of the table you want to download
+	 * @param con The connection to the database
+	 * @return A 2D array of strings.
+	 */
 	public static String[][] downloadTable(String tableName, Connection con) throws SQLException {
 		// Execute SQL query
 		Statement statement = con.createStatement();
@@ -37,6 +45,11 @@ public class connectioncheck {
 	}
 	
 
+	/**
+	 * For each row in the array, if the first element in the row is not null, print the row
+	 * 
+	 * @param infos The array to print
+	 */
 	public static void printArray(String[][] infos) {
 	    // Count and print the number of rows with data
 	    for (int i = 0; i < infos.length; i++) {
@@ -51,6 +64,15 @@ public class connectioncheck {
 	    }
 	}
 
+	/**
+	 * It takes a 2D array of strings, a connection to a database, and a table name, and then it updates
+	 * the table with the values in the array
+	 * 
+	 * @param infos a 2D array of strings, where the first row is the column names and the rest are the
+	 * values
+	 * @param con Connection to the database
+	 * @param tableName The name of the table you want to update
+	 */
 	public static void uploadArray(String[][] infos, Connection con, String tableName) throws SQLException {
 	    // Create SQL statement
 	    for (int i = 1; i < infos.length; i++) {
@@ -72,6 +94,14 @@ public class connectioncheck {
 	    // Create statement and execute
 	}
 
+	/**
+	 * This function creates a table with the name of the first parameter, and the columns of the table
+	 * are the strings in the second parameter
+	 * 
+	 * @param tableName The name of the table you want to create
+	 * @param columnTitles An array of Strings that represent the column titles of the table.
+	 * @param con Connection object
+	 */
 	public static void createTable(String tableName, String[] columnTitles, Connection con) throws SQLException {
 		// Create SQL statement
 		StringBuilder sql = new StringBuilder("CREATE TABLE " + tableName + "(");
@@ -88,6 +118,14 @@ public class connectioncheck {
 		statement.close();
 	}
 
+	/**
+	 * This function takes in a table name, a column name, and a connection to a database, and adds a
+	 * column to the table with the given name
+	 * 
+	 * @param tableName The name of the table you want to add a column to.
+	 * @param columnName The name of the column you want to add.
+	 * @param con Connection object
+	 */
 	public static void addColumn(String tableName, String columnName, Connection con) throws SQLException {
 		// Create SQL statement
 		String sql = "ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + "VARCHAR(30)";
@@ -97,6 +135,7 @@ public class connectioncheck {
 		statement.close();
 	}
 	
+
 	public static void main(String[] args) {
         final String USERNAME = "root";// DBMS connection username
         final String PASSWORD = "329228654sql";// DBMS connection password

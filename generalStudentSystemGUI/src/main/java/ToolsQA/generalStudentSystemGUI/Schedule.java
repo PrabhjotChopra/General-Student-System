@@ -20,6 +20,7 @@ public class Schedule {
 		
 		Hashtable<String, Boolean[]> roomUsed = new Hashtable<String, Boolean[]>();
 		
+		// It's creating a hashtable of rooms and their availability.
 		for(int i=0;i<rooms.size();i++) {
 			roomUsed.put(rooms.get(i), new Boolean[8]);
 		}
@@ -28,6 +29,8 @@ public class Schedule {
 		for(int i=0; i<courses.size();i++) {
 			
 			
+			// It's checking how many students want a course, and if there are enough students to warrant a
+			// class.
 			double requests = 0;
 			for(int j = 0;j<students.size();j++) {
 				if (students.get(j).wantsCourse(courses.get(i))) {
@@ -40,6 +43,7 @@ public class Schedule {
 			int margin = courses.get(i).getMaxKids() - courses.get(i).getMinKids();
 			
 			int numClasses = (int) Math.ceil(requests/courses.get(i).getMaxKids());
+			// It's creating a list of teachers that can teach the course.
 			LinkedList<Teacher> teachersAvailable = new LinkedList<Teacher>();
 			for(int j = 0; j<teachers.size();j++) {
 				if (teachers.get(j).getTeachables().contains(courses.get(i).getType())){
@@ -56,6 +60,7 @@ public class Schedule {
 			int leftoverClass = 0;
 			int drawFromAnother = 0;
 			
+			// It's checking if there are any leftover students that can't be added to a class.
 			if (requests % courses.get(i).getMaxKids() !=0) {
 				leftoverClass = (int) (requests % courses.get(i).getMaxKids());
 			}

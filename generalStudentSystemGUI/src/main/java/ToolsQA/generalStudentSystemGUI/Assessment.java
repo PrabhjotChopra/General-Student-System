@@ -9,6 +9,7 @@ public class Assessment {
 	private JButton details;
 	
 	public Assessment() {}
+	// A constructor to make an new assessment, also initializing its one jbutton
 	public Assessment(String s, double w, int n) {
 		name = s;
 		

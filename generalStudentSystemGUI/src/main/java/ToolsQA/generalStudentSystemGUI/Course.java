@@ -3,6 +3,7 @@ package ToolsQA.generalStudentSystemGUI;
 import java.util.LinkedList;
 
 public class Course {
+	// Declaring the variables that will be used in the class.
 	private String name;
 	private String code;
 	private String type;
@@ -12,6 +13,7 @@ public class Course {
 	private int minKids;
 	private int numClasses;
 	
+	// A constructor for the Course class.
 	public Course(String name, String code, String type, LinkedList<String> rooms, int priority, int kids, int numclass, int minKids) {
 		this.name = name;
 		this.code = code;

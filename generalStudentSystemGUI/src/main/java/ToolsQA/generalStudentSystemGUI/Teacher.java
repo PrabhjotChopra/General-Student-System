@@ -20,6 +20,8 @@ public class Teacher {
 	public Teacher() {
 	}
 
+	// The constructor for the Teacher class. It sets the fields of the class to the parameters passed in, 
+	// along with initializing the relevant gui components
 	public Teacher(String f, String l, int ID, LinkedList<String> teachables) {
 		this.ID = ID;
 		this.teachables = teachables;
@@ -97,6 +99,11 @@ public class Teacher {
 		return false; // no room to add a class to teacher's schedule
 	}
 
+	/**
+	 * It switches the semester that is being displayed
+	 * 
+	 * @param sem the semester you want to switch to
+	 */
 	public void switchSem(int sem) {
 		if (sem == 1 && sem2.getY() - sem1.getY() == 20) {
 			sem1.setLocation(sem1.getX(), sem1.getY() + 20);
@@ -134,6 +141,12 @@ public class Teacher {
 
 	}
 
+	/**
+	 * Returns a gui representation of this teacher's courses from a specified semester
+	 * 
+	 * @param sem the semester you want to get the courses from
+	 * @return A JPanel with a list of courses.
+	 */
 	public JPanel getCourses(int sem) {
 		sem--;
 		sem *= 4;

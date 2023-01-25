@@ -13,6 +13,7 @@ import java.util.Hashtable;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 public class ClassCourse extends Course {
+	// Declaring variables.
 	private int courseNum;
 	private LinkedList<Student> students = new LinkedList<Student>();
 	private LinkedList<Assessment> assignments = new LinkedList<Assessment>();
@@ -69,6 +70,15 @@ public class ClassCourse extends Course {
 	private JButton indstudmark;
 	private JButton indstudatt;
 
+	
+	/**
+	 * Constructor to make new classes
+	 * @param n coursenum
+	 * @param t teacher
+	 * @param s room
+	 * @param p period of class
+	 * @param c course for class
+	 */
 	public ClassCourse(int n, Teacher t, String s, int p, Course c) {
 		super(c);
 		courseNum = n;
@@ -199,6 +209,12 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * This function adds a student to the course, and adds them to the attendance, current, and midterm
+	 * tables
+	 * 
+	 * @param s Student
+	 */
 	public void addStudent(Student s) {
 		students.add(s);
 		Attend[] temp;
@@ -226,6 +242,11 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * This function removes a student from the class
+	 * 
+	 * @param s the student to be removed
+	 */
 	public void removeStudent(Student s) {
 		students.remove(s);
 		attendance.remove(s);
@@ -235,6 +256,17 @@ public class ClassCourse extends Course {
 		// remove from current grades
 	}
 
+	/**
+	 * This function takes in a student, an assignment name, and the marks earned by the student on that
+	 * assignment. It then finds the assignment in the assignments ArrayList, and then finds the student
+	 * in the Hashtable of students and marks for that assignment. It then replaces the marks earned by
+	 * the student with the new marks earned. It then replaces the grade for the student in the current
+	 * Hashtable with the new grade
+	 * 
+	 * @param s Student object
+	 * @param assignmentName String
+	 * @param marksEarned The marks the student earned on the assignment
+	 */
 	public void setGrade(Student s, String assignmentName, Double marksEarned) {
 
 		Assessment assign = null;
@@ -254,6 +286,13 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * This function adds an assessment to the course
+	 * 
+	 * @param name The name of the assessment
+	 * @param weight the weight of the assignment
+	 * @param totalMarks The total marks for the assignment
+	 */
 	public void addAssessment(String name, double weight, int totalMarks) {
 		Assessment assess = new Assessment(name, weight, totalMarks);
 		Hashtable<Student, Double> marks = new Hashtable<Student, Double>();
@@ -266,6 +305,11 @@ public class ClassCourse extends Course {
 		assignments.add(assess);
 	}
 
+	/**
+	 * This function adds an assessment to the course
+	 * 
+	 * @param assess The assessment to be added
+	 */
 	public void addAssessment(Assessment assess) {
 		Hashtable<Student, Double> marks = new Hashtable<Student, Double>();
 		totalWeight += assess.getWeight();
@@ -277,6 +321,11 @@ public class ClassCourse extends Course {
 		assignments.add(assess);
 	}
 
+	/**
+	 * This function removes an assessment from the class and updates the current grade of each student
+	 * 
+	 * @param assess the assessment to be removed
+	 */
 	public void removeAssessment(Assessment assess) {
 		totalWeight -= assess.getWeight();
 		grades.remove(assess);
@@ -290,6 +339,12 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * This function calculates the grade of a student in a course
+	 * 
+	 * @param s Student
+	 * @return The grade of the student
+	 */
 	public double gradeCalc(Student s) {
 		double grade = 0.0;
 
@@ -320,6 +375,10 @@ public class ClassCourse extends Course {
 		return grade;
 	}
 
+	/**
+	 * It removes all the components from the JPanel and adds the components that are needed for the marks
+	 * dashboard
+	 */
 	public void goMarks() {
 
 		School.dashboard.remove(daily);
@@ -339,6 +398,7 @@ public class ClassCourse extends Course {
 
 	}
 
+	// The below code is creating a GUI for the teacher to view the marks of the students.
 	public void studentMarks() {
 		sortKids();
 
@@ -346,6 +406,7 @@ public class ClassCourse extends Course {
 
 		Box container = Box.createVerticalBox();
 
+		// Creating a JPanel for each student in the class.
 		for (int i = 0; i < students.size(); i++) {
 			JPanel thisStudentMark = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			thisStudentMark.setSize(School.rect.width - 200, 20);
@@ -383,6 +444,7 @@ public class ClassCourse extends Course {
 
 		}
 
+		// Creating a scroll pane and adding a header to it.
 		pane = new JScrollPane(container);
 
 		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -425,6 +487,9 @@ public class ClassCourse extends Course {
 		tab.revalidate();
 		tab.repaint();
 
+		// The above code is checking if the marksDash button is at the location 170. If it is, then it will
+		// set the location of the other buttons to 170. It will also set the background of the other buttons
+		// to null.
 		if (marksDash.getY() == 170) {
 			addAss.setLocation(addAss.getX(), 170);
 			removeAss.setLocation(removeAss.getX(), 170);
@@ -440,6 +505,12 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * It creates a JPanel with a JScrollPane inside of it for the specific student's marks, and then adds a bunch of JTextFields to the
+	 * JScrollPane
+	 * 
+	 * @param id the student number of the student
+	 */
 	public void indStudentMarks(int id) {
 
 		Student s = new Student();
@@ -473,6 +544,7 @@ public class ClassCourse extends Course {
 		}
 		
 		}
+		// Creating a scroll pane and adding the container to it.
 		pane = new JScrollPane(container);
 
 		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -1048,6 +1120,7 @@ public class ClassCourse extends Course {
 			name = name.substring(0, nameLen);
 		}
 
+		// Checking if the assignment already exists.
 		double weight;
 		int marks;
 		boolean worked = true;
@@ -1060,8 +1133,11 @@ public class ClassCourse extends Course {
 			}
 
 		}
+
 		result.setText("");
 		result.setHorizontalAlignment(JTextField.CENTER);
+		// The below code is checking if the user has entered a valid weight for the
+		// assessment.
 		try {
 			weight = Double.parseDouble(assWeight.getText());
 			if (weight > 100) {
@@ -1087,6 +1163,8 @@ public class ClassCourse extends Course {
 			// invalid message
 			worked = false;
 		}
+		// The below code is checking if the user has entered a valid number for the total marks for the
+		// assessment.
 		try {
 			marks = (int) Double.parseDouble(totalAssMarks.getText());
 			if (marks > 300) {
@@ -1115,12 +1193,15 @@ public class ClassCourse extends Course {
 		if (worked) {
 			addAssessment(name, weight, marks);
 			result.setText("Assessment \"" + name + "\" successfully added with weight factor " + weight + " and "
-					+ marks + " total marks.");
+					+ marks + " total marks."); // successfully added message
 		}
 
-		// successfully added message
+		
 
 	}
+/**
+ * It removes an assessment according to an inputted name
+ */
 
 	public void removeAss() {
 		tab.removeAll();
@@ -1168,6 +1249,10 @@ public class ClassCourse extends Course {
 		}
 	}
 
+	/**
+	 * It takes the name of an assessment from a text field, finds the assessment with that name, and
+	 * removes it from the list of assessments
+	 */
 	public void removeAssFromGUI() {
 		result.setVisible(true);
 
@@ -1197,6 +1282,7 @@ public class ClassCourse extends Course {
 
 	}
 
+	// submits the grades for a specific assignnment
 	public void submitAssGrades(String nameid) {
 		Assessment ass = new Assessment();
 
@@ -1223,6 +1309,7 @@ public class ClassCourse extends Course {
 		double tempWeight;
 		int tempmarks;
 
+		// seeing if a  valid number of marks has been input
 		try {
 			tempmarks = (int) Double.parseDouble(totalMarks.getText().strip());
 
@@ -1237,6 +1324,7 @@ public class ClassCourse extends Course {
 		}
 		ass.setTotalMarks(tempmarks);
 
+		// checking if a valid weight has been input
 		try {
 			tempWeight = Double.parseDouble(weightfactor.getText().strip());
 			if (tempWeight > 100) {
@@ -1252,6 +1340,7 @@ public class ClassCourse extends Course {
 		ass.setWeight(tempWeight);
 		totalWeight += tempWeight;
 
+		// Parsing the marks of students from textfields
 		for (int i = 0; i < students.size(); i++) {
 			String temp = assMarks.get(i).getText().strip();
 			if (temp.length() > 6) {
@@ -1285,6 +1374,7 @@ public class ClassCourse extends Course {
 
 	}
 
+	// submits the grades for a specific student
 	public void submitIndGrades(int id) {
 		Student s = new Student();
 		for (int i = 0; i < students.size(); i++) {
@@ -1299,8 +1389,12 @@ public class ClassCourse extends Course {
 			middy = middy.substring(0, 5);
 		}
 
+		// only lets users submit valid midterm marks
 		try {
-			if (Double.parseDouble(middy) <= 100 || Double.parseDouble(middy)<0 ) {
+			if (Double.parseDouble(middy) > 100 || Double.parseDouble(middy)<0 ) {
+				// do nothing
+			}
+			else {
 				midterms.replace(s, Double.parseDouble(middy));
 			}
 			
@@ -1309,6 +1403,7 @@ public class ClassCourse extends Course {
 			midterming.setText(String.valueOf(midterms.get(s)));
 		}
 
+		// Parsing the marks and adding them to the classcourse data
 		for (int i = 0; i < assignments.size(); i++) {
 			String temp = assMarks.get(i).getText().strip();
 
@@ -1341,6 +1436,7 @@ public class ClassCourse extends Course {
 
 	}
 
+	// Taking the attendance of students in a class.
 	public void submitAttendance() {
 
 		for (int i = 0; i < students.size(); i++) {
@@ -1398,6 +1494,7 @@ public class ClassCourse extends Course {
 
 	}
 
+	// method for daily attendance screen
 	public JPanel addDailys() {
 		sortKids();
 		dayChoice.setActionCommand("Day Choice");
@@ -1437,6 +1534,7 @@ public class ClassCourse extends Course {
 		return tab;
 	}
 
+	// screen for overall attendannce
 	public JPanel overallAtt() {
 
 		subAtt.setEnabled(false);
@@ -1530,6 +1628,7 @@ public class ClassCourse extends Course {
 		return tab;
 	}
 
+	// method to see an individual student's in-depth attendance
 	public void indAtt(int id) {
 
 		dayChoice.setActionCommand("indAtt");
@@ -1631,6 +1730,7 @@ public class ClassCourse extends Course {
 		int specificabsents = 0;
 		int specificmins = 0;
 
+		// Checking if a week has elapsed in the course. if so, stats about the last week of class are determined
 		if (courseDay >= 4 && !hasNulls) {
 			for (int i = courseDay - 4; i <= courseDay; i++) {
 				if (studentData[i] != null) {
@@ -1656,6 +1756,7 @@ public class ClassCourse extends Course {
 
 			stats.add(lastweek);
 		}
+		// Checking if two weeks have elapsed in the course. if so, stats about the last two weeks of class are determined
 		if (courseDay >= 9 && !hasNulls) {
 			specificlates = 0;
 			specificabsents = 0;
@@ -1684,7 +1785,7 @@ public class ClassCourse extends Course {
 			twoweeks.setFont(Student.studentStandard);
 			stats.add(twoweeks);
 		}
-
+		// Checking if a month has elapsed in the course. if so, stats about the last month of class are determined
 		if (courseDay >= 19 && !hasNulls) {
 			specificlates = 0;
 			specificabsents = 0;
@@ -1719,6 +1820,7 @@ public class ClassCourse extends Course {
 
 		JPanel attending = new JPanel();
 
+		// Creating a new JTextArea for each day of attendance.
 		attending.setLayout(new BoxLayout(attending, BoxLayout.PAGE_AXIS));
 		boolean hasAtt = false;
 		for (int i = 0; i <= courseDay; i++) {
@@ -1748,6 +1850,7 @@ public class ClassCourse extends Course {
 			attending.add(thisday);
 
 		}
+		// Setting up the scrollable area for the attendance
 		final JScrollPane attPanel = new JScrollPane(attending);
 
 		attPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -1805,7 +1908,7 @@ public class ClassCourse extends Course {
 
 	}
 	
-	
+	// method to go to student dashboard
 	public void goStuDash(){
 		School.dashboard.add(main);
 		School.dashboard.add(indstudatt);
@@ -1869,7 +1972,7 @@ public class ClassCourse extends Course {
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				kids.getVerticalScrollBar().setValue(0);
+				kids.getVerticalScrollBar().setValue(0); // sets scrollbar to start at the top
 			}
 		});
 		if (main.getY() == 170) {
@@ -1884,6 +1987,8 @@ public class ClassCourse extends Course {
 		}
 		
 	}
+
+	// method to go to base dashboard screen for classes (teacher gui)
 	public void goDash() {
 
 		School.dashboard.remove(marksDash);
@@ -1970,6 +2075,11 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * It sets the visible attendance of the student to null
+	 * 
+	 * @param s Student object
+	 */
 	public void setNull(Student s) {
 		s.setMinsLate("Time arrived");
 		s.setAbsentReason(0);
@@ -1979,6 +2089,11 @@ public class ClassCourse extends Course {
 		tab.repaint();
 	}
 
+	/**
+	 * It sets the attendance of a student to present, and updates the student's attendance record
+	 * 
+	 * @param s Student object
+	 */
 	public void setPresent(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
 		thisAttendance[courseDay] = new Attend(true, false, 0, "");
@@ -1991,6 +2106,11 @@ public class ClassCourse extends Course {
 
 	}
 
+	/**
+	 * It sets the attendance of a student to absent
+	 * 
+	 * @param s Student object
+	 */
 	public void setAbsent(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
 
@@ -2003,6 +2123,11 @@ public class ClassCourse extends Course {
 		tab.revalidate();
 		tab.repaint();
 	}
+/**
+ * It takes a student object and sets the attendance for that student to late
+ * 
+ * @param s Student
+ */
 
 	public void setLate(Student s) {
 		Attend[] thisAttendance = attendance.get(s);
@@ -2017,6 +2142,13 @@ public class ClassCourse extends Course {
 
 	}
 
+/**
+ * It sets a student to be late, and updates the attendance record
+ * 
+ * @param s The student object
+ * @param mins the number of minutes late
+ * @param time The time the student was marked late
+ */
 	public void setLate(Student s, int mins, LocalTime time) {
 		int h = time.getHour();
 		String minute = String.valueOf(time.getMinute());
@@ -2039,6 +2171,12 @@ public class ClassCourse extends Course {
 		tab.repaint();
 	}
 
+	/**
+	 * It sets a student's attendance to absent, and updates the attendance table
+	 * 
+	 * @param s Student
+	 * @param reason The reason for the absence
+	 */
 	public void setAbsent(Student s, String reason) {
 		s.setMinsLate("Time arrived");
 		s.setAbsentReason(reason);
@@ -2052,6 +2190,12 @@ public class ClassCourse extends Course {
 		tab.repaint();
 	}
 
+	/**
+	 * It changes the day of the attendance
+	 * 
+	 * @param type 1 = daily attendance, 2 = overall attendance, 3 = individual attendance for a
+	 * specific student. This type parameter helps to make it so you can change the day on any attendance screen
+	 */
 	public void changeAttDay(int type) {
 		String choice = String.valueOf(dayChoice.getSelectedItem()).split(" ")[1];
 		int day = Integer.parseInt(choice) - 1;
@@ -2183,6 +2327,13 @@ public class ClassCourse extends Course {
 		return attendance.get(s);
 	}
 
+	/**
+	 * This function takes in an array of Attend objects and a Student object. It then replaces the Attend
+	 * array in the attendance HashMap with the new Attend array to set that student's attendance up to a point
+	 * 
+	 * @param a An array of Attend objects
+	 * @param s Student object
+	 */
 	public void setAttendance(Attend[] a, Student s) {
 
 		Attend[] temp = attendance.get(s);
