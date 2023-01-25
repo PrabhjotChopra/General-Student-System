@@ -2358,4 +2358,14 @@ public class ClassCourse extends Course {
 	public JTextField getTotalAssMarks() {
 		return totalAssMarks;
 	}
+	public LinkedList<Assessment> getassignments() {
+        return assignments;
+    }
+    public Hashtable<Assessment, Hashtable<Student, Double>> getgrades(){
+        return grades;
+    }
+
+    public Hashtable<Student, Double> getmideterms() {
+        return midterms;
+    }
 }

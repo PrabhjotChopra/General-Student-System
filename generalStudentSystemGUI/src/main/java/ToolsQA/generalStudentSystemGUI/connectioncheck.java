@@ -75,7 +75,7 @@ public class connectioncheck {
 	 */
 	public static void uploadArray(String[][] infos, Connection con, String tableName) throws SQLException {
 	    // Create SQL statement
-	    for (int i = 1; i < infos.length; i++) {
+	    for (int i = 2; i < infos.length; i++) {
 	    	StringBuilder sql = new StringBuilder();
 	        if (infos[i][0] != null) {
 	        	
@@ -88,12 +88,22 @@ public class connectioncheck {
 	            }
 	            sql.append(" WHERE (" + infos[0][0] + " = '" + (i) + "'); ");
 	            Statement statement = con.createStatement();
+	            System.out.println(sql.toString().length());
 	    	    statement.executeUpdate(sql.toString());
 	        }
+	        
+	        //it's sticking it all in one string and sending it out
 	    }
 	    // Create statement and execute
 	}
-
+	public static void deleteRow(String tableName, String id, Connection con) throws SQLException {
+        // Create SQL statement
+        String sql = "DELETE FROM " + tableName + " WHERE id = " + id + ";";
+        // Create statement and execute
+        Statement statement = con.createStatement();
+        statement.executeUpdate(sql);
+    }
+	
 	/**
 	 * This function creates a table with the name of the first parameter, and the columns of the table
 	 * are the strings in the second parameter

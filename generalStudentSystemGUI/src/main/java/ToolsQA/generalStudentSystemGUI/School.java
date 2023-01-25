@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
@@ -86,6 +87,7 @@ public class School implements ActionListener, FocusListener {
 
 						window.revalidate();
 						window.repaint();
+						
 					}
 				}
 			}
@@ -207,6 +209,51 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().equals("Close app")) {
+			   
+				if(currClass!=null) {
+					try {
+
+		                Class.forName("com.mysql.cj.jdbc.Driver");
+		                Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+
+		                Student ex = null;
+
+		                String[][] attendance = null;
+		                String[][] Marks = null;
+		                String[][] weights = null;
+		                String[] att = null;
+		                String[] ltime = null;
+		                String[] areason= null;
+		                attendance = connectioncheck.downloadTable("attendance_" + currClass.getCode().toLowerCase(), con);
+		                
+		                for (int x = 1; x < currClass.getStudents().size(); x++) {
+		                    ex = currClass.getStudents().get(x-1);
+		                    
+		                    Attend[] test = currClass.getAttendance(ex);
+		                    att = attendToatt(test);
+		                    ltime = resize(attendTolatet(test));
+		                    areason = resize(attendToareason(test));
+		                    attendance[x][1]=arrayToString(att);
+		                    attendance[x][2]=arrayToString(ltime);
+		                    attendance[x][3]=arrayToString(areason);
+		                    if(ex.getFirstName().equals("Isa")) {
+		                    	System.out.println(attendance[x][3]);
+		                    }
+		                }
+		                
+		                connectioncheck.uploadArray(attendance,con,"attendance_" + currClass.getCode().toLowerCase());
+
+
+		            } catch (ClassNotFoundException |
+
+		                    SQLException e1) {
+		                // TODO Auto-generated catch block
+		                e1.printStackTrace();
+		            }
+		            // Connect to SQL Server
+				}
+				
 			System.exit(0);
 		} else if (e.getActionCommand().equals("Classes")) {
 
@@ -756,6 +803,57 @@ public class School implements ActionListener, FocusListener {
 	public static String[] populateArray(String input) {
 		return input.split(" ");
 	}
+	public static String[][] removecols(String[][] array) {
+	    // Get number of non-null columns
+	    int columnCount = 0;
+	    for (int i = 0; i < array[0].length; i++) {
+	        boolean isNonNull = false;
+	        for (int j = 0; j < array.length; j++) {
+	            if (array[j][i] != null) {
+	                isNonNull = true;
+	                break;
+	            }
+	        }
+	        if (isNonNull) {
+	            columnCount++;
+	        }
+	    }
+
+	    // Create new array with the appropriate size
+	    String[][] newArray = new String[array.length][columnCount];
+
+	    // Copy non-null values to new array
+	    int newCol = 0;
+	    for (int oldCol = 0; oldCol < array[0].length; oldCol++) {
+	        boolean isNonNull = false;
+	        for (int row = 0; row < array.length; row++) {
+	            if (array[row][oldCol] != null) {
+	                isNonNull = true;
+	                break;
+	            }
+	        }
+	        if (isNonNull) {
+	            for (int row = 0; row < array.length; row++) {
+	                newArray[row][newCol] = array[row][oldCol];
+	            }
+	            newCol++;
+	        }
+	    }
+	    return newArray;
+	}
+	public static String[] compareAndReturnMissing(LinkedList<Assessment> list2, String[] array) {
+		  LinkedList<String> list = null;
+		  for (int i=0; i<list2.size();i++) {
+			 list.add(list2.get(i).getName());
+		  }
+			ArrayList<String> missing = new ArrayList<>();
+		    for (String s : array) {
+		        if (!list.contains(s)) {
+		            missing.add(s);
+		        }
+		    }
+		    return missing.toArray(new String[missing.size()]);
+		}
 
 /**
  * It takes in three arrays of strings, and returns an array of Attend objects
@@ -776,15 +874,12 @@ public class School implements ActionListener, FocusListener {
 		for (int i = 0; i < in.length; i++) {
 			present = false;
 			late2 = false;
-
-			// if present and on time
-			if (in[i].equals("0")) {
+			if (in[i].equals("0")|| in[i].equals("")) {
 				present = true;
 				late2 = false;
 				att[i] = new Attend(present, late2, minutesLate, reason);
 			}
 
-			// if late
 			if (in[i].equals("1")) {
 				lcount++;
 				present = true;
@@ -795,11 +890,9 @@ public class School implements ActionListener, FocusListener {
 
 			}
 
-			// if absent
 			if (in[i].equals("2")) {
 				acount++;
 				switch (abreason[acount]) {
-				// reasons for absence (options taken from parent portal)
 				case "1":
 					reason = "Illness or injury";
 					break;
@@ -829,6 +922,108 @@ public class School implements ActionListener, FocusListener {
 		}
 		return att;
 
+	}
+	public static String[] resize(String[] arr) {
+		int newSize = 0;
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] != null) {
+				newSize++;
+			}
+		}
+		String[] resizedArray = new String[newSize];
+		int index = 0;
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] != null) {
+				resizedArray[index] = arr[i];
+				index++;
+			}
+		}
+		return resizedArray;
+	}
+
+	public static String[] attendToatt(Attend[] attend) {
+		String[] result = new String[attend.length];
+		for (int i = 0; i < attend.length; i++) {
+			if(attend[i] == null) {
+				continue;
+			}
+			if (attend[i].getPresent() && !attend[i].getLate()) {
+				result[i] = "0";
+			} else if (attend[i].getPresent() && attend[i].getLate()) {
+				result[i] = "1";
+			} else {
+				result[i] = "2";
+			}
+		}
+		return result;
+	}
+
+	public static String[] attendTolatet(Attend[] attend) {
+		String[] latetime = new String[attend.length];
+		for (int i = 0; i < attend.length; i++) {
+			if(attend[i] == null) {
+				continue;
+			}
+			if (attend[i].getPresent() && !attend[i].getLate()) {
+			} else if (attend[i].getPresent() && attend[i].getLate()) {
+				latetime[i] = Integer.toString(attend[i].getMinutesLate());
+			} else {
+			}
+		}
+		return latetime;
+	}
+
+	public static String[] attendToareason(Attend[] attend) {
+		String[] areason = new String[attend.length];
+		String re;
+		for (int i = 0; i < attend.length; i++) {
+			if(attend[i] == null) {
+				continue;
+			}
+			if (attend[i].getPresent() && !attend[i].getLate()) {
+
+			} else if (attend[i].getPresent() && attend[i].getLate()) {
+
+			} else {
+				re = attend[i].getReason();
+				
+					switch (re) {
+					case "Illness or injury":
+						areason[i] = "1";
+						break;
+					case "Appointment":
+						areason[i] = "2";
+						break;
+					case "Religious day":
+						areason[i] = "3";
+						break;
+					case "Bereavement":
+						areason[i] = "4";
+						break;
+					case "School transportation cancellation":
+						areason[i] = "5";
+						break;
+					case "Parent-approved absence":
+						areason[i] = "6";
+						break;
+						
+					case "Not approved by parent":
+						areason[i] = "0";
+					default:
+						break;
+					
+			}
+		}
+	}
+		return areason;
+	}
+
+	public static String arrayToString(String[] arr) {
+		String x = "";
+		for (String s : arr) {
+			x += (s + " ");
+		}
+		return x.trim();
 	}
 
 	public static void main(String[] args) throws SQLException {
