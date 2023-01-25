@@ -108,7 +108,8 @@ public class ClassCourse extends Course {
 		main.setBounds(100, 180, 170, 75);
 		main.setFont(School.buttonFont);
 		main.addActionListener(new School());
-
+		main.setBackground(Color.decode("#42a1e1"));
+		
 		daily = new JButton("Daily Attendance");
 		daily.setBounds(285, 170, 200, 75);
 		daily.setFont(School.buttonFont);
@@ -147,7 +148,8 @@ public class ClassCourse extends Course {
 		marksDash.setFont(School.buttonFont);
 		marksDash.addActionListener(new School());
 		marksDash.setActionCommand("marksDash");
-
+		marksDash.setBackground(Color.decode("#42a1e1"));
+		
 		assDash = new JButton("Assessments");
 		assDash.setBounds(320, 170, 200, 75);
 		assDash.setFont(School.buttonFont);
@@ -357,8 +359,9 @@ public class ClassCourse extends Course {
 			JButton b = students.get(i).getStudentMarkB();
 			b.setText("View Individual");
 			b.setFont(Student.studentStandard);
+			b.setBackground(null);
 			thisStudentMark.add(b);
-
+			
 			container.add(thisStudentMark);
 			container.add(Box.createRigidArea(new Dimension(0, 10)));
 
@@ -411,6 +414,11 @@ public class ClassCourse extends Course {
 			removeAss.setLocation(removeAss.getX(), 170);
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 180);
+			
+			marksDash.setBackground(Color.decode("#42a1e1"));
+			assDash.setBackground(null);
+			removeAss.setBackground(null);
+			addAss.setBackground(null);
 
 		}
 
@@ -909,6 +917,11 @@ public class ClassCourse extends Course {
 			removeAss.setLocation(removeAss.getX(), 170);
 			assDash.setLocation(assDash.getX(), 180);
 			marksDash.setLocation(marksDash.getX(), 170);
+			
+			assDash.setBackground(Color.decode("#42a1e1"));
+			removeAss.setBackground(null);
+			addAss.setBackground(null);
+			marksDash.setBackground(null);
 
 		}
 	}
@@ -974,6 +987,11 @@ public class ClassCourse extends Course {
 			removeAss.setLocation(removeAss.getX(), 170);
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 170);
+			
+			addAss.setBackground(Color.decode("#42a1e1"));
+			removeAss.setBackground(null);
+			assDash.setBackground(null);
+			marksDash.setBackground(null);
 		}
 
 	}
@@ -985,7 +1003,7 @@ public class ClassCourse extends Course {
 		if (name.equals("Assessment name")) {
 			name = "";
 		}
-		name = name.replace(" ", "_");
+		//name = name.replace(" ", "_");
 
 		if (name.length() == 0) {
 			result.setText("Please enter an assignment name");
@@ -1107,6 +1125,11 @@ public class ClassCourse extends Course {
 			removeAss.setLocation(removeAss.getX(), 180);
 			assDash.setLocation(assDash.getX(), 170);
 			marksDash.setLocation(marksDash.getX(), 170);
+			
+			removeAss.setBackground(Color.decode("#42a1e1"));
+			addAss.setBackground(null);
+			marksDash.setBackground(null);
+			assDash.setBackground(null);
 		}
 	}
 
@@ -1117,7 +1140,7 @@ public class ClassCourse extends Course {
 		if (name.equals("Assessment name")) {
 			name = "";
 		}
-		name = name.replace(" ", "_");
+		//name = name.replace(" ", "_");
 
 		if (name.length() == 0) {
 			result.setText("Please enter an assessment name");
@@ -1368,7 +1391,11 @@ public class ClassCourse extends Course {
 			daily.setLocation(daily.getX(), 180);
 			main.setLocation(main.getX(), 170);
 			overallAtt.setLocation(overallAtt.getX(), 170);
-
+			
+			
+			daily.setBackground(Color.decode("#42a1e1"));
+			main.setBackground(null);
+			overallAtt.setBackground(null);
 		}
 
 		return tab;
@@ -1427,6 +1454,7 @@ public class ClassCourse extends Course {
 			JButton b = students.get(i).getStudentAttB();
 			b.setText("View Individual");
 			b.setFont(Student.studentStandard);
+			b.setBackground(null);
 			thisStudentAtt.add(b);
 
 			container.add(thisStudentAtt);
@@ -1454,8 +1482,11 @@ public class ClassCourse extends Course {
 		if (overallAtt.getY() == 170) {
 			daily.setLocation(daily.getX(), 170);
 			main.setLocation(main.getX(), 170);
-
-			marks.setLocation(marks.getX(), 170);
+			overallAtt.setBackground(Color.decode("#42a1e1"));
+			
+			daily.setBackground(null);
+			main.setBackground(null);
+			
 			overallAtt.setLocation(overallAtt.getX(), 180);
 
 		}
@@ -1672,7 +1703,7 @@ public class ClassCourse extends Course {
 				thisday.setBackground((Color.decode("#cc473d")));
 
 			}
-			thisday.setFont(new Font("Arial", 1, 25));
+			thisday.setFont(Student.studentStandard);
 			thisday.setBorder(BorderFactory.createLineBorder(Color.black));
 
 			thisday.setEditable(false);
@@ -1805,7 +1836,9 @@ public class ClassCourse extends Course {
 			daily.setLocation(daily.getX(), 170);
 			main.setLocation(main.getX(), 180);
 
-			marks.setLocation(marks.getX(), 170);
+			main.setBackground(Color.decode("#42a1e1"));
+			daily.setBackground(null);
+			overallAtt.setBackground(null);
 			overallAtt.setLocation(overallAtt.getX(), 170);
 
 		}

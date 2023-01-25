@@ -11,7 +11,7 @@ public class Assessment {
 	public Assessment() {}
 	public Assessment(String s, double w, int n) {
 		name = s;
-
+		
 		weight = w;
 		totalMarks = n;
 		
@@ -40,7 +40,9 @@ public class Assessment {
 	}
 	public void setName(String s) {
 		name=s;
+		
 		details.setActionCommand("indAss " + name);
+		
 	}
 	public void setWeight(double w) {
 		weight=w;

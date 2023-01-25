@@ -130,6 +130,7 @@ public class School implements ActionListener, FocusListener {
 			if (loginner != null) {
 				currProf = loginner;
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				window.remove(teacherLogin);
 				window.revalidate();
 				window.repaint();
@@ -158,6 +159,8 @@ public class School implements ActionListener, FocusListener {
 
 			if (password.getText().equals(adminPass)) {
 				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				
+				window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			} else {
 				incorrect.setText("Password incorrect");
 				adminLogin.add(incorrect);
@@ -273,11 +276,11 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().split(" ")[0].equals("submitAssMarks")) {
-			currClass.submitAssGrades(e.getActionCommand().split(" ")[1]);
+			currClass.submitAssGrades(e.getActionCommand().substring(e.getActionCommand().indexOf(" ")+1));
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().split(" ")[0].equals("indAss")) {
-			currClass.indAss(e.getActionCommand().split(" ")[1]);
+			currClass.indAss(e.getActionCommand().substring(e.getActionCommand().indexOf(" ")+1));
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().equals("addAss")) {
@@ -486,9 +489,9 @@ public class School implements ActionListener, FocusListener {
 												for (int z = 1; z<weights.length; z++) {
 													
 													if (weights[z][0]!=null) {
-														System.out.println(weights[z][0]);
-													ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
-												}
+														//System.out.println(weights[z][0]);
+														ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
+													}
 												}	
 											}
 										}
