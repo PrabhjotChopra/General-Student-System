@@ -30,7 +30,8 @@ public class ClassCourse extends Course {
 	private int days;
 	private double bonus = 1.1;
 	private int nameLen = 28;
-
+	private boolean isKid;
+	
 	private int currKid;
 	private JButton baseDisplay;
 
@@ -64,6 +65,9 @@ public class ClassCourse extends Course {
 	private JButton removeAss;
 
 	private JButton goBack;
+	
+	private JButton indstudmark;
+	private JButton indstudatt;
 
 	public ClassCourse(int n, Teacher t, String s, int p, Course c) {
 		super(c);
@@ -114,12 +118,24 @@ public class ClassCourse extends Course {
 		daily.setBounds(285, 170, 200, 75);
 		daily.setFont(School.buttonFont);
 		daily.addActionListener(new School());
+		
+		indstudatt = new JButton("Attendance");
+		indstudatt.setBounds(285, 170, 200, 75);
+		indstudatt.setFont(School.buttonFont);
+		indstudatt.addActionListener(new School());
+		indstudatt.setActionCommand("indstudatt");
 
 		overallAtt = new JButton("Overall Attendance");
 		overallAtt.setBounds(495, 170, 250, 75);
 		overallAtt.setFont(School.buttonFont);
 		overallAtt.addActionListener(new School());
-
+		
+		indstudmark = new JButton("Student marks");
+		indstudmark.setBounds(495, 170, 250, 75);
+		indstudmark.setFont(School.buttonFont);
+		indstudmark.addActionListener(new School());
+		indstudmark.setActionCommand("indstudmark");
+		
 		String[] dayChoices = new String[days];
 
 		for (int i = 0; i < days; i++) {
@@ -439,21 +455,23 @@ public class ClassCourse extends Course {
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+		if (!isKid) {
+			for (int i = 0; i < students.size(); i++) {
+				JButton b = students.get(i).getStudentMarkB();
+				b.setText(students.get(i).tabbedName().getText());
+				b.setFont(new Font("Arial", 1, 25));
+				b.setBackground(null);
+				JPanel temp = new JPanel(new GridLayout(1, 1));
+				temp.add(b);
+				container.add(temp);
 
-		for (int i = 0; i < students.size(); i++) {
-			JButton b = students.get(i).getStudentMarkB();
-			b.setText(students.get(i).tabbedName().getText());
-			b.setFont(new Font("Arial", 1, 25));
-			b.setBackground(null);
-			JPanel temp = new JPanel(new GridLayout(1, 1));
-			temp.add(b);
-			container.add(temp);
+				container.add(Box.createRigidArea(new Dimension(0, 10)));
 
-			container.add(Box.createRigidArea(new Dimension(0, 10)));
-
-			if (s.equals(students.get(i))) {
-				b.setBackground(Color.decode("#42a1e1"));
+				if (s.equals(students.get(i))) {
+					b.setBackground(Color.decode("#42a1e1"));
 			}
+		}
+		
 		}
 		pane = new JScrollPane(container);
 
@@ -492,6 +510,10 @@ public class ClassCourse extends Course {
 		thismid.setMaximumSize(new Dimension(80, 25));
 
 		midterming = new JTextField(String.valueOf(midterm));
+		if(isKid) {
+			midterming.setEditable(false);
+		}
+		
 		midterming.setFont(Student.studentStandard);
 		midterming.setMaximumSize(new Dimension(midterming.getWidth(), 25));
 
@@ -544,7 +566,9 @@ public class ClassCourse extends Course {
 			double studentValue = grades.get(assignments.get(i)).get(s);
 
 			JTextField studentMark = new JTextField(String.valueOf(studentValue));
-
+			if (isKid) {
+				studentMark.setEditable(false);
+			}
 			studentMark.setFont(Student.studentStandard);
 			studentMark.setMaximumSize(new Dimension(120, 25));
 			assMarks.add(studentMark);
@@ -604,7 +628,18 @@ public class ClassCourse extends Course {
 		pane.setMaximumSize(new Dimension(320, School.rect.height - 355));
 
 		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		if(isKid) {
+			indstudatt.setLocation(daily.getX(), 170);
+			main.setLocation(main.getX(), 170);
 
+			main.setBackground(null);
+			indstudatt.setBackground(null);
+			indstudmark.setBackground(Color.decode("#42a1e1"));
+			indstudmark.setLocation(overallAtt.getX(), 180);
+			submitMarks.setEnabled(false);
+		}
+		
 		tab.revalidate();
 		tab.repaint();
 	}
@@ -1265,9 +1300,10 @@ public class ClassCourse extends Course {
 		}
 
 		try {
-			if (Double.parseDouble(middy) <= 100) {
+			if (Double.parseDouble(middy) <= 100 || Double.parseDouble(middy)<0 ) {
 				midterms.replace(s, Double.parseDouble(middy));
 			}
+			
 
 		} catch (NumberFormatException e) {
 			midterming.setText(String.valueOf(midterms.get(s)));
@@ -1511,22 +1547,24 @@ public class ClassCourse extends Course {
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+		if (!isKid) {
+			for (int i = 0; i < students.size(); i++) {
+				JButton b = students.get(i).getStudentAttB();
+				b.setText(students.get(i).tabbedName().getText());
+				b.setFont(new Font("Arial", 1, 25));
+				b.setBackground(null);
+				JPanel temp = new JPanel(new GridLayout(1, 1));
+				temp.add(b);
+				container.add(temp);
 
-		for (int i = 0; i < students.size(); i++) {
-			JButton b = students.get(i).getStudentAttB();
-			b.setText(students.get(i).tabbedName().getText());
-			b.setFont(new Font("Arial", 1, 25));
-			b.setBackground(null);
-			JPanel temp = new JPanel(new GridLayout(1, 1));
-			temp.add(b);
-			container.add(temp);
+				container.add(Box.createRigidArea(new Dimension(0, 10)));
 
-			container.add(Box.createRigidArea(new Dimension(0, 10)));
-
-			if (s.equals(students.get(i))) {
-				b.setBackground(Color.decode("#42a1e1"));
+				if (s.equals(students.get(i))) {
+					b.setBackground(Color.decode("#42a1e1"));
+				}
 			}
 		}
+		
 		pane = new JScrollPane(container);
 
 		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -1723,7 +1761,7 @@ public class ClassCourse extends Course {
 		});
 		if (hasAtt) {
 
-			if (courseDay < 5) {
+			if (courseDay < 6) {
 
 				thisKid.add(stats);
 				thisKid.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -1753,12 +1791,99 @@ public class ClassCourse extends Course {
 		thisKid.setBounds(320, 0, School.rect.width - 500, School.rect.height - 355);
 
 		thisKid.setBorder(BorderFactory.createLineBorder(Color.black));
+		if(isKid) {
+			indstudatt.setLocation(daily.getX(), 180);
+			main.setLocation(main.getX(), 170);
 
+			main.setBackground(null);
+			indstudmark.setBackground(null);
+			indstudatt.setBackground(Color.decode("#42a1e1"));
+			indstudmark.setLocation(overallAtt.getX(), 170);
+		}
 		tab.revalidate();
 		tab.repaint();
 
 	}
+	
+	
+	public void goStuDash(){
+		School.dashboard.add(main);
+		School.dashboard.add(indstudatt);
+		School.dashboard.add(indstudmark);
+		School.dashboard.add(dayChoice);
+		main.setActionCommand("studash");
 
+		
+		dashboard.setText(dashboard.getText() + "\nTeacher " + prof.getFirstName().charAt(0) + ". " + prof.getLastName());
+		isKid=true;
+		changeAttDay(4);
+		tab.removeAll();
+		tab.setLayout(new GridLayout(1, 2));
+
+		JPanel info = new JPanel();
+		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+
+		JTextField infohead = new JTextField("Class Information");
+		infohead.setEditable(false);
+		infohead.setFont(new Font("Arial", 1, 40));
+		infohead.setHorizontalAlignment(JTextField.CENTER);
+
+		info.add(infohead);
+		String[] dashboardParts = dashboard.getText().split("\n");
+		dashboard.setText(dashboardParts[0] + "\n" + dashboardParts[1] + "\n" + dashboardParts[2] + "\n"
+				+ dashboardParts[3] + "\n" + dashboardParts[4] + "\nNumber of students: " + students.size());
+		info.add(dashboard);
+		infohead.setMaximumSize(new Dimension(900, 50));
+
+		JPanel container = new JPanel();
+		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+		for (int i = 0; i < students.size(); i++) {
+			JTextArea temp = students.get(i).tabbedName();
+			temp.setFont(new Font("Arial", 1, 25));
+			temp.setMaximumSize(new Dimension(600, 30));
+			temp.setPreferredSize(new Dimension(600, 30));
+			container.add(temp);
+
+			container.add(Box.createRigidArea(new Dimension(0, 10)));
+		}
+
+		final JScrollPane kids = new JScrollPane(container, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		kids.getVerticalScrollBar().setUnitIncrement(16);
+
+		JPanel classlist = new JPanel();
+		classlist.setLayout(new BoxLayout(classlist, BoxLayout.PAGE_AXIS));
+
+		JTextField classy = new JTextField("Class List");
+		classy.setEditable(false);
+		classy.setFont(new Font("Arial", 1, 40));
+		classy.setHorizontalAlignment(JTextField.CENTER);
+
+		classlist.add(classy);
+		classlist.add(kids);
+
+		tab.add(info);
+		tab.add(classlist);
+		tab.revalidate();
+		tab.repaint();
+
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				kids.getVerticalScrollBar().setValue(0);
+			}
+		});
+		if (main.getY() == 170) {
+			indstudatt.setLocation(daily.getX(), 170);
+			main.setLocation(main.getX(), 180);
+
+			main.setBackground(Color.decode("#42a1e1"));
+			indstudatt.setBackground(null);
+			indstudmark.setBackground(null);
+			indstudmark.setLocation(overallAtt.getX(), 170);
+
+		}
+		
+	}
 	public void goDash() {
 
 		School.dashboard.remove(marksDash);
@@ -1977,7 +2102,7 @@ public class ClassCourse extends Course {
 	public void sortKids() {
 
 		int n = students.size();
-
+		
 		// One by one move boundary of unsorted subarray
 		for (int i = 0; i < n - 1; i++) {
 			// Find the minimum element in unsorted array
@@ -2066,6 +2191,9 @@ public class ClassCourse extends Course {
 			temp[i] = a[i];
 		}
 		attendance.replace(s, temp);
+	}
+	public void setMidterm(Student s, double mark) {
+		midterms.replace(s, mark);
 	}
 
 	public JTextField getAssName() {

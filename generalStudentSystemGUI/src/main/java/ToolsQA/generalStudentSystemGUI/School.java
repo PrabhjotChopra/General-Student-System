@@ -87,6 +87,22 @@ public class School implements ActionListener, FocusListener {
 				}
 			}
 		}
+		else if (student) {
+			for (int i = 0; i < 8; i++) {
+				if (currKid.getClasses()[i] != null) {
+					if (e.getSource() == currKid.getClasses()[i].getBaseDisplay()) {
+						currClass = currKid.getClasses()[i];
+
+						dashboard.removeAll();
+						currClass.goStuDash();
+						dashboard.add(currClass.getTab());
+
+						window.revalidate();
+						window.repaint();
+					}
+				}
+			}
+		}
 
 		if (e.getSource() == tLogin) {
 
@@ -156,8 +172,9 @@ public class School implements ActionListener, FocusListener {
 
 				window.revalidate();
 				window.repaint();
+				System.out.println();
 
-				System.out.println("worked!!");
+				
 			} else {
 				incorrect.setText("No student found");
 				studentLogin.add(incorrect);
@@ -189,6 +206,13 @@ public class School implements ActionListener, FocusListener {
 			dashboard.add(currProf.getSem1());
 			dashboard.add(currProf.getSem2());
 			dashboard.add(currProf.getCourses(1));
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("studclasses")) {
+			dashboard.removeAll();
+			dashboard.add(currKid.getSem1());
+			dashboard.add(currKid.getSem2());
+			dashboard.add(currKid.getCourses(1));
 			window.revalidate();
 			window.repaint();
 		} else if (e.getActionCommand().equals("Daily Attendance")) {
@@ -305,13 +329,28 @@ public class School implements ActionListener, FocusListener {
 			window.revalidate();
 			window.repaint();
 		}
+		else if(e.getActionCommand().equals("indstudatt")) {
+			currClass.indAtt(currKid.getStudentNumber());
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("indstudmark")) {
+			currClass.indStudentMarks(currKid.getStudentNumber());
+			window.revalidate();
+			window.repaint();
+		}
+		else if(e.getActionCommand().equals("studash")) {
+			currClass.goStuDash();
+			window.revalidate();
+			window.repaint();
+		}
+		
 
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static void initialize() throws SQLException { // initializes login selection and login interface
 		// Load JDBC driver
-
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -387,15 +426,18 @@ public class School implements ActionListener, FocusListener {
 														firsts, lasts, id);
 												String[] sch = populateArray(stu[j][4]);
 												for (int q = 0; q < sch.length; q++) {
-													if (currentclass.equals(sch[q])) {
-														ex.addClass(ourClass);
-
-													}
+													if(currentclass.equals(sch[q].toLowerCase()+"1")) {
+	                                                    ex.addClass(ourClass);
+	                                                }
+													
+													
 												}
+												
 												ourClass.addStudent(ex);
+												
 												if (studentsearch(students, ex.getFirstName()) == false) {
 													students.add(ex);
-													System.out.println(ex.getFirstName());
+													
 												}
 
 												Attend[] test = ourClass.getAttendance(ex);
@@ -405,10 +447,11 @@ public class School implements ActionListener, FocusListener {
 												test = presents(att, ltime, areason);
 
 												ourClass.setAttendance(test, ex);
+												ourClass.setMidterm(ex, Double.parseDouble(Marks[a][1]));
 												for (int z = 1; z < weights.length - 1; z++) {
 													if (weights[z][0] != null) {
 														ourClass.setGrade(ex, weights[z][0],
-																Double.parseDouble(Marks[a][z]));
+																Double.parseDouble(Marks[a][z+1]));
 													}
 												}
 											}
@@ -431,7 +474,6 @@ public class School implements ActionListener, FocusListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		FlatDarkLaf.setup();
 
 		window = new JFrame("General Student System");
@@ -642,7 +684,7 @@ public class School implements ActionListener, FocusListener {
 		}
 
 		for (int i = 0; i < students.size(); i++) {
-			System.out.println(students.get(i).getStudentNumber());
+			
 			if (students.get(i).getStudentNumber() == enterNum) {
 				return students.get(i);
 			}

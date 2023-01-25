@@ -76,6 +76,7 @@ public class Student {
 
 		JButton classes = new JButton("Classes");
 		classes.addActionListener(new School());
+		classes.setActionCommand("studclasses");
 
 		classes.setFont(new Font("Arial", 1, 40));
 		header.add(classes);
@@ -354,5 +355,8 @@ public class Student {
 		}
 		
 
+	}
+	public ClassCourse[] getClasses() {
+		return classes;
 	}
 }
