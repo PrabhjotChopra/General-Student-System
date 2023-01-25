@@ -126,7 +126,7 @@ public class Schedule {
 		} // end for loop for adding courses
 		
 		for(int i=0;i<students.size();i++) {
-			
+			// adding students
 		}
 		
 		

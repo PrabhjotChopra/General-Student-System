@@ -38,12 +38,12 @@ public class School implements ActionListener, FocusListener {
 	static final String URL = "jdbc:mysql://localhost:3306/finals";// DBMS connection URL
 	
 	static boolean teacher;
-	static boolean admin;
+	static boolean student;
 
 	static JButton tLogin;
 	static JButton aLogin;
 	static JButton submitTeacherLogin;
-	static JButton submitAdminLogin;
+	static JButton submitstudentLogin;
 
 	static JTextField ID;
 	static JTextField lastName;
@@ -51,14 +51,15 @@ public class School implements ActionListener, FocusListener {
 
 	static JPanel loginChoice;
 	static JPanel teacherLogin;
-	static JPanel adminLogin;
+	static JPanel studentLogin;
 	static JFrame window;
-	static String adminPass = "123tester"; // hardcoded since database isn't finished
+	
 	static JTextArea incorrect;
 	static JPanel dashboard;
 
 	static Teacher currProf;
 	static ClassCourse currClass;
+	static Student currKid;
 
 	public void addStudent(Student s) {
 		students.add(s);
@@ -68,29 +69,7 @@ public class School implements ActionListener, FocusListener {
 		students.remove(s);
 	}
 
-	public void addTeacher(Teacher t) {
-		teachers.add(t);
-	}
-
-	public void removeTeacher(Teacher t) {
-		teachers.remove(t);
-	}
-
-	public void addCourse(Course c) {
-		courseOfferings.add(c);
-	}
-
-	public void removeCourse(Course c) {
-		courseOfferings.remove(c);
-	}
-
-	public void addClass(ClassCourse c) {
-		currentClasses.add(c);
-	}
-
-	public void removeClass(ClassCourse c) {
-		currentClasses.remove(c);
-	}
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -121,7 +100,7 @@ public class School implements ActionListener, FocusListener {
 		} else if (e.getSource() == aLogin) {
 
 			window.remove(loginChoice);
-			window.add(adminLogin);
+			window.add(studentLogin);
 			window.revalidate();
 			window.repaint();
 		} else if (e.getSource() == submitTeacherLogin) { // edit to check login credentials
@@ -155,15 +134,36 @@ public class School implements ActionListener, FocusListener {
 			}
 			window.revalidate();
 			window.repaint();
-		} else if (e.getSource() == submitAdminLogin) {
-
-			if (password.getText().equals(adminPass)) {
-				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		} else if (e.getSource() == submitstudentLogin) {
+			
+			if (studentLogin() !=null) {
+				currKid = studentLogin();
 				
+				window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 				window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+				window.remove(studentLogin);
+				window.revalidate();
+				window.repaint();
+				student = true;
+				dashboard = new JPanel(null);
+
+				window.add(currKid.getHeader());
+
+				JButton b = currKid.getSem1();
+				b.setBackground(Color.decode("#42a1e1"));
+				dashboard.add(b);
+				dashboard.add(currKid.getSem2());
+				dashboard.add(currKid.getCourses(1));
+				window.add(dashboard);
+
+				window.revalidate();
+				window.repaint();
+				
+				
+				System.out.println("worked!!");
 			} else {
-				incorrect.setText("Password incorrect");
-				adminLogin.add(incorrect);
+				incorrect.setText("No student found");
+				studentLogin.add(incorrect);
 			}
 
 			window.revalidate();
@@ -176,7 +176,16 @@ public class School implements ActionListener, FocusListener {
 			currProf.switchSem(1);
 			window.revalidate();
 			window.repaint();
-		} else if (e.getActionCommand().equals("Close app")) {
+		} else if (e.getActionCommand().equals("studsem1")) {
+			currKid.switchSem(1);
+			window.revalidate();
+			window.repaint();
+		} else if (e.getActionCommand().equals("studsem2")) {
+			currKid.switchSem(2);
+			window.revalidate();
+			window.repaint();
+		}
+		else if (e.getActionCommand().equals("Close app")) {
 			System.exit(0);
 		} else if (e.getActionCommand().equals("Classes")) {
 
@@ -303,6 +312,7 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void initialize() throws SQLException { // initializes login selection and login interface
 		FlatDarkLaf.setup();
 
@@ -319,7 +329,7 @@ public class School implements ActionListener, FocusListener {
 		loginChoice.setLayout(new GridLayout(2, 1));
 
 		tLogin = new JButton("Click here for the teacher login");
-		aLogin = new JButton("Click here for the administrator login");
+		aLogin = new JButton("Click here for the student login");
 		tLogin.setFont(new Font("Serif", Font.PLAIN, 20));
 		aLogin.setFont(new Font("Serif", Font.PLAIN, 20));
 
@@ -366,20 +376,21 @@ public class School implements ActionListener, FocusListener {
 		submitTeacherLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		teacherLogin.add(Box.createRigidArea(new Dimension(0, 20)));
 
-		JTextArea pass = new JTextArea("Enter the school-assigned password to login");
+		JTextField pass = new JTextField("Enter your student number to login");
 		pass.setEditable(false);
-		adminLogin = new JPanel();
-		adminLogin.setLayout(new BoxLayout(adminLogin, BoxLayout.PAGE_AXIS));
+		
+		studentLogin = new JPanel();
+		studentLogin.setLayout(new BoxLayout(studentLogin, BoxLayout.PAGE_AXIS));
 
-		pass.setFont(new Font("Serif", Font.PLAIN, 26));
+		pass.setFont(new Font("Serif", Font.PLAIN, 34));
 		pass.setMaximumSize(new Dimension(500, 50));
 
-		submitAdminLogin = new JButton("Submit administrator login");
-		submitAdminLogin.addActionListener(new School());
-		submitAdminLogin.setMaximumSize(new Dimension(250, 50));
-		submitAdminLogin.setFont(new Font("Arial", Font.PLAIN, 18));
+		submitstudentLogin = new JButton("Submit student login");
+		submitstudentLogin.addActionListener(new School());
+		submitstudentLogin.setMaximumSize(new Dimension(250, 50));
+		submitstudentLogin.setFont(new Font("Arial", Font.PLAIN, 18));
 
-		password = new JTextField("Enter the password here");
+		password = new JTextField("Enter your student number here");
 		password.addFocusListener(new School());
 		password.setMaximumSize(new Dimension(250, 30));
 		password.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -389,134 +400,146 @@ public class School implements ActionListener, FocusListener {
 		incorrect.setAlignmentX(Component.CENTER_ALIGNMENT);
 		incorrect.setMaximumSize(new Dimension(250, 30));
 
-		adminLogin.add(pass);
-		adminLogin.add(Box.createRigidArea(new Dimension(0, 10)));
-		adminLogin.add(password);
-		adminLogin.add(Box.createRigidArea(new Dimension(0, 10)));
-		adminLogin.add(submitAdminLogin);
-		submitAdminLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
-		adminLogin.add(Box.createRigidArea(new Dimension(0, 20)));
+		studentLogin.add(pass);
+		studentLogin.add(Box.createRigidArea(new Dimension(0, 20)));
+		studentLogin.add(password);
+		studentLogin.add(Box.createRigidArea(new Dimension(0, 10)));
+		studentLogin.add(submitstudentLogin);
+		submitstudentLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
+		studentLogin.add(Box.createRigidArea(new Dimension(0, 20)));
 		
 		
 
 		// Load JDBC driver
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
+				try {
+					Class.forName("com.mysql.cj.jdbc.Driver");
 
-			// Connect to SQL Server
-			Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+					// Connect to SQL Server
+					Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
-			// Download table data into 2D array
-			String[] newclass = { "student_id", "Attendance", "Late", "Absent_reason" };
-			String[] clweights = { "Assginment_name", "Weight_factor" };
-			// adding teachers
-			Teacher teac = null;
-			Course cor = null;
-			ClassCourse ourClass = null;
-			String currentclass = null;
-			String[][] coursez = connectioncheck.downloadTable("course", con);
-			String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
-			String[][] running = connectioncheck.downloadTable("running_course", con);
-			String[][] stu = connectioncheck.downloadTable("students", con);
-			String[][] attendance = null;
-			String[][] Marks;
-			String[][] weights;
+					// Download table data into 2D array
+					
+					// adding teachers
+					Teacher teac = null;
+					Course cor = null;
+					ClassCourse ourClass = null;
+					String currentclass = null;
+					String[][] coursez = connectioncheck.downloadTable("course", con);
+					String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
+					String[][] running = connectioncheck.downloadTable("running_course", con);
+					String[][] stu = connectioncheck.downloadTable("students", con);
+					String[][] attendance = null;
+					String[][] Marks;
+					String[][] weights;
 
-			for (int l = 1; l < teacherinfo.length; l++) {
-				if (teacherinfo[l][1] != null) {
-					String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
-					String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
-					int teacher_id = Integer.parseInt((teacherinfo[l][0]));
-					LinkedList teachables = populateList(teacherinfo[l][2]);
-					teac = (new Teacher(first, last, teacher_id, teachables));
-					for (int i = 1; i < running.length; i++) {
-						if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
-							currentclass = null;
-							if (running[i][1] != null) {
-								currentclass = running[i][0].toLowerCase();
-								attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
-								Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
-								weights = connectioncheck.downloadTable(currentclass + "_weights", con);
+					for (int l = 1; l < teacherinfo.length; l++) {
+						if (teacherinfo[l][1] != null) {
+							String first = teacherinfo[l][1].substring(0, teacherinfo[l][1].indexOf(" "));
+							String last = teacherinfo[l][1].substring(teacherinfo[l][1].indexOf(" ") + 1);
+							int teacher_id = Integer.parseInt((teacherinfo[l][0]));
+							LinkedList teachables = populateList(teacherinfo[l][2]);
+							teac = (new Teacher(first, last, teacher_id, teachables));
+							for (int i = 1; i < running.length; i++) {
+								if (running[i][1] != null && Integer.parseInt(running[i][1]) == (teac.getID())) {
+									currentclass = null;
+									if (running[i][1] != null) {
+										currentclass = running[i][0].toLowerCase();
+										attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
+										Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
+										weights = connectioncheck.downloadTable(currentclass + "_weights", con);
 
-								for (int k = 1; k < coursez.length; k++) {
-									if (coursez[k][0] != null) {
-										String Course_id = coursez[k][0];
-										String coursename = coursez[k][1];
-										String dpt = coursez[k][2];
-										int pri = Integer.parseInt(coursez[k][3]);
-										LinkedList rms = populateList(coursez[k][4]);
-										cor = new Course(coursename, Course_id + "1", dpt, rms, pri, 30, 1, 15);
-										courseOfferings.add(cor);
-									}
+										for (int k = 1; k < coursez.length; k++) {
+											if (coursez[k][0] != null) {
+												String Course_id = coursez[k][0];
+												String coursename = coursez[k][1];
+												String dpt = coursez[k][2];
+												int pri = Integer.parseInt(coursez[k][3]);
+												LinkedList rms = populateList(coursez[k][4]);
+												cor = new Course(coursename, Course_id + "1", dpt, rms, pri, 30, 1, 15);
+												courseOfferings.add(cor);
+											}
 
-									if (currentclass != null && coursez[k][1] != null
-											&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
-										ourClass = new ClassCourse(1, teac, running[1][2],
-												Integer.parseInt(running[1][3]), cor);
-									}
-								}
-								
-								for (int z = 1; z<weights.length-1; z++) {
-									
-									if (weights[z][0]!=null) {
-
-									ourClass.addAssessment(weights[z][0], Double.parseDouble(weights[z][1]), Integer.parseInt(weights[z][2]));
-									//ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
-								}
-								}	
-								
-								for (int a = 1; a < attendance.length; a++) {
-
-									for (int j = 1; j < stu.length; j++) {
-
-										if (stu[j][1] != null) {
-											if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
-												int id = Integer.parseInt(stu[j][0]);
-												String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
-												String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
-												int grade = Integer.parseInt(stu[j][2]);
-												Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
-														firsts, lasts, id);
-												ourClass.addStudent(ex);
-												Attend[] test = ourClass.getAttendance(ex);
-												
-													String[] att = populateArray(attendance[a][1]);
-													String[] ltime = populateArray(attendance[a][2]);
-													String[] areason = populateArray(attendance[a][3]);
-													test = presents(att, ltime, areason);
-												
-												ourClass.setAttendance(test, ex);
-												for (int z = 1; z<weights.length; z++) {
-													
-													if (weights[z][0]!=null) {
-														//System.out.println(weights[z][0]);
-														ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
-													}
-												}	
+											if (currentclass != null && coursez[k][1] != null
+													&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
+												ourClass = new ClassCourse(1, teac, running[1][2],
+														Integer.parseInt(running[1][3]), cor);
 											}
 										}
-									}		
+
+										for (int z = 1; z < weights.length - 1; z++) {
+
+											if (weights[z][0] != null) {
+
+												ourClass.addAssessment(weights[z][0], Double.parseDouble(weights[z][1]),
+														Integer.parseInt(weights[z][2]));
+												// ourClass.setGrade(ex,weights[z][0], Double.parseDouble(Marks[a][z]) );
+											}
+										}
 									
+										for (int j = 1; j < stu.length; j++) {
+										for (int a = 1; a < attendance.length; a++) {
+												if (stu[j][1] != null) {
+													if (attendance[a][0] != null && attendance[a][0].equals(stu[j][0])) {
+														int id = Integer.parseInt(stu[j][0]);
+														String firsts = stu[j][1].substring(0, stu[j][1].indexOf(" ") + 1);
+														String lasts = stu[j][1].substring(stu[j][1].indexOf(" ") + 1);
+														int grade = Integer.parseInt(stu[j][2]);
+														Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
+																firsts, lasts, id);
+														ourClass.addStudent(ex);
+														Attend[] test = ourClass.getAttendance(ex);
+
+														String[] att = populateArray(attendance[a][1]);
+														String[] ltime = populateArray(attendance[a][2]);
+														String[] areason = populateArray(attendance[a][3]);
+														test = presents(att, ltime, areason);
+
+														ourClass.setAttendance(test, ex);
+														for (int z = 1; z < weights.length - 1; z++) {
+															if (weights[z][0] != null) {
+																ourClass.setGrade(ex, weights[z][0],
+																		Double.parseDouble(Marks[a][z]));
+															}
+														}
+													}
+												}
+												
+											}
+											
+										}
+										currentClasses.add(ourClass);
+										teac.addClass(ourClass, 2);
+										teachers.add(teac);
+									}
 								}
-								
-								
-								teac.addClass(ourClass, 2);
-								teachers.add(teac);
 							}
+
 						}
 					}
+					for (int s = 0; s<stu.length; s++) {
+						try {
+						int id = Integer.parseInt(stu[s][0]);
+						String firsts = stu[s][1].substring(0, stu[s][1].indexOf(" ") + 1);
+						String lasts = stu[s][1].substring(stu[s][1].indexOf(" ") + 1);
+						int grade = Integer.parseInt(stu[s][2]);
+						Student ex = new Student(new Hashtable<Course, Boolean>(), grade,
+								firsts, lasts, id);
+						ourClass.addStudent(ex);
+						students.add(ex);
+						}
+						catch(NumberFormatException e) {
+							continue;
+						}
 
+					}
+					con.close();
+
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+
 			}
-			con.close();
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-	}
 
 	public void focusGained(FocusEvent e) {
 
@@ -550,7 +573,7 @@ public class School implements ActionListener, FocusListener {
 		if (ID.getText().equals("Enter your 5-digit teacher ID here") && e.getComponent() == ID) {
 			ID.setText("");
 		}
-		if (password.getText().equals("Enter the password here") && e.getComponent() == password) {
+		if (password.getText().equals("Enter your student number here") && e.getComponent() == password) {
 			password.setText("");
 		}
 
@@ -584,7 +607,7 @@ public class School implements ActionListener, FocusListener {
 			ID.setText("Enter your 5-digit teacher ID here");
 		}
 		if (password.getText().equals("") && e.getComponent() == password) {
-			password.setText("Enter the password here");
+			password.setText("Enter your student number here");
 		}
 
 	}
@@ -609,6 +632,28 @@ public class School implements ActionListener, FocusListener {
 
 		return null;
 
+	}
+	public Student studentLogin() {
+		
+		if(students.isEmpty()) {
+			return null;
+		}
+		int enterNum;
+		try {
+			enterNum = Integer.parseInt(password.getText().strip());
+		}
+		catch(NumberFormatException e) {
+			return null;
+		}
+		
+		for(int i=0;i<students.size();i++) {
+			System.out.println(students.get(i).getStudentNumber());
+			if (students.get(i).getStudentNumber() == enterNum) {
+				return students.get(i);
+			}
+		}
+		return null;
+		
 	}
 
 	public static LinkedList<String> populateList(String input) {
@@ -686,10 +731,6 @@ public class School implements ActionListener, FocusListener {
     }
 
 		public static void main(String[] args) throws SQLException {
-			// test data
-
-			
 			initialize();
-
 		}
-	}
+}

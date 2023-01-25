@@ -33,6 +33,12 @@ public class Student {
 	private JButton studentAttB;
 	private JButton studentMarkB;
 	
+	
+	private JPanel header;
+	private JButton sem1;
+	private JButton sem2;
+	private JPanel courses;
+	
 	public Student() {}
 	public Student(Hashtable<Course, Boolean> requests, int grade, String first, String last, int id) {
 		courseReqs = requests;
@@ -41,15 +47,58 @@ public class Student {
 		lastName = last;
 		studentNumber = id;
 		FlatDarkLaf.setup();
+		
+		
+		sem1 = new JButton("Semester 1");
+		sem1.setBounds(100, 180, 200, 75);
+		sem1.setFont(School.buttonFont);
+		sem1.addActionListener(new School());
+		sem1.setActionCommand("studsem1");
+		
+		sem2 = new JButton("Semester 2");
+		sem2.setBounds(500, 160, 200, 75);
+		sem2.setFont(School.buttonFont);
+		sem2.addActionListener(new School());
+		sem2.setActionCommand("studsem2");
+		
+		header = new JPanel();
+		header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
 
+		header.setBounds(100, 0, School.rect.width - 200, 150);
+		header.setBorder(BorderFactory.createLineBorder(Color.black));
+
+		JTextArea welcome = new JTextArea("Welcome, " + firstName +  lastName);
+
+		welcome.setFont(new Font("Arial", 1, 50));
+		header.add(welcome);
+		welcome.setAlignmentX(0);
+		welcome.setEditable(false);
+
+		JButton classes = new JButton("Classes");
+		classes.addActionListener(new School());
+
+		classes.setFont(new Font("Arial", 1, 40));
+		header.add(classes);
+		classes.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		header.add(Box.createRigidArea(new Dimension(20, 0)));
+
+		JButton exit = new JButton("Close app");
+		exit.addActionListener(new School());
+
+		exit.setFont(new Font("Arial", 1, 40));
+		header.add(exit);
+		exit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+		courses = new JPanel();
+		courses.setLayout(new BoxLayout(courses, BoxLayout.Y_AXIS));
+		courses.setBounds(100, 255, School.rect.width - 200, School.rect.height - 355);
+		courses.setBorder(BorderFactory.createLineBorder(Color.black));
+
+		
 		daily = new JPanel();
 
 		daily.setLayout(new BoxLayout(daily, BoxLayout.X_AXIS));
 		daily.setSize(School.rect.width - 200, 20);
-
-		
-		
-		
 		
 		present = new JButton("Present");
 		present.setFont(studentStandard);
@@ -247,5 +296,63 @@ public class Student {
 			}
 		}
 		return false;
+	}
+	public JPanel getHeader() {
+		return header;
+	}
+
+	public JButton getSem1() {
+		return sem1;
+	}
+
+	public JButton getSem2() {
+		return sem2;
+	}
+	public JPanel getCourses(int sem) {
+		sem--;
+		sem *= 4;
+		for (int i = sem; i < sem + 4; i++) {
+			if (classes[i] != null) {
+				courses.add(classes[i].getBaseDisplay());
+			}
+
+		}
+		return courses;
+	}
+	public void switchSem(int sem) {
+		if (sem == 1 && sem2.getY() - sem1.getY() == 20) {
+			sem1.setLocation(sem1.getX(), sem1.getY() + 20);
+			sem2.setLocation(sem2.getX(), sem2.getY() - 20);
+
+			courses.removeAll();
+			for (int i = 0; i < 4; i++) {
+				if (classes[i] != null) {
+					courses.add(classes[i].getBaseDisplay());
+				}
+
+			}
+			sem1.setBackground(Color.decode("#42a1e1"));
+			sem2.setBackground(null);
+			courses.revalidate();
+			courses.repaint();
+			
+
+		} else if (sem == 2 && sem1.getY() - sem2.getY() == 20) {
+			sem1.setLocation(sem1.getX(), sem1.getY() - 20);
+			sem2.setLocation(sem2.getX(), sem2.getY() + 20);
+			courses.removeAll();
+			for (int i = 4; i < 8; i++) {
+				if (classes[i] != null) {
+					courses.add(classes[i].getBaseDisplay());
+				}
+
+			}
+			sem2.setBackground(Color.decode("#42a1e1"));
+			sem1.setBackground(null);
+			courses.revalidate();
+			courses.repaint();
+		}
+		
+
 	}
 }

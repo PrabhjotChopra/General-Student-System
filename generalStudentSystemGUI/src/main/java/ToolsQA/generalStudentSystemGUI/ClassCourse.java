@@ -1438,7 +1438,7 @@ public class ClassCourse extends Course {
 			absents = (int) Math.round(((double) absents / (courseDay + 1)) * 100); // percent of days absent
 
 			JTextArea latePercent = new JTextArea("late " + String.valueOf(lates) + "% of days so far\t");
-			latePercent.setEditable(false);
+			latePercent.setEditable(false);	
 			latePercent.setFont(Student.studentStandard);
 			JTextArea abPercent = new JTextArea("absent " + String.valueOf(absents) + "% of days so far\t");
 			abPercent.setEditable(false);
