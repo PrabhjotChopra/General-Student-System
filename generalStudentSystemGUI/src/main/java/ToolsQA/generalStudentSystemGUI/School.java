@@ -225,7 +225,7 @@ public class School implements ActionListener, FocusListener {
 		                String[] att = null;
 		                String[] ltime = null;
 		                String[] areason= null;
-		                attendance = connectioncheck.downloadTable("attendance_" + currClass.getCode().toLowerCase(), con);
+		                attendance = connectioncheck.downloadTableAtt("attendance_" + currClass.getCode().toLowerCase(), con);
 		                
 		                for (int x = 1; x < currClass.getStudents().size(); x++) {
 		                    ex = currClass.getStudents().get(x-1);
@@ -237,13 +237,45 @@ public class School implements ActionListener, FocusListener {
 		                    attendance[x][1]=arrayToString(att);
 		                    attendance[x][2]=arrayToString(ltime);
 		                    attendance[x][3]=arrayToString(areason);
-		                    if(ex.getFirstName().equals("Isa")) {
-		                    	System.out.println(attendance[x][3]);
-		                    }
+		                   
 		                }
 		                
 		                connectioncheck.uploadArray(attendance,con,"attendance_" + currClass.getCode().toLowerCase());
 
+		                //updating marks
+		                
+		                
+		                
+		                Marks = new String[currClass.getStudents().size()+1][currClass.getassignments().size()+2];
+		                Marks[0][0] = "Student_Id";
+		                Marks[0][1] = "Midterm";
+		                
+		                
+		                for(int i=2;i<currClass.getassignments().size()+2;i++) {
+		                	Marks[0][i] = currClass.getassignments().get(i-2).getName();
+		                }
+		                connectioncheck.printArray(Marks);
+
+		                
+		                for (int x = 1; x < currClass.getStudents().size()+1; x++) {
+		                    ex = currClass.getStudents().get(x-1);
+		                    Marks[x][0] = String.valueOf(ex.getStudentNumber());
+		                    Marks[x][1] = String.valueOf(currClass.getmideterms().get(ex));
+		                    for(int j = 0; j<currClass.getassignments().size(); j++) {
+		                    	Marks[x][2+j] = String.valueOf(currClass.getgrades().get(currClass.getassignments().get(j)).get(ex));
+
+		                    }
+		                    
+		                }
+		         
+		                connectioncheck.uploadArray(Marks,con, currClass.getCode().toLowerCase()+"_marks");
+		           
+
+		                
+		                
+		                
+		                
+		                
 
 		            } catch (ClassNotFoundException |
 
@@ -425,7 +457,7 @@ public class School implements ActionListener, FocusListener {
 			String[][] coursez = connectioncheck.downloadTable("course", con);
 			String[][] teacherinfo = connectioncheck.downloadTable("teachers", con);
 			String[][] running = connectioncheck.downloadTable("running_course", con);
-			String[][] stu = connectioncheck.downloadTable("students", con);
+			String[][] stu = connectioncheck.downloadTableAtt("students", con);
 			String[][] attendance = null;
 			String[][] Marks;
 			String[][] weights;
@@ -443,9 +475,11 @@ public class School implements ActionListener, FocusListener {
 							if (running[i][1] != null) {
 								// Downloading the attendance, marks and weights of the current class.
 								currentclass = running[i][0].toLowerCase();
-								attendance = connectioncheck.downloadTable("attendance_" + currentclass, con);
-								Marks = connectioncheck.downloadTable(currentclass + "_marks", con);
+								attendance = connectioncheck.downloadTableAtt("attendance_" + currentclass, con);
+								Marks = connectioncheck.downloadTableAtt(currentclass + "_marks", con);
+								connectioncheck.printArray(Marks);
 								weights = connectioncheck.downloadTable(currentclass + "_weights", con);
+								connectioncheck.printArray(weights);
 
 								// Creating a new course object and adding it to the courseOfferings list.
 								for (int k = 1; k < coursez.length; k++) {
@@ -459,7 +493,8 @@ public class School implements ActionListener, FocusListener {
 										courseOfferings.add(cor);
 									}
 
-									// Checking if the current class is not null and if the coursez[k][1] is not null and if the
+									// Checking if the current class is not null and if the coursez[k][1] is not
+									// null and if the
 									// coursez[k][0] is equal to the current class.
 									if (currentclass != null && coursez[k][1] != null
 											&& coursez[k][0].toLowerCase().equals(currentclass.substring(0, 5))) {
@@ -492,21 +527,21 @@ public class School implements ActionListener, FocusListener {
 														firsts, lasts, id);
 												String[] sch = populateArray(stu[j][4]);
 												for (int q = 0; q < sch.length; q++) {
-													if(currentclass.equals(sch[q].toLowerCase()+"1")) {
-	                                                    ex.addClass(ourClass);
-	                                                }
-													
-													
-												}
-												
-												ourClass.addStudent(ex);
-												
-												if (studentsearch(students, ex.getFirstName()) == false) {
-													students.add(ex);
-													
+													if (currentclass.equals(sch[q].toLowerCase() + "1")) {
+														ex.addClass(ourClass);
+													}
+
 												}
 
-											// Populating the attendance array with the attendance data from the excel file.
+												ourClass.addStudent(ex);
+
+												if (studentsearch(students, ex.getFirstName()) == false) {
+													students.add(ex);
+
+												}
+
+												// Populating the attendance array with the attendance data from the
+												// excel file.
 												Attend[] test = ourClass.getAttendance(ex);
 												String[] att = populateArray(attendance[a][1]);
 												String[] ltime = populateArray(attendance[a][2]);
@@ -518,7 +553,7 @@ public class School implements ActionListener, FocusListener {
 												for (int z = 1; z < weights.length - 1; z++) {
 													if (weights[z][0] != null) {
 														ourClass.setGrade(ex, weights[z][0],
-																Double.parseDouble(Marks[a][z+1]));
+																Double.parseDouble(Marks[a][z + 1]));
 													}
 												}
 											}
@@ -541,11 +576,9 @@ public class School implements ActionListener, FocusListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
-		
-		// initializing base non-specific gui components (all of the non-full-screen ones)
+
+		// initializing base non-specific gui components (all of the non-full-screen
+		// ones)
 		FlatDarkLaf.setup();
 
 		window = new JFrame("General Student System");
@@ -642,11 +675,11 @@ public class School implements ActionListener, FocusListener {
 	}
 
 	/**
-	 * This function takes a linked list of students and a name and returns true if the name is in the
-	 * list and false otherwise
+	 * This function takes a linked list of students and a name and returns true if
+	 * the name is in the list and false otherwise
 	 * 
 	 * @param students LinkedList of Student objects
-	 * @param name The name of the student you want to search for.
+	 * @param name     The name of the student you want to search for.
 	 * @return A boolean value.
 	 */
 	public static boolean studentsearch(LinkedList<Student> students, String name) {
@@ -752,8 +785,9 @@ public class School implements ActionListener, FocusListener {
 	}
 
 	/**
-	 * It checks if the student number entered by the user matches any of the student numbers in the
-	 * arraylist. If it does, it returns the student object. If it doesn't, it returns null
+	 * It checks if the student number entered by the user matches any of the
+	 * student numbers in the arraylist. If it does, it returns the student object.
+	 * If it doesn't, it returns null
 	 * 
 	 * @return The student object is being returned.
 	 */
@@ -770,7 +804,7 @@ public class School implements ActionListener, FocusListener {
 		}
 
 		for (int i = 0; i < students.size(); i++) {
-			
+
 			if (students.get(i).getStudentNumber() == enterNum) {
 				return students.get(i);
 			}
@@ -779,12 +813,13 @@ public class School implements ActionListener, FocusListener {
 
 	}
 
-/**
- * It takes a string, splits it into words, and returns a linked list of those words
- * 
- * @param input The string to be converted to a LinkedList
- * @return A LinkedList of Strings
- */
+	/**
+	 * It takes a string, splits it into words, and returns a linked list of those
+	 * words
+	 * 
+	 * @param input The string to be converted to a LinkedList
+	 * @return A LinkedList of Strings
+	 */
 	public static LinkedList<String> populateList(String input) {
 		LinkedList<String> list = new LinkedList<>();
 		String[] words = input.split(" ");
@@ -794,75 +829,79 @@ public class School implements ActionListener, FocusListener {
 		return list;
 	}
 
-/**
- * It takes a string, splits it into an array of strings, and returns the array
- * 
- * @param input The string to be split.
- * @return The method is returning an array of strings.
- */
+	/**
+	 * It takes a string, splits it into an array of strings, and returns the array
+	 * 
+	 * @param input The string to be split.
+	 * @return The method is returning an array of strings.
+	 */
 	public static String[] populateArray(String input) {
 		return input.split(" ");
 	}
+
 	public static String[][] removecols(String[][] array) {
-	    // Get number of non-null columns
-	    int columnCount = 0;
-	    for (int i = 0; i < array[0].length; i++) {
-	        boolean isNonNull = false;
-	        for (int j = 0; j < array.length; j++) {
-	            if (array[j][i] != null) {
-	                isNonNull = true;
-	                break;
-	            }
-	        }
-	        if (isNonNull) {
-	            columnCount++;
-	        }
-	    }
-
-	    // Create new array with the appropriate size
-	    String[][] newArray = new String[array.length][columnCount];
-
-	    // Copy non-null values to new array
-	    int newCol = 0;
-	    for (int oldCol = 0; oldCol < array[0].length; oldCol++) {
-	        boolean isNonNull = false;
-	        for (int row = 0; row < array.length; row++) {
-	            if (array[row][oldCol] != null) {
-	                isNonNull = true;
-	                break;
-	            }
-	        }
-	        if (isNonNull) {
-	            for (int row = 0; row < array.length; row++) {
-	                newArray[row][newCol] = array[row][oldCol];
-	            }
-	            newCol++;
-	        }
-	    }
-	    return newArray;
-	}
-	public static String[] compareAndReturnMissing(LinkedList<Assessment> list2, String[] array) {
-		  LinkedList<String> list = null;
-		  for (int i=0; i<list2.size();i++) {
-			 list.add(list2.get(i).getName());
-		  }
-			ArrayList<String> missing = new ArrayList<>();
-		    for (String s : array) {
-		        if (!list.contains(s)) {
-		            missing.add(s);
-		        }
-		    }
-		    return missing.toArray(new String[missing.size()]);
+		// Get number of non-null columns
+		int columnCount = 0;
+		for (int i = 0; i < array[0].length; i++) {
+			boolean isNonNull = false;
+			for (int j = 0; j < array.length; j++) {
+				if (array[j][i] != null) {
+					isNonNull = true;
+					break;
+				}
+			}
+			if (isNonNull) {
+				columnCount++;
+			}
 		}
 
-/**
- * It takes in three arrays of strings, and returns an array of Attend objects
- * 
- * @param in an array of strings that represent the attendance status of each day of the month.
- * @param late an array of strings that contains the number of minutes late for each student
- * @param abreason String[]
- * @return An array of Attend objects
- */
+		// Create new array with the appropriate size
+		String[][] newArray = new String[array.length][columnCount];
+
+		// Copy non-null values to new array
+		int newCol = 0;
+		for (int oldCol = 0; oldCol < array[0].length; oldCol++) {
+			boolean isNonNull = false;
+			for (int row = 0; row < array.length; row++) {
+				if (array[row][oldCol] != null) {
+					isNonNull = true;
+					break;
+				}
+			}
+			if (isNonNull) {
+				for (int row = 0; row < array.length; row++) {
+					newArray[row][newCol] = array[row][oldCol];
+				}
+				newCol++;
+			}
+		}
+		return newArray;
+	}
+
+	public static String[] compareAndReturnMissing(LinkedList<Assessment> list2, String[] array) {
+		LinkedList<String> list = null;
+		for (int i = 0; i < list2.size(); i++) {
+			list.add(list2.get(i).getName());
+		}
+		ArrayList<String> missing = new ArrayList<>();
+		for (String s : array) {
+			if (!list.contains(s)) {
+				missing.add(s);
+			}
+		}
+		return missing.toArray(new String[missing.size()]);
+	}
+
+	/**
+	 * It takes in three arrays of strings, and returns an array of Attend objects
+	 * 
+	 * @param in       an array of strings that represent the attendance status of
+	 *                 each day of the month.
+	 * @param late     an array of strings that contains the number of minutes late
+	 *                 for each student
+	 * @param abreason String[]
+	 * @return An array of Attend objects
+	 */
 	public static Attend[] presents(String[] in, String[] late, String[] abreason) {
 		boolean present = false;
 		boolean late2 = false;
@@ -874,7 +913,7 @@ public class School implements ActionListener, FocusListener {
 		for (int i = 0; i < in.length; i++) {
 			present = false;
 			late2 = false;
-			if (in[i].equals("0")|| in[i].equals("")) {
+			if (in[i].equals("0") || in[i].equals("")) {
 				present = true;
 				late2 = false;
 				att[i] = new Attend(present, late2, minutesLate, reason);
@@ -923,6 +962,7 @@ public class School implements ActionListener, FocusListener {
 		return att;
 
 	}
+
 	public static String[] resize(String[] arr) {
 		int newSize = 0;
 		for (int i = 0; i < arr.length; i++) {
@@ -944,7 +984,7 @@ public class School implements ActionListener, FocusListener {
 	public static String[] attendToatt(Attend[] attend) {
 		String[] result = new String[attend.length];
 		for (int i = 0; i < attend.length; i++) {
-			if(attend[i] == null) {
+			if (attend[i] == null) {
 				continue;
 			}
 			if (attend[i].getPresent() && !attend[i].getLate()) {
@@ -961,7 +1001,7 @@ public class School implements ActionListener, FocusListener {
 	public static String[] attendTolatet(Attend[] attend) {
 		String[] latetime = new String[attend.length];
 		for (int i = 0; i < attend.length; i++) {
-			if(attend[i] == null) {
+			if (attend[i] == null) {
 				continue;
 			}
 			if (attend[i].getPresent() && !attend[i].getLate()) {
@@ -977,7 +1017,7 @@ public class School implements ActionListener, FocusListener {
 		String[] areason = new String[attend.length];
 		String re;
 		for (int i = 0; i < attend.length; i++) {
-			if(attend[i] == null) {
+			if (attend[i] == null) {
 				continue;
 			}
 			if (attend[i].getPresent() && !attend[i].getLate()) {
@@ -986,35 +1026,35 @@ public class School implements ActionListener, FocusListener {
 
 			} else {
 				re = attend[i].getReason();
-				
-					switch (re) {
-					case "Illness or injury":
-						areason[i] = "1";
-						break;
-					case "Appointment":
-						areason[i] = "2";
-						break;
-					case "Religious day":
-						areason[i] = "3";
-						break;
-					case "Bereavement":
-						areason[i] = "4";
-						break;
-					case "School transportation cancellation":
-						areason[i] = "5";
-						break;
-					case "Parent-approved absence":
-						areason[i] = "6";
-						break;
-						
-					case "Not approved by parent":
-						areason[i] = "0";
-					default:
-						break;
-					
+
+				switch (re) {
+				case "Illness or injury":
+					areason[i] = "1";
+					break;
+				case "Appointment":
+					areason[i] = "2";
+					break;
+				case "Religious day":
+					areason[i] = "3";
+					break;
+				case "Bereavement":
+					areason[i] = "4";
+					break;
+				case "School transportation cancellation":
+					areason[i] = "5";
+					break;
+				case "Parent-approved absence":
+					areason[i] = "6";
+					break;
+
+				case "Not approved by parent":
+					areason[i] = "0";
+				default:
+					break;
+
+				}
 			}
 		}
-	}
 		return areason;
 	}
 
@@ -1029,4 +1069,5 @@ public class School implements ActionListener, FocusListener {
 	public static void main(String[] args) throws SQLException {
 		initialize();
 	}
+
 }

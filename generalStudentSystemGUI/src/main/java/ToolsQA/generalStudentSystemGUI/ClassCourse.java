@@ -400,7 +400,8 @@ public class ClassCourse extends Course {
 
 	// The below code is creating a GUI for the teacher to view the marks of the students.
 	public void studentMarks() {
-		sortKids();
+
+
 
 		tab.removeAll();
 
@@ -725,7 +726,7 @@ public class ClassCourse extends Course {
 
 			}
 		}
-		System.out.println(nameid);
+		
 
 		tab.removeAll();
 
@@ -927,7 +928,7 @@ public class ClassCourse extends Course {
 	}
 
 	public void assMarks() {
-		sortKids();
+		
 
 		tab.removeAll();
 
@@ -1496,7 +1497,7 @@ public class ClassCourse extends Course {
 
 	// method for daily attendance screen
 	public JPanel addDailys() {
-		sortKids();
+		
 		dayChoice.setActionCommand("Day Choice");
 		subAtt.setEnabled(true);
 		tab.removeAll();
@@ -1538,7 +1539,7 @@ public class ClassCourse extends Course {
 	public JPanel overallAtt() {
 
 		subAtt.setEnabled(false);
-		sortKids();
+		
 
 		tab.removeAll();
 
@@ -2004,7 +2005,7 @@ public class ClassCourse extends Course {
 		School.dashboard.add(marks);
 		School.dashboard.add(subAtt);
 
-		sortKids();
+		
 		changeAttDay(4);
 		tab.removeAll();
 		tab.setLayout(new GridLayout(1, 2));
@@ -2232,44 +2233,7 @@ public class ClassCourse extends Course {
 
 	}
 
-	/**
-	 * Method Name: selectionSort
-	 * 
-	 * @Author Rajat Mishra, Prabhjot Chopra
-	 * @Date 09/01/2022
-	 * @Modified 01/05/2023
-	 * @Description java implementation of selection sort for string linked lists
-	 * @Parameters LinkedList<String> to be sorted
-	 * @Returns time in milliseconds to sort the array Dependencies: N/A
-	 * @Throws N/A
-	 */
-	public void sortKids() {
-
-		int n = students.size();
-		
-		// One by one move boundary of unsorted subarray
-		for (int i = 0; i < n - 1; i++) {
-			// Find the minimum element in unsorted array
-			int min_idx = i;
-			for (int j = i + 1; j < n; j++)
-				if (students.get(j).getLastName().compareTo(students.get(min_idx).getLastName()) < 0)
-					min_idx = j;
-
-				else if (students.get(j).getLastName().compareTo(students.get(min_idx).getLastName()) == 0) {
-					if (students.get(j).getFirstName().compareTo(students.get(min_idx).getFirstName()) < 0) {
-						min_idx = j;
-					}
-
-				}
-
-			// Swap the found minimum element with the first
-			// element
-			Student temp = students.get(min_idx);
-			students.set(min_idx, students.get(i));
-			students.set(i, temp);
-		}
-
-	}
+	
 
 	public int getPeriod() {
 		return period;
@@ -2343,7 +2307,7 @@ public class ClassCourse extends Course {
 		}
 		attendance.replace(s, temp);
 	}
-	public void setMidterm(Student s, double mark) {
+	public void setMidterm(Student s, double mark) {	
 		midterms.replace(s, mark);
 	}
 
